@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="SDL_Game" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="MicroEngine_Test">
+				<Option output="bin/Debug/MicroEngine_Test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="MicroUI_Test">
+				<Option output="bin/Debug/MicroUI_Test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add directory="SDL2_Mingw32/include" />
+		</Compiler>
+		<Linker>
+			<Add option="-lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf" />
+			<Add directory="SDL2_Mingw32/lib" />
+		</Linker>
+		<Unit filename="include/MicroEngine/ME_AssetHandler.h" />
+		<Unit filename="include/MicroEngine/ME_Camer2D.h" />
+		<Unit filename="include/MicroEngine/ME_GameObject.h" />
+		<Unit filename="include/MicroEngine/ME_Vector2D.h" />
+		<Unit filename="include/MicroEngine/MicroEngine.h" />
+		<Unit filename="include/MicroPhysics/MicroPhysics.h" />
+		<Unit filename="include/MicroUI/MUI_Button.h" />
+		<Unit filename="include/MicroUI/MUI_CheckBox.h" />
+		<Unit filename="include/MicroUI/MUI_TextBox.h" />
+		<Unit filename="include/MicroUI/MicroUI.h" />
+		<Unit filename="src/MicroEngine/ME_AssetHandler.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/MicroEngine/ME_Camer2D.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/MicroEngine/ME_GameObject.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/MicroEngine/ME_Renderer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/MicroEngine/ME_Vector2D.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/MicroEngine/MicroEngine.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/MicroPhysics/MicroPhysics.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/MicroUI/MUI_Button.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/MicroUI/MUI_CheckBox.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/MicroUI/MUI_Test.c">
+			<Option compilerVar="CC" />
+			<Option target="MicroUI_Test" />
+		</Unit>
+		<Unit filename="src/MicroUI/MUI_TextBox.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/MicroUI/MicroUI.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/Pong.c">
+			<Option compilerVar="CC" />
+			<Option target="MicroEngine_Test" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
