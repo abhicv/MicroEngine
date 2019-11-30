@@ -25,12 +25,14 @@ Vector2 CalculateMovDir(Vector2 velocity, Vector2 position)
     else if(position.x + 15.0 > ME_GetScreenWidth())
         movDir = ReflectDir(tmpVelocity,NewVector2(-1,0));
 
-    else if(position.y <= 0)
+    else if(position.y <= 20)
         movDir = ReflectDir(tmpVelocity,NewVector2(0,1));
 
-    else if(position.y + 15.0 > ME_GetScreenHeight())
+    else if(position.y + 15.0 > ME_GetScreenHeight() - 15)
         movDir = ReflectDir(tmpVelocity,NewVector2(0,-1));
 
+    Vector2Normalize(&movDir);
+    Vector2Scale(&movDir,500);
     return movDir;
 }
 
@@ -45,6 +47,9 @@ int main(int argc, char *argv[])
 
     Vector2 ballVelocity = NewVector2(300,300);
     float playerSpeed = 0;
+
+    int pScore = 0;
+    int cScore = 0;
 
     SDL_Color white = {255,255,255,255};
 
@@ -62,6 +67,14 @@ int main(int argc, char *argv[])
     creditText.textString = "Made with MicroEngine";
     creditText.textColor = white;
 
+    MUI_TextBox playerScore = MUI_CreateTextBox(ME_GetScreenWidth()/2 + 50, 60, 60);
+    sprintf(playerScore.textString,"0");
+    playerScore.textColor = white;
+
+    MUI_TextBox computerScore = MUI_CreateTextBox(ME_GetScreenWidth()/2 - 50, 60, 60);
+    sprintf(computerScore.textString,"0");
+    computerScore.textColor = white;
+
     //Game objects
     SDL_Texture *mainTexture = IMG_LoadTexture(ME_GetRenderer(), "assets/Sprites/pongTexture.png");
     ME_GameObject *player = ME_CreateGameObject(ME_GetScreenWidth() - 20,ME_GetScreenHeight() / 2);
@@ -78,6 +91,10 @@ int main(int argc, char *argv[])
     ball->destRect.w = 15;
     ball->destRect.h = 15;
     ball->texture = mainTexture;
+
+    SDL_Texture *grid = IMG_LoadTexture(ME_GetRenderer(), "assets/Sprites/grid.png");
+    SDL_Rect gridRect = {0,0,800,600};
+
 
 
     //Main Game loop
@@ -121,6 +138,10 @@ int main(int argc, char *argv[])
 
                 case SDL_SCANCODE_D:
                 case SDL_SCANCODE_RIGHT:
+                    break;
+
+                case SDL_SCANCODE_ESCAPE:
+                    quit = true;
                     break;
                 }
                 break;
@@ -170,10 +191,42 @@ int main(int argc, char *argv[])
 
             player->position.y += playerSpeed * deltaTime;
 
-            computer->position.y = ball->position.y;
+            computer->position.y += (ball->position.y - computer->position.y) * 5 *deltaTime;
 
             ballVelocity = CalculateMovDir(ballVelocity, ball->position);
             //printf("x : %f, y : %f\n",velocity.x, velocity.y);
+
+            if(ball->position.x < 0)
+            {
+                pScore++;
+                sprintf(playerScore.textString,"%d", pScore);
+                ball->position.x = 400;
+                ball->position.y = 300;
+
+                ballVelocity.x = rand();
+                ballVelocity.y = rand();
+
+                Vector2Normalize(&ballVelocity);
+                Vector2Scale(&ballVelocity,500);
+
+                SDL_Delay(1000);
+            }
+
+            if(ball->position.x >= ME_GetScreenWidth() - 15)
+            {
+                cScore++;
+                sprintf(computerScore.textString,"%d", cScore);
+                ball->position.x = 400;
+                ball->position.y = 300;
+
+                ballVelocity.x = rand();
+                ballVelocity.y = rand();
+
+                Vector2Normalize(&ballVelocity);
+                 Vector2Scale(&ballVelocity,500);
+
+                SDL_Delay(1000);
+            }
 
             ME_UpdateGameObject(player);
             ME_UpdateGameObject(computer);
@@ -193,6 +246,11 @@ int main(int argc, char *argv[])
             ME_RenderGameObject(player);
             ME_RenderGameObject(computer);
             ME_RenderGameObject(ball);
+
+            MUI_RenderTextBox(&playerScore,ME_GetRenderer());
+            MUI_RenderTextBox(&computerScore,ME_GetRenderer());
+
+            SDL_RenderCopy(ME_GetRenderer(), grid, NULL, &gridRect);
 
             SDL_RenderPresent(ME_GetRenderer());
             break;

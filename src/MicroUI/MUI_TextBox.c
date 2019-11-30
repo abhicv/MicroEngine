@@ -1,7 +1,7 @@
 #include "../../include/MicroUI/MUI_TextBox.h"
 
 #define MAX_STRING_SIZE 50
-#define DEFAULT_FONT_FILE "assets/Font/OpenSans-Regular.ttf"
+#define DEFAULT_FONT_FILE "assets/Font/bit5x3.ttf"
 
 MUI_TextBox MUI_CreateTextBox(int x, int y, int fontSize)
 {
@@ -11,7 +11,7 @@ MUI_TextBox MUI_CreateTextBox(int x, int y, int fontSize)
     textBox.rect.y = y;
 
     textBox.textString = (char*)malloc(sizeof(char) * MAX_STRING_SIZE);
-    strcpy(textBox.textString, "text box");
+    //strcpy(textBox.textString, "text box");
 
     textBox.font = NULL;
     textBox.font = TTF_OpenFont(DEFAULT_FONT_FILE, fontSize);
@@ -34,7 +34,7 @@ void MUI_RenderTextBox(MUI_TextBox* textBox, SDL_Renderer* rend)
     if(textBox->enabled)
     {
         if(textBox->font != NULL)
-            fontSurface = TTF_RenderText_Blended(textBox->font, textBox->textString, textBox->textColor);
+            fontSurface = TTF_RenderText_Solid(textBox->font, textBox->textString, textBox->textColor);
 
         if(fontSurface != NULL)
             fontTexture = SDL_CreateTextureFromSurface(rend, fontSurface);
