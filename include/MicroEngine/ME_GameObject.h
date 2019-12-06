@@ -2,8 +2,6 @@
 #define ME_GAMEOBJECT_H
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,7 +24,7 @@ typedef struct
 
 ME_GameObject* ME_CreateGameObject(int, int);
 void ME_UpdateGameObject(ME_GameObject *gameObject);
-void ME_RenderGameObject(const ME_GameObject *gameObject);
+void ME_RenderGameObject(ME_GameObject *gameObject, SDL_Renderer*);
 void ME_DestroyGameObject(ME_GameObject *gameObject);
 
 #endif //ME_GAMEOBJECT_H

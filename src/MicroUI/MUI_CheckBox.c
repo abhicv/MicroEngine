@@ -1,4 +1,5 @@
 #include "../../include/MicroUI/MUI_CheckBox.h"
+#include "../../include/MicroEngine/ME_Utility.h"
 
 MUI_CheckBox MUI_CreateCheckBox(int x, int y)
 {
@@ -9,8 +10,8 @@ MUI_CheckBox MUI_CreateCheckBox(int x, int y)
 
     checkBox.rect.x = x;
     checkBox.rect.y = y;
-    checkBox.rect.w = 32;
-    checkBox.rect.h = 32;
+    checkBox.rect.w = 36;
+    checkBox.rect.h = 36;
 
     checkBox.enabled = true;
     checkBox.checked = false;
@@ -46,30 +47,30 @@ bool MUI_CheckBoxEvent(MUI_CheckBox *checkBox, SDL_Event event)
 void MUI_RenderCheckBox(MUI_CheckBox *checkBox, SDL_Renderer *renderer)
 {
     SDL_Rect tickRect = checkBox->rect;
-    tickRect.w -= 10;
-    tickRect.h -= 10;
+    tickRect.w  = 21;//checkBox->rect.w * 0.5;
+    tickRect.h  = 20;//checkBox->rect.h * 0.5;
 
     if(checkBox->enabled)
     {
         if(checkBox->bgTexture != NULL)
         {
-            SDL_QueryTexture(checkBox->bgTexture, NULL, NULL, &checkBox->rect.w, &checkBox->rect.h);
-            SDL_QueryTexture(checkBox->tickTexture, NULL, NULL, &tickRect.w, &tickRect.h);
-
-            SDL_RenderCopy(renderer, checkBox->bgTexture, NULL, &checkBox->rect);
-
             tickRect.x = checkBox->rect.x + (checkBox->rect.w - tickRect.w) / 2;
             tickRect.y = checkBox->rect.y + (checkBox->rect.h - tickRect.h) / 2;
+
+            SDL_RenderCopy(renderer, checkBox->bgTexture, NULL, &checkBox->rect);
 
             if(checkBox->checked && checkBox->tickTexture != NULL)
                 SDL_RenderCopy(renderer, checkBox->tickTexture, NULL, &tickRect);
         }
         else
         {
-            SDL_RenderDrawRect(renderer, &checkBox->rect);
+            tickRect.x = checkBox->rect.x + (checkBox->rect.w - tickRect.w) / 2;
+            tickRect.y = checkBox->rect.y + (checkBox->rect.h - tickRect.h) / 2;
+
+            ME_RenderDrawRect(renderer, &checkBox->rect, ME_HexToSdlColor(0xff0000));
 
             if(checkBox->checked)
-                SDL_RenderFillRect(renderer, &tickRect);
+               ME_RenderFillRect(renderer, &tickRect, ME_HexToSdlColor(0xff0000));
         }
     }
 }

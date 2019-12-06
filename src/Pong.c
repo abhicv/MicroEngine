@@ -1,5 +1,6 @@
 #include "../../include/MicroEngine/MicroEngine.h"
 #include "../../include/MicroUI/MicroUI.h"
+#include "../../include/MicroEngine/ME_Utility.h"
 
 #define MENU 0
 #define PLAYMODE 1
@@ -55,15 +56,14 @@ int main(int argc, char *argv[])
 
     //UI elements
     MUI_Button play = MUI_CreateButton(ME_GetScreenWidth()/2,ME_GetScreenHeight()/2);
-    play.bgTexture = IMG_LoadTexture(ME_GetRenderer(), "assets/Sprites/Button_white.png");
+    //play.bgTexture = IMG_LoadTexture(ME_GetRenderer(), "assets/Sprites/pongTexture.png");
     play.label.textString = "PLAY";
-    //play.label.font = TTF_OpenFont("assets/Font/OpenSans-ExtraBold.ttf",30);
 
-    MUI_TextBox pongTitle = MUI_CreateTextBox(play.rect.x, play.rect.y - 100, 100);
+    MUI_TextBox pongTitle = MUI_CreateTextBox(play.rect.x, play.rect.y - 100, 140);
     pongTitle.textString = "PONG";
     pongTitle.textColor = white;
 
-    MUI_TextBox creditText = MUI_CreateTextBox(play.rect.x, play.rect.y + 60, 20);
+    MUI_TextBox creditText = MUI_CreateTextBox(play.rect.x, play.rect.y + 200, 20);
     creditText.textString = "Made with MicroEngine";
     creditText.textColor = white;
 
@@ -77,6 +77,7 @@ int main(int argc, char *argv[])
 
     //Game objects
     SDL_Texture *mainTexture = IMG_LoadTexture(ME_GetRenderer(), "assets/Sprites/pongTexture.png");
+
     ME_GameObject *player = ME_CreateGameObject(ME_GetScreenWidth() - 20,ME_GetScreenHeight() / 2);
     player->destRect.w = 20;
     player->destRect.h = 120;
@@ -95,17 +96,16 @@ int main(int argc, char *argv[])
     SDL_Texture *grid = IMG_LoadTexture(ME_GetRenderer(), "assets/Sprites/grid.png");
     SDL_Rect gridRect = {0,0,800,600};
 
-
+    SDL_Renderer *mainRenderer = ME_GetRenderer();
 
     //Main Game loop
     while(!quit)
     {
         ME_GetDeltaTime(&deltaTime);
-        //printf("%f\n",deltaTime);
 
         //Input Handling
         SDL_Event event;
-        while (SDL_PollEvent(&event))
+        if(SDL_PollEvent(&event))
         {
             if(MUI_ButtonPressed(&play,event))
                 GameState = PLAYMODE;
@@ -175,13 +175,13 @@ int main(int argc, char *argv[])
         switch(GameState)
         {
         case MENU:
-            SDL_RenderClear(ME_GetRenderer());
+            SDL_RenderClear(mainRenderer);
 
-            MUI_RenderButton(&play,ME_GetRenderer());
-            MUI_RenderTextBox(&creditText,ME_GetRenderer());
-            MUI_RenderTextBox(&pongTitle,ME_GetRenderer());
+            MUI_RenderButton(&play,mainRenderer);
+            MUI_RenderTextBox(&creditText,mainRenderer);
+            MUI_RenderTextBox(&pongTitle,mainRenderer);
 
-            SDL_RenderPresent(ME_GetRenderer());
+            SDL_RenderPresent(mainRenderer);
             break;
 
         case PLAYMODE:
@@ -191,7 +191,7 @@ int main(int argc, char *argv[])
 
             player->position.y += playerSpeed * deltaTime;
 
-            computer->position.y += (ball->position.y - computer->position.y) * 5 *deltaTime;
+            computer->position.y += (ball->position.y - computer->position.y) * 2 * deltaTime;
 
             ballVelocity = CalculateMovDir(ballVelocity, ball->position);
             //printf("x : %f, y : %f\n",velocity.x, velocity.y);
@@ -223,7 +223,7 @@ int main(int argc, char *argv[])
                 ballVelocity.y = rand();
 
                 Vector2Normalize(&ballVelocity);
-                 Vector2Scale(&ballVelocity,500);
+                Vector2Scale(&ballVelocity,500);
 
                 SDL_Delay(1000);
             }
@@ -240,19 +240,19 @@ int main(int argc, char *argv[])
 
 
             //RENDERING
-            SDL_RenderClear(ME_GetRenderer());
+            SDL_RenderClear(mainRenderer);
 
             //Rendering GameObjects
-            ME_RenderGameObject(player);
-            ME_RenderGameObject(computer);
-            ME_RenderGameObject(ball);
+            ME_RenderGameObject(player, mainRenderer);
+            ME_RenderGameObject(computer, mainRenderer);
+            ME_RenderGameObject(ball, mainRenderer);
 
-            MUI_RenderTextBox(&playerScore,ME_GetRenderer());
-            MUI_RenderTextBox(&computerScore,ME_GetRenderer());
+            MUI_RenderTextBox(&playerScore,mainRenderer);
+            MUI_RenderTextBox(&computerScore,mainRenderer);
 
-            SDL_RenderCopy(ME_GetRenderer(), grid, NULL, &gridRect);
+            SDL_RenderCopy(mainRenderer, grid, NULL, &gridRect);
 
-            SDL_RenderPresent(ME_GetRenderer());
+            SDL_RenderPresent(mainRenderer);
             break;
         }
     }
@@ -263,6 +263,10 @@ int main(int argc, char *argv[])
     ME_DestroyGameObject(ball);
 
     MUI_DestroyButton(&play);
+    MUI_DestroyTextBox(&playerScore);
+    MUI_DestroyTextBox(&computerScore);
+    MUI_DestroyTextBox(&pongTitle);
+    MUI_DestroyTextBox(&creditText);
 
     ME_Quit();
 

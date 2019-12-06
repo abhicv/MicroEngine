@@ -12,6 +12,7 @@ typedef struct
 {
     char *textString;
     TTF_Font *font;
+    SDL_Texture *fontTexture;
     SDL_Rect rect;
     SDL_Color textColor;
     bool enabled;

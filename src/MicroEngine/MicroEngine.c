@@ -34,7 +34,7 @@ int ME_Init(const char *title, int screenWidth, int screenHeight)
     }
 
     Uint32 rendflag = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
-    renderer = SDL_CreateRenderer(window,-1,rendflag);
+    renderer = SDL_CreateRenderer(window,3,rendflag);
 
     if(renderer == NULL)
     {

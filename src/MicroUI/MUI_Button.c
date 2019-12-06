@@ -1,21 +1,28 @@
 #include "../../include/MicroUI/MUI_Button.h"
+#include "../../include/MicroEngine/ME_Utility.h"
 
-const SDL_Color defaultButtonLabelColor = {0,0,0,255};
+const SDL_Color dfBtnNormalColor = {255, 255, 255, 255};
+const SDL_Color dfBtnHighlightColor = {0, 0, 255, 255};
+const int dfButtonWidth = 150;
+const int dfButtonHeight = 40;
 
 MUI_Button MUI_CreateButton(int x, int y)
 {
     MUI_Button button;
     button.bgTexture = NULL;
     button.enabled = true;
+    button.state = IDLE;
+
     button.rect.x  = x;
     button.rect.y = y;
-    button.rect.w = 150;
-    button.rect.h = 40;
+    button.rect.w = dfButtonWidth;
+    button.rect.h = dfButtonHeight;
 
-    button.label = MUI_CreateTextBox(x,y,25);
-    button.label.textString = "button";
+    button.label = MUI_CreateTextBox(x,y,30);
+    button.label.textString = "Button";
 
-    button.label.textColor = defaultButtonLabelColor;
+    button.normalColor = dfBtnNormalColor;
+    button.highlightColor = dfBtnHighlightColor;
 
     return button;
 }
@@ -28,21 +35,26 @@ bool MUI_ButtonPressed(MUI_Button *button, SDL_Event event)
     {
         SDL_Rect tmpRect = button->rect;
 
+        mousePos.x = event.motion.x;
+        mousePos.y = event.motion.y;
+
         tmpRect.x = button->rect.x - button->rect.w / 2;
         tmpRect.y = button->rect.y - button->rect.h / 2;
 
-        if (event.type == SDL_MOUSEBUTTONDOWN)
+        if(SDL_PointInRect(&mousePos,&tmpRect))
         {
-            mousePos.x = event.button.x;
-            mousePos.y = event.button.y;
+            button->state = ACTIVE;
 
-            if(SDL_PointInRect(&mousePos,&tmpRect))
+            if (event.type == SDL_MOUSEBUTTONDOWN)
             {
+                button->state = CLICKED;
                 return true;
             }
         }
-
-        return false;
+        else
+        {
+            button->state = IDLE;
+        }
     }
 
     return false;
@@ -51,24 +63,36 @@ bool MUI_ButtonPressed(MUI_Button *button, SDL_Event event)
 
 void MUI_RenderButton(MUI_Button *button, SDL_Renderer *rend)
 {
+    SDL_Color presentColor;
+
     if(button->enabled)
     {
+        SDL_Rect tmpRect = button->rect;
+
+        tmpRect.x = button->rect.x - button->rect.w / 2;
+        tmpRect.y = button->rect.y - button->rect.h / 2;
+
         if(button->bgTexture != NULL)
         {
-            SDL_QueryTexture(button->bgTexture, NULL, NULL, &button->rect.w, &button->rect.h);
-            SDL_Rect tmpRect = button->rect;
-
-            tmpRect.x = button->rect.x - button->rect.w / 2;
-            tmpRect.y = button->rect.y - button->rect.h / 2;
-
             SDL_RenderCopy(rend,button->bgTexture,NULL,&tmpRect);
         }
         else
         {
-            SDL_RenderDrawRect(rend,&button->rect);
+            switch(button->state)
+            {
+            case ACTIVE:
+                presentColor = button->highlightColor;
+                break;
+
+            case IDLE:
+            case CLICKED:
+                presentColor = button->normalColor;
+                break;
+            }
+
+            ME_RenderFillRect(rend, &tmpRect, presentColor);
         }
 
-        //Aligning label with button center
         MUI_RenderTextBox(&button->label, rend);
     }
 

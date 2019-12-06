@@ -3,11 +3,18 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
 
 #include <stdbool.h>
 
 #include "MUI_TextBox.h"
+
+typedef enum{
+
+    CLICKED,
+    ACTIVE,
+    IDLE,
+
+}MUI_ButtonState;
 
 typedef struct
 {
@@ -15,7 +22,9 @@ typedef struct
     SDL_Rect rect;
     MUI_TextBox label;
     bool enabled;
-    const char *buttonID;
+    MUI_ButtonState state;
+    SDL_Color highlightColor;
+    SDL_Color normalColor;
 
 }MUI_Button;
 
