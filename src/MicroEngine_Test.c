@@ -9,13 +9,15 @@ int main(int argc, char *argv[])
     ME_ParticleSystem *part = ME_CreateParticleSystem(400,300, 100);
     part->texture = IMG_LoadTexture(ME_GetRenderer(), "assets/Sprites/Coin.png");
 
+    SDL_Renderer *renderer = ME_GetRenderer();
+
     bool quit = false;
     float deltaTime = 0.016f;
+    SDL_Event event;
 
     while(!quit)
     {
         ME_GetDeltaTime(&deltaTime);
-        SDL_Event event;
 
         if(SDL_PollEvent(&event))
         {
@@ -35,11 +37,11 @@ int main(int argc, char *argv[])
         ME_UpdateParticleSystem(part, deltaTime);
 
 
-        SDL_RenderClear(ME_GetRenderer());
+        SDL_RenderClear(renderer);
 
-        ME_RenderParticleSystem(part, ME_GetRenderer());
+        ME_RenderParticleSystem(part, renderer);
 
-        SDL_RenderPresent(ME_GetRenderer());
+        SDL_RenderPresent(renderer);
     }
 
     ME_DestroyParticlSystem(part);

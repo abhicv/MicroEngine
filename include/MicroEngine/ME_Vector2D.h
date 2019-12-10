@@ -18,5 +18,6 @@ DATATYPE Vector2Dot(Vector2 ,Vector2);
 void Vector2Normalize(Vector2*);
 void Vector2Scale(Vector2* ,DATATYPE);
 Vector2 Vector2Subtract(Vector2 ,Vector2);
+Vector2 ReflectDir(Vector2,Vector2);
 
 #endif //ME_VECTOR2D_H

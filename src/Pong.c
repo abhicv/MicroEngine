@@ -2,18 +2,9 @@
 #include "../../include/MicroUI/MicroUI.h"
 #include "../../include/MicroEngine/ME_Utility.h"
 
+//Game states
 #define MENU 0
 #define PLAYMODE 1
-
-int GameState = MENU;
-
-Vector2 ReflectDir(Vector2 I,Vector2 N)
-{
-    DATATYPE dotIN =  2* Vector2Dot(I,N);
-    Vector2Scale(&N,dotIN);
-
-    return Vector2Subtract(I,N);
-}
 
 Vector2 CalculateMovDir(Vector2 velocity, Vector2 position)
 {
@@ -33,8 +24,23 @@ Vector2 CalculateMovDir(Vector2 velocity, Vector2 position)
         movDir = ReflectDir(tmpVelocity,NewVector2(0,-1));
 
     Vector2Normalize(&movDir);
-    Vector2Scale(&movDir,500);
+    Vector2Scale(&movDir,400);
+
     return movDir;
+}
+
+void ResetBall(Vector2 *position, Vector2 *velocity)
+{
+    position->x = 400;
+    position->y = 300;
+
+    int angle = 0;
+    angle = rand() % 120 + 30;
+
+    velocity->x = cos(angle);
+    velocity->y = sin(angle);
+
+    Vector2Scale(velocity,400);
 }
 
 int main(int argc, char *argv[])
@@ -43,10 +49,13 @@ int main(int argc, char *argv[])
     if(!ME_Init("Pong Game",800,600))
         return EXIT_FAILURE;
 
+    int GameState = MENU;
+    bool pause = false;
+
     float deltaTime = 0.016f;
     bool quit = false;
 
-    Vector2 ballVelocity = NewVector2(300,300);
+    Vector2 ballVelocity = NewVector2(400,400);
     float playerSpeed = 0;
 
     int pScore = 0;
@@ -93,10 +102,13 @@ int main(int argc, char *argv[])
     ball->destRect.h = 15;
     ball->texture = mainTexture;
 
+    //Background grid
     SDL_Texture *grid = IMG_LoadTexture(ME_GetRenderer(), "assets/Sprites/grid.png");
     SDL_Rect gridRect = {0,0,800,600};
 
     SDL_Renderer *mainRenderer = ME_GetRenderer();
+
+    SDL_Event event;
 
     //Main Game loop
     while(!quit)
@@ -104,7 +116,6 @@ int main(int argc, char *argv[])
         ME_GetDeltaTime(&deltaTime);
 
         //Input Handling
-        SDL_Event event;
         if(SDL_PollEvent(&event))
         {
             if(MUI_ButtonPressed(&play,event))
@@ -140,9 +151,10 @@ int main(int argc, char *argv[])
                 case SDL_SCANCODE_RIGHT:
                     break;
 
-                case SDL_SCANCODE_ESCAPE:
-                    quit = true;
+                case SDL_SCANCODE_SPACE:
+                    pause = !pause;
                     break;
+
                 }
                 break;
 
@@ -178,66 +190,52 @@ int main(int argc, char *argv[])
             SDL_RenderClear(mainRenderer);
 
             MUI_RenderButton(&play,mainRenderer);
-            MUI_RenderTextBox(&creditText,mainRenderer);
-            MUI_RenderTextBox(&pongTitle,mainRenderer);
+            MUI_RenderTextBox(&creditText,mainRenderer ,MUI_TEXT_SOLID);
+            MUI_RenderTextBox(&pongTitle,mainRenderer, MUI_TEXT_SOLID);
 
             SDL_RenderPresent(mainRenderer);
             break;
 
         case PLAYMODE:
 
-            ball->position.x += ballVelocity.x * deltaTime;
-            ball->position.y += ballVelocity.y * deltaTime;
+            if(pause)
+                deltaTime = 0.0;
 
-            player->position.y += playerSpeed * deltaTime;
-
-            computer->position.y += (ball->position.y - computer->position.y) * 2 * deltaTime;
-
-            ballVelocity = CalculateMovDir(ballVelocity, ball->position);
-            //printf("x : %f, y : %f\n",velocity.x, velocity.y);
-
-            if(ball->position.x < 0)
+            if(ball->position.x <= 0)
             {
                 pScore++;
                 sprintf(playerScore.textString,"%d", pScore);
-                ball->position.x = 400;
-                ball->position.y = 300;
+                ResetBall(&ball->position, &ballVelocity);
 
-                ballVelocity.x = rand();
-                ballVelocity.y = rand();
-
-                Vector2Normalize(&ballVelocity);
-                Vector2Scale(&ballVelocity,500);
-
-                SDL_Delay(1000);
+                SDL_Delay(500);
             }
-
-            if(ball->position.x >= ME_GetScreenWidth() - 15)
+            else if(ball->position.x >= ME_GetScreenWidth())
             {
                 cScore++;
                 sprintf(computerScore.textString,"%d", cScore);
-                ball->position.x = 400;
-                ball->position.y = 300;
+                ResetBall(&ball->position, &ballVelocity);
 
-                ballVelocity.x = rand();
-                ballVelocity.y = rand();
-
-                Vector2Normalize(&ballVelocity);
-                Vector2Scale(&ballVelocity,500);
-
-                SDL_Delay(1000);
+                SDL_Delay(500);
             }
+            else if(SDL_HasIntersection(&player->destRect,&ball->destRect))
+            {
+                ballVelocity = ReflectDir(ballVelocity,NewVector2(-1,0));
+            }
+            else if(SDL_HasIntersection(&computer->destRect,&ball->destRect))
+            {
+                ballVelocity = ReflectDir(ballVelocity,NewVector2(1,0));
+            }
+            else
+                ballVelocity = CalculateMovDir(ballVelocity, ball->position);
+
+            ball->position.x += ballVelocity.x * deltaTime;
+            ball->position.y += ballVelocity.y * deltaTime;
+            player->position.y += playerSpeed * deltaTime;
+            computer->position.y += (ball->position.y - computer->position.y) * 5 * deltaTime;
 
             ME_UpdateGameObject(player);
             ME_UpdateGameObject(computer);
             ME_UpdateGameObject(ball);
-
-            if(SDL_HasIntersection(&player->destRect,&ball->destRect))
-                ballVelocity = ReflectDir(ballVelocity,NewVector2(-1,0));
-
-            if(SDL_HasIntersection(&computer->destRect,&ball->destRect))
-                ballVelocity = ReflectDir(ballVelocity,NewVector2(1,0));
-
 
             //RENDERING
             SDL_RenderClear(mainRenderer);
@@ -247,8 +245,9 @@ int main(int argc, char *argv[])
             ME_RenderGameObject(computer, mainRenderer);
             ME_RenderGameObject(ball, mainRenderer);
 
-            MUI_RenderTextBox(&playerScore,mainRenderer);
-            MUI_RenderTextBox(&computerScore,mainRenderer);
+            //Rendering UI
+            MUI_RenderTextBox(&playerScore,mainRenderer, MUI_TEXT_SOLID);
+            MUI_RenderTextBox(&computerScore,mainRenderer, MUI_TEXT_SOLID);
 
             SDL_RenderCopy(mainRenderer, grid, NULL, &gridRect);
 

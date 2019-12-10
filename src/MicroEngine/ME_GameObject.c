@@ -1,4 +1,5 @@
 #include "../../include/MicroEngine/ME_GameObject.h"
+#include "../../include/MicroEngine/ME_Utility.h"
 
 ME_GameObject* ME_CreateGameObject(int xPos, int yPos)
 {
@@ -27,9 +28,6 @@ ME_GameObject* ME_CreateGameObject(int xPos, int yPos)
 
 void ME_UpdateGameObject(ME_GameObject *gameObject)
 {
-    gameObject->destRect.x = (int)(gameObject->position.x - gameObject->destRect.w / 2);
-    gameObject->destRect.y = (int)(gameObject->position.y - gameObject->destRect.h / 2);
-
     if(gameObject->animate && gameObject->nFrames > 0)
         gameObject->srcRect.x = gameObject->srcRect.w * (((int)SDL_GetTicks() / 60) % gameObject->nFrames);
     else
@@ -38,6 +36,14 @@ void ME_UpdateGameObject(ME_GameObject *gameObject)
 
 void ME_RenderGameObject(ME_GameObject *gameObject, SDL_Renderer *rend)
 {
+    gameObject->destRect.x = (int)(gameObject->position.x - gameObject->destRect.w / 2);
+    gameObject->destRect.y = (int)(gameObject->position.y - gameObject->destRect.h / 2);
+
+    SDL_Rect debugRect = gameObject->destRect;
+    debugRect.x = gameObject->position.x;
+    debugRect.y = gameObject->position.y;
+
+
     if(gameObject->enabled)
     {
         if(gameObject->texture != NULL)
@@ -46,9 +52,7 @@ void ME_RenderGameObject(ME_GameObject *gameObject, SDL_Renderer *rend)
         }
         else
         {
-            SDL_SetRenderDrawColor(rend, gameObject->debugColor.r, gameObject->debugColor.g, gameObject->debugColor.b, 255);
-            SDL_RenderFillRect(rend, &gameObject->destRect);
-            SDL_SetRenderDrawColor(rend, 0,0,0,255);
+            ME_RenderFillRect(rend, &gameObject->destRect, gameObject->debugColor);
         }
     }
 }

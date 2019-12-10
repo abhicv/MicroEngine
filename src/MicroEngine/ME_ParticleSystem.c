@@ -57,7 +57,7 @@ void ME_RenderParticleSystem(ME_ParticleSystem *particleSystem, SDL_Renderer *re
 {
     int i = 0;
     SDL_Rect destRect = {0, 0, 20, 20};
-    SDL_Color color;
+    SDL_Color color = ME_HexToSdlColor(0xff00ff);
 
     for(i = 0; i < particleSystem->numParticles; i++)
     {
@@ -66,7 +66,7 @@ void ME_RenderParticleSystem(ME_ParticleSystem *particleSystem, SDL_Renderer *re
 
         //destRect.w = destRect.h = rand() % SDL_GetTicks() / 1000;
 
-        color = ME_RandomSdlColor();
+       // color = ME_RandomSdlColor();
 
         if(particleSystem->texture != NULL)
             SDL_RenderCopyEx(renderer, particleSystem->texture, NULL, &destRect, 0, NULL, SDL_FLIP_NONE);
@@ -75,7 +75,7 @@ void ME_RenderParticleSystem(ME_ParticleSystem *particleSystem, SDL_Renderer *re
         SDL_RenderDrawPoint(renderer, destRect.x, destRect.y);
         SDL_SetRenderDrawColor(renderer, 0,0,0,255);
 
-        ME_RenderFillRect(renderer, &destRect, color);
+        ME_RenderDrawRect(renderer, &destRect, color);
     }
 }
 

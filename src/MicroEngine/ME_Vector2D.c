@@ -48,3 +48,11 @@ Vector2 Vector2Subtract(Vector2 v1,Vector2 v2)
 
 	return v;
 }
+
+Vector2 ReflectDir(Vector2 I,Vector2 N)
+{
+    DATATYPE dotIN =  2* Vector2Dot(I,N);
+    Vector2Scale(&N,dotIN);
+
+    return Vector2Subtract(I,N);
+}

@@ -1,6 +1,7 @@
 #ifndef MUI_TEXTBOX_H
 #define MUI_TEXTBOX_H
 
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
@@ -19,8 +20,15 @@ typedef struct
 
 } MUI_TextBox;
 
+enum MUI_TextRenderMethod
+{
+    MUI_TEXT_SOLID,
+    MUI_TEXT_BLENDED,
+    MUI_TEXT_SHADED
+};
+
 MUI_TextBox MUI_CreateTextBox(int, int, int);
-void MUI_RenderTextBox(MUI_TextBox*, SDL_Renderer*);
+void MUI_RenderTextBox(MUI_TextBox*, SDL_Renderer*, enum MUI_TextRenderMethod);
 void MUI_DestroyTextBox(MUI_TextBox*);
 
 #endif //MUI_TEXTBOX_H

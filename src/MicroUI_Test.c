@@ -8,21 +8,24 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
 
     SDL_Renderer *mainRenderer = ME_GetRenderer();
-    ME_SetRenderColor(mainRenderer, ME_HexToSdlColor(0xffffff));
+    //ME_SetRenderColor(mainRenderer, ME_HexToSdlColor(0xffffff));
 
     bool quit = false;
     float deltaTime = 0.016f;
 
+
+    //UI Elements
     MUI_Button button = MUI_CreateButton(300,100);
     //button.bgTexture = IMG_LoadTexture(mainRenderer, "assets/Sprites/Button_white.png");
-    button.label.textColor = ME_HexToSdlColor(0xffff00);
+    //button.label.textColor = ME_HexToSdlColor(0xffff00);
 
     MUI_TextBox text = MUI_CreateTextBox(100,100,20);
-    text.textColor = ME_HexToSdlColor(0xff00ff);
+    text.textColor = ME_HexToSdlColor(0xffffff);
+    //text.font = TTF_OpenFont("assets/Font/OpenSans-Regular.ttf", 20);
 
     MUI_CheckBox checkBox = MUI_CreateCheckBox(200,200);
     //checkBox.bgTexture = IMG_LoadTexture(mainRenderer, "assets/Sprites/grey_circle.png");
-    checkBox.tickTexture = IMG_LoadTexture(mainRenderer, "assets/Sprites/checkmark.png");
+    //checkBox.tickTexture = IMG_LoadTexture(mainRenderer, "assets/Sprites/checkmark.png");
     checkBox.checked = true;
 
     SDL_Event event;
@@ -30,7 +33,7 @@ int main(int argc, char* argv[])
     {
         ME_GetDeltaTime(&deltaTime);
 
-        while(SDL_PollEvent(&event))
+        if(SDL_PollEvent(&event))
         {
             if(MUI_CheckBoxEvent(&checkBox, event))
             {
@@ -44,9 +47,9 @@ int main(int argc, char* argv[])
 
             switch(event.type)
             {
-                case SDL_QUIT:
-                    quit = true;
-                    break;
+            case SDL_QUIT:
+                quit = true;
+                break;
             }
         }
 
@@ -55,10 +58,12 @@ int main(int argc, char* argv[])
         else
             text.enabled = false;
 
+        sprintf(text.textString, "fps : %0.2f", 1/deltaTime);
+
         SDL_RenderClear(mainRenderer);
 
         MUI_RenderButton(&button, mainRenderer);
-        MUI_RenderTextBox(&text, mainRenderer);
+        MUI_RenderTextBox(&text, mainRenderer, MUI_TEXT_SOLID);
         MUI_RenderCheckBox(&checkBox, mainRenderer);
 
         SDL_RenderPresent(mainRenderer);

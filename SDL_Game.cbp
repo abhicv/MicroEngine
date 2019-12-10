@@ -12,8 +12,12 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
+					<Add option="-pg" />
 					<Add option="-g" />
 				</Compiler>
+				<Linker>
+					<Add option="-pg -lgmon" />
+				</Linker>
 			</Target>
 			<Target title="MicroUI_Test">
 				<Option output="bin/Debug/MicroUI_Test" prefix_auto="1" extension_auto="1" />
@@ -21,8 +25,12 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
+					<Add option="-pg" />
 					<Add option="-g" />
 				</Compiler>
+				<Linker>
+					<Add option="-pg -lgmon" />
+				</Linker>
 			</Target>
 			<Target title="MicroEngine_Test">
 				<Option output="bin/Debug/MicroEngine_Test" prefix_auto="1" extension_auto="1" />
@@ -30,8 +38,12 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
+					<Add option="-pg" />
 					<Add option="-g" />
 				</Compiler>
+				<Linker>
+					<Add option="-pg -lgmon" />
+				</Linker>
 			</Target>
 		</Build>
 		<Compiler>
@@ -43,6 +55,7 @@
 		</Linker>
 		<Unit filename="include/MicroEngine/ME_AssetHandler.h" />
 		<Unit filename="include/MicroEngine/ME_Camer2D.h" />
+		<Unit filename="include/MicroEngine/ME_DArray.h" />
 		<Unit filename="include/MicroEngine/ME_GameObject.h" />
 		<Unit filename="include/MicroEngine/ME_ParticleSystem.h" />
 		<Unit filename="include/MicroEngine/ME_Renderer.h" />

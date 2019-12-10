@@ -1,5 +1,6 @@
 //Micro Engine core
 #include "../../include/MicroEngine/MicroEngine.h"
+#include "../../include/MicroEngine/ME_Utility.h"
 
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
@@ -34,7 +35,7 @@ int ME_Init(const char *title, int screenWidth, int screenHeight)
     }
 
     Uint32 rendflag = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
-    renderer = SDL_CreateRenderer(window,3,rendflag);
+    renderer = SDL_CreateRenderer(window,-1,rendflag);
 
     if(renderer == NULL)
     {
@@ -42,7 +43,7 @@ int ME_Init(const char *title, int screenWidth, int screenHeight)
         return 0;
     }
 
-    SDL_SetRenderDrawColor(renderer,dfDrawColor.r,dfDrawColor.g,dfDrawColor.b,dfDrawColor.a);
+    ME_SetRenderColor(renderer, dfDrawColor);
 
     return 1;
 }
@@ -80,17 +81,20 @@ int ME_GetScreenHeight()
     return height;
 }
 
+int currentTime = 0;
+int previousTime = 0;
+
 void ME_GetDeltaTime(float *deltaTime)
 {
-    static Uint64 currentTime = 0;
-    static Uint64 previousTime = 0;
-
-    if(previousTime == 0 && currentTime == 0)
-        return;
-
     previousTime = currentTime;
     currentTime = SDL_GetPerformanceCounter();
 
-    *deltaTime = (float)((currentTime - previousTime) * 1000/ SDL_GetPerformanceFrequency());
+    if(previousTime == 0)
+    {
+        *deltaTime = 0.016f;
+        return;
+    }
+
+    *deltaTime = (float)((currentTime - previousTime) * 1000 / SDL_GetPerformanceFrequency());
     *deltaTime *= 0.001f;
 }

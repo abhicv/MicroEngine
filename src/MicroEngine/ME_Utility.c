@@ -23,6 +23,15 @@ void ME_SetRenderColor(SDL_Renderer *renderer, SDL_Color color)
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 }
 
+SDL_Color ME_GetRenderColor(SDL_Renderer *renderer)
+{
+    SDL_Color rendColor;
+
+    SDL_GetRenderDrawColor(renderer, &rendColor.r, &rendColor.g, &rendColor.b, &rendColor.a);
+
+    return rendColor;
+}
+
 void ME_RenderDrawRect(SDL_Renderer *renderer, const SDL_Rect *rect, SDL_Color color)
 {
     SDL_Color rendColor;

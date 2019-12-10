@@ -10,8 +10,8 @@ MUI_CheckBox MUI_CreateCheckBox(int x, int y)
 
     checkBox.rect.x = x;
     checkBox.rect.y = y;
-    checkBox.rect.w = 36;
-    checkBox.rect.h = 36;
+    checkBox.rect.w = 21;
+    checkBox.rect.h = 21;
 
     checkBox.enabled = true;
     checkBox.checked = false;
@@ -40,15 +40,15 @@ bool MUI_CheckBoxEvent(MUI_CheckBox *checkBox, SDL_Event event)
             return false;
         }
 
-        return false;
+    return false;
 }
 
 
 void MUI_RenderCheckBox(MUI_CheckBox *checkBox, SDL_Renderer *renderer)
 {
     SDL_Rect tickRect = checkBox->rect;
-    tickRect.w  = 21;//checkBox->rect.w * 0.5;
-    tickRect.h  = 20;//checkBox->rect.h * 0.5;
+    tickRect.w  = checkBox->rect.w * 0.6;
+    tickRect.h  = checkBox->rect.h * 0.6;
 
     if(checkBox->enabled)
     {

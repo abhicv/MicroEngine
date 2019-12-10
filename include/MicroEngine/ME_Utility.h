@@ -10,7 +10,10 @@ typedef unsigned int ME_Color;
 
 SDL_Color ME_HexToSdlColor(ME_Color);
 SDL_Color ME_RandomSdlColor();
+
 void ME_SetRenderColor(SDL_Renderer*, SDL_Color);
+SDL_Color ME_GetRenderColor(SDL_Renderer*);
+
 void ME_RenderDrawRect(SDL_Renderer*, const SDL_Rect*, SDL_Color);
 void ME_RenderFillRect(SDL_Renderer*, const SDL_Rect*, SDL_Color);
 
