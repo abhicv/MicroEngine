@@ -1,11 +1,8 @@
 #include "../../include/MicroUI/MUI_Button.h"
 #include "../../include/MicroEngine/ME_Utility.h"
 
-#define DEFAULT_BUTTON_WIDTH 100
-#define DEFAULT_BUTTON_HEIGHT 30
-
-SDL_Color BUTTON_NORMAL_COLOR  = {255, 255, 255, 255};
-SDL_Color BUTTON_ACTIVE_COLOR  = {0, 0, 255, 255};
+const SDL_Color BUTTON_NORMAL_COLOR  = {255, 255, 255, 255};
+const SDL_Color BUTTON_ACTIVE_COLOR  = {0, 0, 255, 255};
 
 MUI_Button MUI_CreateButton(int x, int y)
 {
@@ -13,15 +10,15 @@ MUI_Button MUI_CreateButton(int x, int y)
 
     button.bgTexture = NULL;
     button.enabled = true;
-    button.state = IDLE;
+    button.state = INACTIVE;
 
     button.rect.x  = x;
     button.rect.y = y;
     button.rect.w = DEFAULT_BUTTON_WIDTH;
     button.rect.h = DEFAULT_BUTTON_HEIGHT;
 
-    button.label = MUI_CreateTextBox(x,y,20);
-    strcpy(button.label.textString,"Hello");
+    button.label = MUI_CreateTextBox(x,y,DEFAULT_BUTTON_FONT_SIZE);
+    strcpy(button.label.textString,"Button");
 
     button.normalColor = BUTTON_NORMAL_COLOR;
     button.highlightColor = BUTTON_ACTIVE_COLOR;
@@ -55,7 +52,7 @@ bool MUI_ButtonPressed(MUI_Button *button, SDL_Event event)
         }
         else
         {
-            button->state = IDLE;
+            button->state = INACTIVE;
         }
     }
 
@@ -63,9 +60,26 @@ bool MUI_ButtonPressed(MUI_Button *button, SDL_Event event)
 
 }
 
-void MUI_RenderButton(MUI_Button *button, SDL_Renderer *rend)
+void MUI_SetButtonPosition(MUI_Button *button, int x, int y)
 {
-    SDL_Color presentColor;
+    button->rect.x = x;
+    button->rect.y = y;
+}
+
+void MUI_SetButtonLabel(MUI_Button *button, const char *label)
+{
+    if(label != NULL)
+        strcpy(button->label.textString, label);
+}
+
+void MUI_SetButtonLabelFont(MUI_Button *button, TTF_Font *font)
+{
+    MUI_SetTextBoxFont(&button->label, font);
+}
+
+void MUI_RenderButton(MUI_Button *button, SDL_Renderer *renderer)
+{
+    SDL_Color buttonColor;
 
     if(button->enabled)
     {
@@ -76,28 +90,28 @@ void MUI_RenderButton(MUI_Button *button, SDL_Renderer *rend)
 
         if(button->bgTexture != NULL)
         {
-            SDL_RenderCopy(rend,button->bgTexture,NULL,&tmpRect);
+            SDL_RenderCopy(renderer,button->bgTexture,NULL,&tmpRect);
         }
         else
         {
             switch(button->state)
             {
             case ACTIVE:
-                presentColor = button->highlightColor;
+                buttonColor = button->highlightColor;
                 break;
 
-            case IDLE:
-                presentColor = button->normalColor;
+            case INACTIVE:
+                buttonColor = button->normalColor;
                 break;
 
             case CLICKED:
-                presentColor = ME_HexToSdlColor(0xff0000);
+                buttonColor = ME_HexToSdlColor(0xff0000);
             }
 
-            ME_RenderFillRect(rend, &tmpRect, presentColor);
+            ME_RenderFillRect(renderer, &tmpRect, buttonColor);
         }
 
-        MUI_RenderTextBox(&button->label, rend, MUI_TEXT_BLENDED);
+        MUI_RenderTextBox(&button->label, renderer, MUI_TEXT_BLENDED);
     }
 
 }

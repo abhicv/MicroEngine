@@ -43,7 +43,6 @@ bool MUI_CheckBoxEvent(MUI_CheckBox *checkBox, SDL_Event event)
     return false;
 }
 
-
 void MUI_RenderCheckBox(MUI_CheckBox *checkBox, SDL_Renderer *renderer)
 {
     SDL_Rect tickRect = checkBox->rect;

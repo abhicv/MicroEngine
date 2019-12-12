@@ -1,10 +1,6 @@
 #include "../../include/MicroUI/MUI_TextBox.h"
 #include "../../include/MicroEngine/ME_Utility.h"
 
-#define MAX_STRING_SIZE 50
-#define BIT_5x3_FONT_FILE "assets/Font/bit5x3.ttf"
-#define OPENSANS_FONT_FILE "assets/Font/OpenSans-Regular.ttf"
-
 const SDL_Color dfTextColor = {0, 0, 0, 255};
 
 MUI_TextBox MUI_CreateTextBox(int x, int y, int fontSize)
@@ -33,11 +29,30 @@ MUI_TextBox MUI_CreateTextBox(int x, int y, int fontSize)
     return textBox;
 }
 
-void MUI_RenderTextBox(MUI_TextBox* textBox, SDL_Renderer* rend, enum MUI_TextRenderMethod rendMethod)
+void MUI_SetTextBoxPosition(MUI_TextBox *textBox, int x, int y)
+{
+    textBox->rect.x = x;
+    textBox->rect.y = y;
+}
+
+void MUI_SetTextBoxColor(MUI_TextBox *textBox, SDL_Color color)
+{
+    textBox->textColor = color;
+}
+
+void MUI_SetTextBoxFont(MUI_TextBox *textBox, TTF_Font *font)
+{
+    if(font != NULL)
+        textBox->font = font;
+    else
+        SDL_Log("Could not set new font");
+}
+
+void MUI_RenderTextBox(MUI_TextBox* textBox, SDL_Renderer* renderer, enum MUI_TextRenderMethod rendMethod)
 {
     SDL_Surface *fontSurface = NULL;
 
-    SDL_Color rendColor = ME_GetRenderColor(rend);
+    SDL_Color rendColor = ME_GetRenderColor(renderer);
 
     if(textBox->enabled)
     {
@@ -64,18 +79,17 @@ void MUI_RenderTextBox(MUI_TextBox* textBox, SDL_Renderer* rend, enum MUI_TextRe
         }
 
         if(fontSurface != NULL)
-            textBox->fontTexture = SDL_CreateTextureFromSurface(rend, fontSurface);
+            textBox->fontTexture = SDL_CreateTextureFromSurface(renderer, fontSurface);
 
         if(textBox->fontTexture != NULL)
         {
             SDL_QueryTexture(textBox->fontTexture, NULL, NULL, &textBox->rect.w, &textBox->rect.h);
 
             SDL_Rect tmpRect = textBox->rect;
-
             tmpRect.x = textBox->rect.x - textBox->rect.w / 2;
             tmpRect.y = textBox->rect.y - textBox->rect.h / 2;
 
-            SDL_RenderCopy(rend, textBox->fontTexture, NULL, &tmpRect);
+            SDL_RenderCopy(renderer, textBox->fontTexture, NULL, &tmpRect);
         }
 
         SDL_FreeSurface(fontSurface);

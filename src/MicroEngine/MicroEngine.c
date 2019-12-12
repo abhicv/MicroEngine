@@ -7,6 +7,12 @@ static SDL_Renderer *renderer = NULL;
 static int width = 0;
 static int height = 0;
 
+bool quit = false;
+int startTime = 0;
+int endTime = 0;
+float deltaTime = 0.016f;
+SDL_Event event;
+
 const SDL_Color dfDrawColor = {0,0,0,255};
 
 int ME_Init(const char *title, int screenWidth, int screenHeight)
@@ -37,6 +43,11 @@ int ME_Init(const char *title, int screenWidth, int screenHeight)
     Uint32 rendflag = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
     renderer = SDL_CreateRenderer(window,-1,rendflag);
 
+    SDL_RendererInfo rendererInfo;
+    SDL_GetRendererInfo(renderer, &rendererInfo);
+
+    SDL_Log("Renderer : %s",rendererInfo.name);
+
     if(renderer == NULL)
     {
         SDL_Log("Failed to create SDL renderer : %s\n",SDL_GetError());
@@ -46,6 +57,39 @@ int ME_Init(const char *title, int screenWidth, int screenHeight)
     ME_SetRenderColor(renderer, dfDrawColor);
 
     return 1;
+}
+
+void ME_Run(void (*HandleEvents)(SDL_Event event),
+            void (*Update)(float deltaTime),
+            void (*Render)(SDL_Renderer *renderer))
+{
+    while(!quit)
+    {
+        startTime = SDL_GetPerformanceCounter();
+
+        //Event handling
+        if(SDL_PollEvent(&event))
+        {
+            if(event.type == SDL_QUIT)
+                quit = true;
+
+            HandleEvents(event);
+        }
+
+        //Update
+        Update(deltaTime);
+
+        //Rendering
+        SDL_RenderClear(renderer);
+        Render(renderer);
+        SDL_RenderPresent(renderer);
+
+        //Calculating delta time
+        endTime = SDL_GetPerformanceCounter();
+        deltaTime = (float)((endTime - startTime) * 1000.0 / SDL_GetPerformanceFrequency());
+        deltaTime *= 0.001f;
+        deltaTime = deltaTime < 0.016f ? 0.016f : deltaTime;
+    }
 }
 
 void ME_Quit()
@@ -81,20 +125,3 @@ int ME_GetScreenHeight()
     return height;
 }
 
-int currentTime = 0;
-int previousTime = 0;
-
-void ME_GetDeltaTime(float *deltaTime)
-{
-    previousTime = currentTime;
-    currentTime = SDL_GetPerformanceCounter();
-
-    if(previousTime == 0)
-    {
-        *deltaTime = 0.016f;
-        return;
-    }
-
-    *deltaTime = (float)((currentTime - previousTime) * 1000 / SDL_GetPerformanceFrequency());
-    *deltaTime *= 0.001f;
-}

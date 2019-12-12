@@ -65,6 +65,7 @@
 		<Unit filename="include/MicroPhysics/MicroPhysics.h" />
 		<Unit filename="include/MicroUI/MUI_Button.h" />
 		<Unit filename="include/MicroUI/MUI_CheckBox.h" />
+		<Unit filename="include/MicroUI/MUI_Slider.h" />
 		<Unit filename="include/MicroUI/MUI_TextBox.h" />
 		<Unit filename="include/MicroUI/MicroUI.h" />
 		<Unit filename="src/MicroEngine/ME_AssetHandler.c">
@@ -102,6 +103,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/MicroUI/MUI_CheckBox.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/MicroUI/MUI_Slider.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/MicroUI/MUI_TextBox.c">
