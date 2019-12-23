@@ -30,6 +30,12 @@ enum MUI_TextRenderMethod
     MUI_TEXT_SHADED
 };
 
+enum MUI_TextBoxType
+{
+    MUI_DYNAMIC_TEXT,
+    MUI_STATIC_TEXT,
+};
+
 MUI_TextBox MUI_CreateTextBox(int x, int y, int fontSize);
 
 void MUI_SetTextBoxPosition(MUI_TextBox *textBox, int x, int y);

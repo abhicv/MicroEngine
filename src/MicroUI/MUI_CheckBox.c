@@ -23,22 +23,22 @@ bool MUI_CheckBoxEvent(MUI_CheckBox *checkBox, SDL_Event event)
 {
     SDL_Point mousePos;
 
-        if(checkBox->enabled)
+    if(checkBox->enabled)
+    {
+        if (event.type == SDL_MOUSEBUTTONDOWN)
         {
-            if (event.type == SDL_MOUSEBUTTONDOWN)
+            mousePos.x = event.button.x;
+            mousePos.y = event.button.y;
+
+            if(SDL_PointInRect(&mousePos,&checkBox->rect))
             {
-                mousePos.x = event.button.x;
-                mousePos.y = event.button.y;
-
-                if(SDL_PointInRect(&mousePos,&checkBox->rect))
-                {
-                    checkBox->checked = !checkBox->checked;
-                    return true;
-                }
+                checkBox->checked = !checkBox->checked;
+                return true;
             }
-
-            return false;
         }
+
+        return false;
+    }
 
     return false;
 }
@@ -69,7 +69,7 @@ void MUI_RenderCheckBox(MUI_CheckBox *checkBox, SDL_Renderer *renderer)
             ME_RenderDrawRect(renderer, &checkBox->rect, ME_HexToSdlColor(0xff0000));
 
             if(checkBox->checked)
-               ME_RenderFillRect(renderer, &tickRect, ME_HexToSdlColor(0xff0000));
+                ME_RenderFillRect(renderer, &tickRect, ME_HexToSdlColor(0xff0000));
         }
     }
 }

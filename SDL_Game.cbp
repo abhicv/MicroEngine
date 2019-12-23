@@ -2,48 +2,37 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="SDL_Game" />
+		<Option title="MicroEngine" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
-			<Target title="Pong_Game">
-				<Option output="bin/Debug/Pong_Game" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj/Debug/" />
+			<Target title="MicroEngine_test">
+				<Option output="bin/MicroEngine_test" prefix_auto="1" extension_auto="1" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-pg" />
-					<Add option="-g" />
-				</Compiler>
-				<Linker>
-					<Add option="-pg -lgmon" />
-				</Linker>
 			</Target>
-			<Target title="MicroUI_Test">
-				<Option output="bin/Debug/MicroUI_Test" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj/Debug/" />
+			<Target title="Pong_game">
+				<Option output="bin/Pong_game" prefix_auto="1" extension_auto="1" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-pg" />
-					<Add option="-g" />
-				</Compiler>
-				<Linker>
-					<Add option="-pg -lgmon" />
-				</Linker>
+				<Option use_console_runner="0" />
 			</Target>
-			<Target title="MicroEngine_Test">
-				<Option output="bin/Debug/MicroEngine_Test" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj/Debug/" />
+			<Target title="MicroUI_test">
+				<Option output="bin/MicroUI_test" prefix_auto="1" extension_auto="1" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-pg" />
-					<Add option="-g" />
-				</Compiler>
-				<Linker>
-					<Add option="-pg -lgmon" />
-				</Linker>
+				<Option use_console_runner="0" />
+			</Target>
+			<Target title="SpaceShip_game">
+				<Option output="bin/SpaceShip_game" prefix_auto="1" extension_auto="1" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+			</Target>
+			<Target title="FlappyBird_clone_game">
+				<Option output="bin/FlappyBird_clone" prefix_auto="1" extension_auto="1" />
+				<Option type="1" />
+				<Option compiler="gcc" />
 			</Target>
 		</Build>
 		<Compiler>
@@ -68,6 +57,10 @@
 		<Unit filename="include/MicroUI/MUI_Slider.h" />
 		<Unit filename="include/MicroUI/MUI_TextBox.h" />
 		<Unit filename="include/MicroUI/MicroUI.h" />
+		<Unit filename="src/FlappyBird_game.c">
+			<Option compilerVar="CC" />
+			<Option target="FlappyBird_clone_game" />
+		</Unit>
 		<Unit filename="src/MicroEngine/ME_AssetHandler.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -95,6 +88,8 @@
 		<Unit filename="src/MicroEngine_Test.c">
 			<Option compilerVar="CC" />
 			<Option target="MicroEngine_Test" />
+			<Option target="" />
+			<Option target="MicroEngine_test" />
 		</Unit>
 		<Unit filename="src/MicroPhysics/MicroPhysics.c">
 			<Option compilerVar="CC" />
@@ -117,10 +112,20 @@
 		<Unit filename="src/MicroUI_Test.c">
 			<Option compilerVar="CC" />
 			<Option target="MicroUI_Test" />
+			<Option target="" />
+			<Option target="MicroUI_test" />
 		</Unit>
 		<Unit filename="src/Pong.c">
 			<Option compilerVar="CC" />
 			<Option target="Pong_Game" />
+			<Option target="" />
+			<Option target="Pong_game" />
+		</Unit>
+		<Unit filename="src/SpaceShip_Game.c">
+			<Option compilerVar="CC" />
+			<Option target="SpaceShip_Game" />
+			<Option target="" />
+			<Option target="SpaceShip_game" />
 		</Unit>
 		<Extensions>
 			<code_completion />

@@ -32,7 +32,7 @@ int ME_Init(const char *title, int screenWidth, int screenHeight)
     if(IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG) == 0)
         SDL_Log("Failed to initiate IMG : %s\n",IMG_GetError());
 
-    window = SDL_CreateWindow(title,SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,width,height,0);
+    window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
 
     if(window == NULL)
     {
@@ -41,12 +41,11 @@ int ME_Init(const char *title, int screenWidth, int screenHeight)
     }
 
     Uint32 rendflag = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
-    renderer = SDL_CreateRenderer(window,-1,rendflag);
+    renderer = SDL_CreateRenderer(window, -1, rendflag);
 
     SDL_RendererInfo rendererInfo;
     SDL_GetRendererInfo(renderer, &rendererInfo);
 
-    SDL_Log("Renderer : %s",rendererInfo.name);
 
     if(renderer == NULL)
     {
@@ -56,6 +55,9 @@ int ME_Init(const char *title, int screenWidth, int screenHeight)
 
     ME_SetRenderColor(renderer, dfDrawColor);
 
+    SDL_Log("MicroEngine :: Renderer : %s",rendererInfo.name);
+    SDL_Log("MicroEngine :: Window dimensions : %d x %d",width, height);
+
     return 1;
 }
 
@@ -63,15 +65,30 @@ void ME_Run(void (*HandleEvents)(SDL_Event event),
             void (*Update)(float deltaTime),
             void (*Render)(SDL_Renderer *renderer))
 {
+    //Spalsh screen
+    SDL_Texture *splashTextre = IMG_LoadTexture(renderer, "assets/MicroEngine_SplashScreen_2.png");
+    SDL_Rect splashRect = {0,0, width, height};
+
+    SDL_RenderClear(renderer);
+    SDL_RenderCopy(renderer, splashTextre, NULL, &splashRect);
+    SDL_RenderPresent(renderer);
+
+    SDL_Delay(2000);
+
     while(!quit)
     {
         startTime = SDL_GetPerformanceCounter();
 
         //Event handling
-        if(SDL_PollEvent(&event))
+        while(SDL_PollEvent(&event))
         {
-            if(event.type == SDL_QUIT)
+            switch(event.type)
+            {
+            case SDL_QUIT:
                 quit = true;
+                break;
+            }
+
 
             HandleEvents(event);
         }
@@ -88,7 +105,7 @@ void ME_Run(void (*HandleEvents)(SDL_Event event),
         endTime = SDL_GetPerformanceCounter();
         deltaTime = (float)((endTime - startTime) * 1000.0 / SDL_GetPerformanceFrequency());
         deltaTime *= 0.001f;
-        deltaTime = deltaTime < 0.016f ? 0.016f : deltaTime;
+        //deltaTime = deltaTime < 0.016f ? 0.016f : deltaTime;
     }
 }
 

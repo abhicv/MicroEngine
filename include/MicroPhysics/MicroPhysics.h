@@ -12,16 +12,16 @@ typedef struct
     float mass;
     Vector2 velocity;
 
-}MP_DynamicObject;
+} MP_DynamicObject;
 
-MP_DynamicObject MP_CreateDynamic(float ,SDL_Rect);
+MP_DynamicObject MP_CreateDynamic(float,SDL_Rect);
 
 typedef struct
 {
     int objectID;
     SDL_Rect collisionRect;
 
-}MP_StaticObject;
+} MP_StaticObject;
 
 
 #endif // MICROPHYSICS_H

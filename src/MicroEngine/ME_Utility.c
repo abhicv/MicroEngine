@@ -1,5 +1,15 @@
 #include "../../include/MicroEngine/ME_Utility.h"
 
+float MapFloat(float x, float in_min, float in_max, float out_min, float out_max)
+{
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+long MapInt(long x, long in_min, long in_max, long out_min, long out_max)
+{
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
 SDL_Color ME_HexToSdlColor(ME_Color color)
 {
     SDL_Color sdlColor;
@@ -10,6 +20,11 @@ SDL_Color ME_HexToSdlColor(ME_Color color)
     sdlColor.a = 255;
 
     return sdlColor;
+}
+
+int ME_Random(int min, int max)
+{
+    return (rand() % (max - min + 1)) + min;
 }
 
 SDL_Color ME_RandomSdlColor()

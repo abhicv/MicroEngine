@@ -6,7 +6,7 @@ typedef struct
     void *data;
     int numOfElements;
 
-}ME_DArray;
+} ME_DArray;
 
 void ME_CreateDArray();
 void ME_DestroyDArray(ME_DArray *dArray);

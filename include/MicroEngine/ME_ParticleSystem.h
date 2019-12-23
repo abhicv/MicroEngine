@@ -7,7 +7,8 @@
 
 #include "ME_Vector2D.h"
 
-typedef struct {
+typedef struct
+{
 
     int numParticles;
     Vector2 systemPos;
@@ -15,7 +16,7 @@ typedef struct {
     Vector2 *velocity;
     SDL_Texture *texture;
 
-}ME_ParticleSystem;
+} ME_ParticleSystem;
 
 ME_ParticleSystem* ME_CreateParticleSystem(int x, int y, int numParticles);
 void ME_UpdateParticleSystem(ME_ParticleSystem *particleSystem, float deltaTime);

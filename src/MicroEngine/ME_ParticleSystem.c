@@ -25,6 +25,8 @@ ME_ParticleSystem* ME_CreateParticleSystem(int x, int y, int numParticles)
         particleSystem->velocity[i] = NewVector2((rand() % 100) * cos(angle), (rand() % 100) * sin(angle));
     }
 
+    SDL_Log("Particle system :: no of particles : %d", numParticles);
+
     return particleSystem;
 }
 
@@ -66,7 +68,7 @@ void ME_RenderParticleSystem(ME_ParticleSystem *particleSystem, SDL_Renderer *re
 
         //destRect.w = destRect.h = rand() % SDL_GetTicks() / 1000;
 
-       // color = ME_RandomSdlColor();
+        // color = ME_RandomSdlColor();
 
         if(particleSystem->texture != NULL)
             SDL_RenderCopyEx(renderer, particleSystem->texture, NULL, &destRect, 0, NULL, SDL_FLIP_NONE);

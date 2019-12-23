@@ -6,6 +6,7 @@ MUI_Button button;
 MUI_Button b2;
 MUI_TextBox text;
 MUI_CheckBox checkBox;
+MUI_Slider slider;
 
 void HandleEvents(SDL_Event event)
 {
@@ -22,6 +23,11 @@ void HandleEvents(SDL_Event event)
     if(MUI_ButtonPressed(&b2, event))
     {
         SDL_Log("%s Button press\n", b2.label);
+    }
+
+    if(MUI_OnSliderValueChange(&slider, event))
+    {
+        printf("slider value : %f\n", slider.value);
     }
 
 }
@@ -42,6 +48,7 @@ void Render(SDL_Renderer *renderer)
     MUI_RenderButton(&b2, renderer);
     MUI_RenderTextBox(&text, renderer, MUI_TEXT_SOLID);
     MUI_RenderCheckBox(&checkBox, renderer);
+    MUI_RenderSlider(&slider, renderer);
 }
 
 int main(int argc, char* argv[])
@@ -70,6 +77,8 @@ int main(int argc, char* argv[])
     //checkBox.bgTexture = IMG_LoadTexture(mainRenderer, "assets/Sprites/grey_circle.png");
     //checkBox.tickTexture = IMG_LoadTexture(mainRenderer, "assets/Sprites/checkmark.png");
     checkBox.checked = true;
+
+    slider = MUI_CreateSlider(30, 30, 50.0f, 0.0f, 100.0f);
 
     ME_Run(&HandleEvents, &Update, &Render);
 

@@ -11,7 +11,7 @@ MUI_TextBox MUI_CreateTextBox(int x, int y, int fontSize)
     textBox.rect.y = y;
 
     textBox.textString = (char*)malloc(sizeof(char) * MAX_STRING_SIZE);
-    strcpy(textBox.textString, "TextBox");
+    strcpy(textBox.textString, "textbox");
 
     textBox.font = NULL;
     textBox.font = TTF_OpenFont(BIT_5x3_FONT_FILE, fontSize);
@@ -20,7 +20,7 @@ MUI_TextBox MUI_CreateTextBox(int x, int y, int fontSize)
 
     if(textBox.font == NULL)
     {
-        SDL_Log("Could not load default font : %s", TTF_GetError());
+        SDL_Log("MUI :: TextBox : Could not load font : %s", TTF_GetError());
     }
 
     textBox.textColor = dfTextColor;
@@ -45,7 +45,7 @@ void MUI_SetTextBoxFont(MUI_TextBox *textBox, TTF_Font *font)
     if(font != NULL)
         textBox->font = font;
     else
-        SDL_Log("Could not set new font");
+        SDL_Log("MUI :: TextBox : Could not set new font");
 }
 
 void MUI_RenderTextBox(MUI_TextBox* textBox, SDL_Renderer* renderer, enum MUI_TextRenderMethod rendMethod)
@@ -73,7 +73,7 @@ void MUI_RenderTextBox(MUI_TextBox* textBox, SDL_Renderer* renderer, enum MUI_Te
                 break;
 
             default:
-                SDL_Log("Invalid text render method");
+                SDL_Log("MUI :: TextBox : Invalid text render method");
                 break;
             }
         }

@@ -12,7 +12,7 @@ typedef struct
     SDL_Point *rotationCenter;
     double angle;
 
-}ME_RenderRequest;
+} ME_RenderRequest;
 
 void ME_CreateRenderRequest(SDL_Texture *,
                             SDL_Rect *,

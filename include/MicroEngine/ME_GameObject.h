@@ -12,12 +12,16 @@
 typedef struct
 {
     Vector2 position;
+    float angle;
+    Vector2 scale;
+    bool enabled;
+
     int nFrames;
     bool animate;
+
     SDL_Texture *texture;
     SDL_Rect srcRect;
     SDL_Rect destRect;
-    bool enabled;
     SDL_Color debugColor;
 
 } ME_GameObject;

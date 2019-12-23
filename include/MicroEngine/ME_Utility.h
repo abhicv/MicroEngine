@@ -4,12 +4,17 @@
 #include <SDL2\SDL.h>
 #include <stdio.h>
 
-#define PRINT_COLOR(Color) printf("r: %d, g: %d, b: %d\n",Color.r,Color.g,Color.b)
+#define DEBUG_PRINT_COLOR(Color) printf("r: %d, g: %d, b: %d\n",Color.r,Color.g,Color.b)
+#define DEBUG_LOG_COORDINATES(position) printf("x : %d, y : %d\n", position.x, position.y)
 
 typedef unsigned int ME_Color;
 
+float MapFloat(float x, float in_min, float in_max, float out_min, float out_max);
+long MapInt(long x, long in_min, long in_max, long out_min, long out_max);
+
 SDL_Color ME_HexToSdlColor(ME_Color);
 SDL_Color ME_RandomSdlColor();
+int ME_Random(int min, int max);
 
 void ME_SetRenderColor(SDL_Renderer*, SDL_Color);
 SDL_Color ME_GetRenderColor(SDL_Renderer*);

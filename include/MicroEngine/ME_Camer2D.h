@@ -9,6 +9,6 @@ typedef struct
     int width;
     int height;
 
-}Camera2d;
+} Camera2d;
 
 #endif // ME_CAMERA2D_H
