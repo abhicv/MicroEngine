@@ -13,8 +13,8 @@ ME_GameObject* ME_CreateGameObject(int xPos, int yPos)
 
     gameObject->angle = 0;
 
-    gameObject->destRect.w = 64;
-    gameObject->destRect.h = 64;
+    gameObject->destRect.w = 32;
+    gameObject->destRect.h = 32;
 
     gameObject->srcRect.x = 0;
     gameObject->srcRect.y = 0;
@@ -45,8 +45,6 @@ void ME_RenderGameObject(ME_GameObject *gameObject, SDL_Renderer *renderer)
     debugRect.x = gameObject->position.x;
     debugRect.y = gameObject->position.y;
 
-    //SDL_Point centerOfRot = {gameObject->position.x, gameObject->position.y};
-    SDL_Point centerOfRot = {gameObject->destRect.x, gameObject->destRect.y};
 
     if(gameObject->enabled)
     {

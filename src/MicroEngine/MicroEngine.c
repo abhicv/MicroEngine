@@ -1,6 +1,7 @@
 //Micro Engine core
 #include "../../include/MicroEngine/MicroEngine.h"
 #include "../../include/MicroEngine/ME_Utility.h"
+#include "../../include/MicroUI/MicroUI.h"
 
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
@@ -13,7 +14,19 @@ int endTime = 0;
 float deltaTime = 0.016f;
 SDL_Event event;
 
+float pauseFactor = 1;
+
 const SDL_Color dfDrawColor = {0,0,0,255};
+
+void Pause()
+{
+    pauseFactor = 0.0f;
+}
+
+void UnPause()
+{
+    pauseFactor = 1.0f;
+}
 
 int ME_Init(const char *title, int screenWidth, int screenHeight)
 {
@@ -73,7 +86,11 @@ void ME_Run(void (*HandleEvents)(SDL_Event event),
     SDL_RenderCopy(renderer, splashTextre, NULL, &splashRect);
     SDL_RenderPresent(renderer);
 
-    SDL_Delay(2000);
+    SDL_Delay(1000);
+
+    MUI_TextBox fpsText = MUI_CreateTextBox(30, 10, 25);
+    MUI_SetTextBoxColor(&fpsText, ME_HexToSdlColor(0xffff00));
+
 
     while(!quit)
     {
@@ -89,7 +106,6 @@ void ME_Run(void (*HandleEvents)(SDL_Event event),
                 break;
             }
 
-
             HandleEvents(event);
         }
 
@@ -99,14 +115,21 @@ void ME_Run(void (*HandleEvents)(SDL_Event event),
         //Rendering
         SDL_RenderClear(renderer);
         Render(renderer);
+        MUI_RenderTextBox(&fpsText, renderer, MUI_TEXT_SOLID);
         SDL_RenderPresent(renderer);
 
         //Calculating delta time
         endTime = SDL_GetPerformanceCounter();
-        deltaTime = (float)((endTime - startTime) * 1000.0 / SDL_GetPerformanceFrequency());
+        deltaTime = (float)((endTime - startTime) * 1000 / SDL_GetPerformanceFrequency());
         deltaTime *= 0.001f;
+        deltaTime *= pauseFactor;
+
+        sprintf(fpsText.textString, "%0.2f", 1/deltaTime);
         //deltaTime = deltaTime < 0.016f ? 0.016f : deltaTime;
     }
+
+    //cleaning fps text box
+    MUI_DestroyTextBox(&fpsText);
 }
 
 void ME_Quit()
