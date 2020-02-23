@@ -1,4 +1,4 @@
-//Micro Engine core
+//Micro Engine core components
 #include "../../include/MicroEngine/MicroEngine.h"
 #include "../../include/MicroEngine/ME_Utility.h"
 #include "../../include/MicroUI/MicroUI.h"
