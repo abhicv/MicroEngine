@@ -36,9 +36,10 @@
 				<Option compiler="gcc" />
 			</Target>
 			<Target title="Vector_Field">
-				<Option output="Vector_Filed" prefix_auto="1" extension_auto="1" />
-				<Option type="0" />
+				<Option output="bin/Vector_Filed" prefix_auto="1" extension_auto="1" />
+				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
 			</Target>
 		</Build>
 		<Compiler>
@@ -132,6 +133,10 @@
 			<Option target="SpaceShip_Game" />
 			<Option target="" />
 			<Option target="SpaceShip_game" />
+		</Unit>
+		<Unit filename="src/Vector_Field.c">
+			<Option compilerVar="CC" />
+			<Option target="Vector_Field" />
 		</Unit>
 		<Extensions>
 			<code_completion />

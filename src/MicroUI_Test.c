@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    SDL_Renderer *mainRenderer = ME_GetRenderer();;
+    SDL_Renderer *mainRenderer = ME_GetRenderer();
 
     //UI Elements
     button = MUI_CreateButton(300,100);
