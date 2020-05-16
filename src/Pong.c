@@ -1,6 +1,5 @@
-#include "../../include/MicroEngine/MicroEngine.h"
-#include "../../include/MicroUI/MicroUI.h"
-#include "../../include/MicroEngine/ME_Utility.h"
+#include <MicroEngine.h>
+#include <MicroUI.h>
 
 //Game states
 enum GameState
@@ -213,7 +212,7 @@ void Render(SDL_Renderer *renderer)
 int main(int argc, char *argv[])
 {
     //Initialization of micro engine
-    if(!ME_Init("Pong Game",800,600))
+    if(!ME_Init("Pong Game", 800, 600))
     {
         ME_Quit();
         return EXIT_FAILURE;
@@ -226,7 +225,7 @@ int main(int argc, char *argv[])
     gridRect.x = gridRect.y = 0;
 
     //UI elements initialization
-    play = MUI_CreateButton(ME_GetScreenWidth()/2,ME_GetScreenHeight()/2);
+    play = MUI_CreateButton(ME_GetScreenWidth() / 2, ME_GetScreenHeight() / 2);
     MUI_SetButtonLabel(&play, "Play");
 
     pongTitle = MUI_CreateTextBox(play.rect.x, play.rect.y - 100, 140);
@@ -237,11 +236,11 @@ int main(int argc, char *argv[])
     strcpy(creditText.textString, "Made With MicroEngine");
     creditText.textColor = white;
 
-    playerScore = MUI_CreateTextBox(ME_GetScreenWidth()/2 + 50, 60, 60);
-    sprintf(playerScore.textString,"0");
+    playerScore = MUI_CreateTextBox(ME_GetScreenWidth() / 2 + 50, 60, 60);
+    sprintf(playerScore.textString, "0");
     playerScore.textColor = white;
 
-    computerScore = MUI_CreateTextBox(ME_GetScreenWidth()/2 - 50, 60, 60);
+    computerScore = MUI_CreateTextBox(ME_GetScreenWidth() / 2 - 50, 60, 60);
     sprintf(computerScore.textString,"0");
     computerScore.textColor = white;
 
@@ -266,15 +265,14 @@ int main(int argc, char *argv[])
     //Background grid
     grid = IMG_LoadTexture(mainRenderer, "assets/Sprites/grid.png");
 
-
     ME_Run(&HandleEvents, &Update, &Render);
-
 
     //Cleaning up everything
     ME_DestroyGameObject(player);
     ME_DestroyGameObject(computer);
     ME_DestroyGameObject(ball);
 
+    //cleaning up gui components
     MUI_DestroyButton(&play);
     MUI_DestroyTextBox(&playerScore);
     MUI_DestroyTextBox(&computerScore);
@@ -283,5 +281,5 @@ int main(int argc, char *argv[])
 
     ME_Quit();
 
-    return EXIT_SUCCESS;
+    return 0;
 }

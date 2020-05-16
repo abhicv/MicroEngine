@@ -63,8 +63,6 @@ void ME_RenderGameObject(ME_GameObject *gameObject, SDL_Renderer *renderer)
 void ME_DestroyGameObject(ME_GameObject *gameObject)
 {
     SDL_DestroyTexture(gameObject->texture);
-
     free(gameObject);
-
     gameObject = NULL;
 }

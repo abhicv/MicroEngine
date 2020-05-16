@@ -11,7 +11,6 @@ MUI_Button MUI_CreateButton(int x, int y)
     button.bgTexture = NULL;
     button.enabled = true;
     button.state = INACTIVE;
-
     button.rect.x  = x;
     button.rect.y = y;
     button.rect.w = DEFAULT_BUTTON_WIDTH;
@@ -36,11 +35,10 @@ bool MUI_ButtonPressed(MUI_Button *button, SDL_Event event)
 
         mousePos.x = event.motion.x;
         mousePos.y = event.motion.y;
-
         tmpRect.x = button->rect.x - button->rect.w / 2;
         tmpRect.y = button->rect.y - button->rect.h / 2;
 
-        if(SDL_PointInRect(&mousePos,&tmpRect))
+        if(SDL_PointInRect(&mousePos, &tmpRect))
         {
             button->state = ACTIVE;
 

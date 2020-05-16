@@ -2,6 +2,7 @@
 #include "../../include/MicroUI/MicroUI.h"
 #include "../../include/MIcroEngine/ME_Utility.h"
 
+//Required gui components
 MUI_Button button;
 MUI_Button b2;
 MUI_TextBox text;
@@ -53,6 +54,7 @@ void Render(SDL_Renderer *renderer)
 
 int main(int argc, char* argv[])
 {
+    //Intialization
     if(!ME_Init("MicroUI test",800,600))
     {
         SDL_Quit();
@@ -63,15 +65,15 @@ int main(int argc, char* argv[])
 
     //UI Elements
     button = MUI_CreateButton(300,100);
-    MUI_SetButtonLabelFont(&button, TTF_OpenFont(BIT_5x3_FONT_FILE,25));
-    MUI_SetButtonLabel(&button, "play");
+    MUI_SetButtonLabelFont(&button, TTF_OpenFont(BIT_5x3_FONT_FILE, 25));
+    MUI_SetButtonLabel(&button, "Play");
 
     b2 = MUI_CreateButton(300, 150);
     MUI_SetButtonLabel(&b2, "Quit");
 
     text = MUI_CreateTextBox(100,100,20);
     text.textColor = ME_HexToSdlColor(0xffffff);
-    //text.font = TTF_OpenFont("assets/Font/OpenSans-Regular.ttf", 20);
+    text.font = TTF_OpenFont("assets/Font/OpenSans-Regular.ttf", 20);
 
     checkBox = MUI_CreateCheckBox(200,200);
     //checkBox.bgTexture = IMG_LoadTexture(mainRenderer, "assets/Sprites/grey_circle.png");
@@ -82,6 +84,7 @@ int main(int argc, char* argv[])
 
     ME_Run(&HandleEvents, &Update, &Render);
 
+    //cleaning things
     MUI_DestroyButton(&button);
     MUI_DestroyButton(&b2);
     MUI_DestroyTextBox(&text);
@@ -89,5 +92,5 @@ int main(int argc, char* argv[])
 
     ME_Quit();
 
-    return EXIT_SUCCESS;
+    return 0;
 }

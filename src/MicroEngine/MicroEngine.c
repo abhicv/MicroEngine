@@ -91,7 +91,7 @@ void ME_Run(void (*HandleEvents)(SDL_Event event),
     MUI_TextBox fpsText = MUI_CreateTextBox(30, 10, 25);
     MUI_SetTextBoxColor(&fpsText, ME_HexToSdlColor(0xffff00));
 
-
+    //main loop
     while(!quit)
     {
         startTime = SDL_GetPerformanceCounter();
@@ -164,4 +164,3 @@ int ME_GetScreenHeight()
 {
     return height;
 }
-

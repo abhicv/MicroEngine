@@ -1,7 +1,6 @@
 //Micro Game Engine
 /*
 Author :: Abhijith.C.V (Lone-coder)
-
 */
 
 #ifndef MICROENGINE_H
@@ -21,21 +20,18 @@ Author :: Abhijith.C.V (Lone-coder)
 
 #include "ME_GameObject.h"
 #include "ME_Vector2D.h"
+#include "ME_ParticleSystem.h"
+#include "ME_Renderer.h"
+#include "ME_Utility.h"
 
 int ME_Init(const char *title, int screenWidth, int screenHeight);
-
 void ME_Run(void (*handleEvents)(SDL_Event event),
             void (*update)(float deltaTime),
             void (*render)(SDL_Renderer *renderer));
-
 void ME_Quit();
-
 SDL_Window* ME_GetWindow();
-
 SDL_Renderer* ME_GetRenderer();
-
 int ME_GetScreenWidth();
-
 int ME_GetScreenHeight();
 
 #endif //GAMEENGINE_H

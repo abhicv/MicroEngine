@@ -2,6 +2,7 @@
 #include "../include/MicroUI/MicroUI.h"
 #include "../include/MicroEngine/ME_Utility.h"
 
+//macro definition for for loop frequently used
 #define foreach(count) int i = 0; \
                         for(i = 0; i < count; i++)
 
@@ -15,43 +16,38 @@ ME_GameObject *obstacles[obstacle_max_count];
 MUI_TextBox scoreText;
 MUI_TextBox gameOverText;
 
-Vector2 velocity = {0, 0};
+Vector2 velocity = {0.0f, 0.0f};
 float gravity = 200.0f;
 int score = 0;
 int toCheck = 0;
 
-void HandleEvents(SDL_Event event)
-{
-    if(event.type == SDL_KEYDOWN)
-    {
+void HandleEvents(SDL_Event event) {
+
+    if(event.type == SDL_KEYDOWN) {
         if(event.key.keysym.scancode == SDL_SCANCODE_SPACE)
             velocity.y = -300.0f;
-            //gravity = -1200.0f;
+        //gravity = -1200.0f;
 
         else if(event.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
             UnPause();
     }
 
-    if(event.type == SDL_KEYUP)
-    {
+    if(event.type == SDL_KEYUP) {
         if(event.key.keysym.scancode == SDL_SCANCODE_SPACE)
             velocity.y = 200.0f;
-            //gravity = 1000.0f;
+        //gravity = 1000.0f;
     }
 }
 
-void Update(float deltaTime)
-{
-    if(player->position.y > ME_GetScreenHeight())
-    {
+void Update(float deltaTime) {
+    if(player->position.y > ME_GetScreenHeight()) {
         velocity.y = 0;
         player->position.y =  ME_GetScreenHeight();
         gameOverText.enabled = true;
         Pause();
     }
 
-    if(player->position.y < 0)
-    {
+    if(player->position.y < 0) {
         velocity.y = 0;
         player->position.y =  0;
         gameOverText.enabled = true;
@@ -62,13 +58,11 @@ void Update(float deltaTime)
     player->position.y += velocity.y * deltaTime;
 
 
-    foreach(obstacle_max_count)
-    {
+    foreach(obstacle_max_count) {
         obstacles[i]->position.x += -200 * deltaTime;
 
         //reseting position of obstacles
-        if(obstacles[i]->position.x <= 0 - 100)
-        {
+        if(obstacles[i]->position.x <= 0 - 100) {
             obstacles[i]->position.y = ME_Random(ME_GetScreenHeight() - 200, ME_GetScreenHeight() + 30);
 
             if(i != 0)
@@ -79,21 +73,16 @@ void Update(float deltaTime)
 
 
             obstacles[i]->enabled = false;
-        }
-        else if(obstacles[i]->position.x > ME_GetScreenWidth() + 100)
-        {
+        } else if(obstacles[i]->position.x > ME_GetScreenWidth() + 100) {
             obstacles[i]->enabled = false;
-        }
-        else
-        {
+        } else {
             obstacles[i]->enabled = true;
         }
 
     }
 
     //Checking for obstacle avoidance by player and incrementing score
-    if(obstacles[toCheck]->position.x + 60 < player->position.x)
-    {
+    if(obstacles[toCheck]->position.x + 60 < player->position.x) {
         score++;
         toCheck++;
 
@@ -105,14 +94,12 @@ void Update(float deltaTime)
 
 }
 
-void Render(SDL_Renderer *renderer)
-{
+void Render(SDL_Renderer *renderer) {
     ME_RenderGameObject(player, renderer);
 
     int y;
 
-    foreach(obstacle_max_count)
-    {
+    foreach(obstacle_max_count) {
         ME_RenderGameObject(obstacles[i], renderer);
         y = obstacles[i]->position.y;
 
@@ -128,11 +115,9 @@ void Render(SDL_Renderer *renderer)
 
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     //---MicroEngine initialization---
-    if(!ME_Init("Flappy Bird Clone", 400, 600))
-    {
+    if(!ME_Init("Flappy Bird Clone", 400, 600)) {
         ME_Quit();
         return 1;
     }
@@ -145,8 +130,7 @@ int main(int argc, char *argv[])
     //player->texture = IMG_LoadTexture(ME_GetRenderer(), "assets/Sprites/Player.png");
 
     //obstacles
-    foreach(obstacle_max_count)
-    {
+    foreach(obstacle_max_count) {
         obstacles[i] = ME_CreateGameObject(ME_GetScreenWidth() + 100, ME_Random(ME_GetScreenHeight() - 200, ME_GetScreenHeight()));
         obstacles[i]->texture = IMG_LoadTexture(ME_GetRenderer(), "assets/Sprites/obstacle.png");
         obstacles[i]->destRect.w = 100;
@@ -172,8 +156,7 @@ int main(int argc, char *argv[])
     //---Cleaning up everything---
     ME_DestroyGameObject(player);
 
-    for(i = 0 ; i < obstacle_max_count; i++)
-    {
+    for(i = 0 ; i < obstacle_max_count; i++) {
         ME_DestroyGameObject(obstacles[i]);
     }
 
