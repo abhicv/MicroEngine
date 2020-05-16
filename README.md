@@ -17,11 +17,10 @@
 - Event handling
 
 ## How to build
-- run batch file build.bat
--Require cl (Microsoft visual C compiler) to be in the path variable
+- Run batch file in the root directory (build.bat)
+- Require cl (Microsoft visual C compiler) to be in the path environment variable.
 - if using different version of Microsoft Visual Studio change the version number in :
   call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall" x64
-
 
 ## Games developed
 - #### Flappy bird
