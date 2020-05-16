@@ -20,7 +20,7 @@
 - run batch file build.bat
 -Require cl (Microsoft visual C compiler) to be in the path variable
 - if using different version of Microsoft Visual Studio change the version number in :
-  call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall"
+  call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall" x64
 
 
 ## Games developed
