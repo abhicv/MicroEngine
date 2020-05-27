@@ -8,8 +8,7 @@ float velocity[50];
 Vector2 bulletDir[50];
 int currentBulletIndex;
 
-void Shoot()
-{
+void Shoot() {
     velocity[currentBulletIndex] = 500.0f;
 
     bulletDir[currentBulletIndex].x = mousePos.x - spaceship->position.x;
@@ -21,12 +20,10 @@ void Shoot()
 
     int i = 0;
 
-    if(currentBulletIndex >= 50)
-    {
+    if (currentBulletIndex >= 50) {
         currentBulletIndex = 0;
 
-        for(i = 0; i < 50; i++)
-        {
+        for (i = 0; i < 50; i++) {
             bullets[i]->position = spaceship->position;
             velocity[i] = 0;
             //bulletDir[i] = NewVector2(0, 0);
@@ -35,35 +32,30 @@ void Shoot()
 
 }
 
-void HandleEvents(SDL_Event event)
-{
+void HandleEvents(SDL_Event event) {
     SDL_GetMouseState(&mousePos.x, &mousePos.y);
 
     DEBUG_LOG_COORDINATES(mousePos);
 
-    spaceship->angle = - 180 / M_PI * atan2(mousePos.x - spaceship->position.x, mousePos.y - spaceship->position.y);
+    spaceship->angle = -180 / M_PI * atan2(mousePos.x - spaceship->position.x, mousePos.y - spaceship->position.y);
 
-    if(event.type == SDL_MOUSEBUTTONDOWN)
-    {
+    if (event.type == SDL_MOUSEBUTTONDOWN) {
         Shoot();
     }
 }
 
 
-void Update(float deltaTime)
-{
+void Update(float deltaTime) {
     int i = 0;
 
-    for(i = 0; i < 50; i++)
-    {
+    for (i = 0; i < 50; i++) {
         bullets[i]->position.x += velocity[i] * bulletDir[i].x * deltaTime;
         bullets[i]->position.y += velocity[i] * bulletDir[i].y * deltaTime;
     }
 
 }
 
-void Render(SDL_Renderer *renderer)
-{
+void Render(SDL_Renderer *renderer) {
     SDL_Color rendColor = ME_GetRenderColor(renderer);
 
     ME_RenderGameObject(spaceship, renderer);
@@ -74,16 +66,13 @@ void Render(SDL_Renderer *renderer)
 
     int i = 0;
 
-    for(i = 0; i < 50; i++)
-    {
+    for (i = 0; i < 50; i++) {
         ME_RenderGameObject(bullets[i], renderer);
     }
 }
 
-int main(int argc, char *argv[])
-{
-    if(!ME_Init("SpaceShip Game", 1024, 720))
-    {
+int main(int argc, char *argv[]) {
+    if (!ME_Init("SpaceShip Game", 1024, 720)) {
         ME_Quit();
         return 1;
     }
@@ -93,12 +82,11 @@ int main(int argc, char *argv[])
     int i = 0;
 
     spaceship = ME_CreateGameObject(400, 300);
-    spaceship->texture = IMG_LoadTexture(ME_GetRenderer(),"assets/Sprites/spaceship.png");
+    spaceship->texture = IMG_LoadTexture(ME_GetRenderer(), "assets/Sprites/spaceship.png");
     spaceship->destRect.w = 128;
     spaceship->destRect.h = 128;
 
-    for(i = 0; i < 50; i++)
-    {
+    for (i = 0; i < 50; i++) {
         bullets[i] = ME_CreateGameObject(400, 300);
         bullets[i]->destRect.w = 15;
         bullets[i]->destRect.h = 15;
@@ -111,8 +99,7 @@ int main(int argc, char *argv[])
 
     //Cleaning up everything
     ME_DestroyGameObject(spaceship);
-    for(i = 0; i < 50; i++)
-    {
+    for (i = 0; i < 50; i++) {
         ME_DestroyGameObject(bullets[i]);
     }
 

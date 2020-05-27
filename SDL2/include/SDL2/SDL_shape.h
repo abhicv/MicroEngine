@@ -63,7 +63,9 @@ extern "C" {
  *
  *  \sa SDL_DestroyWindow()
  */
-extern DECLSPEC SDL_Window * SDLCALL SDL_CreateShapedWindow(const char *title,unsigned int x,unsigned int y,unsigned int w,unsigned int h,Uint32 flags);
+extern DECLSPEC SDL_Window *
+SDLCALL SDL_CreateShapedWindow(const char *title, unsigned int x, unsigned int y, unsigned int w, unsigned int h,
+                               Uint32 flags);
 
 /**
  * \brief Return whether the given window is a shaped window.
@@ -118,7 +120,7 @@ typedef struct SDL_WindowShapeMode {
  * \sa SDL_WindowShapeMode
  * \sa SDL_GetShapedWindowMode.
  */
-extern DECLSPEC int SDLCALL SDL_SetWindowShape(SDL_Window *window,SDL_Surface *shape,SDL_WindowShapeMode *shape_mode);
+extern DECLSPEC int SDLCALL SDL_SetWindowShape(SDL_Window *window, SDL_Surface *shape, SDL_WindowShapeMode *shape_mode);
 
 /**
  * \brief Get the shape parameters of a shaped window.
@@ -133,12 +135,13 @@ extern DECLSPEC int SDLCALL SDL_SetWindowShape(SDL_Window *window,SDL_Surface *s
  * \sa SDL_WindowShapeMode
  * \sa SDL_SetWindowShape
  */
-extern DECLSPEC int SDLCALL SDL_GetShapedWindowMode(SDL_Window *window,SDL_WindowShapeMode *shape_mode);
+extern DECLSPEC int SDLCALL SDL_GetShapedWindowMode(SDL_Window *window, SDL_WindowShapeMode *shape_mode);
 
 /* Ends C function definitions when using C++ */
 #ifdef __cplusplus
 }
 #endif
+
 #include "close_code.h"
 
 #endif /* SDL_shape_h_ */

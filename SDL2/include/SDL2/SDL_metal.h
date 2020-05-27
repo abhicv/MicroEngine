@@ -68,7 +68,7 @@ typedef void *SDL_MetalView;
  *
  *  \sa SDL_Metal_DestroyView
  */
-extern DECLSPEC SDL_MetalView SDLCALL SDL_Metal_CreateView(SDL_Window * window);
+extern DECLSPEC SDL_MetalView SDLCALL SDL_Metal_CreateView(SDL_Window *window);
 
 /**
  *  \brief Destroy an existing SDL_MetalView object.
@@ -86,6 +86,7 @@ extern DECLSPEC void SDLCALL SDL_Metal_DestroyView(SDL_MetalView view);
 #ifdef __cplusplus
 }
 #endif
+
 #include "close_code.h"
 
 #endif /* SDL_metal_h_ */

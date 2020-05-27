@@ -74,6 +74,7 @@ extern DECLSPEC void SDLCALL SDL_UnloadObject(void *handle);
 #ifdef __cplusplus
 }
 #endif
+
 #include "close_code.h"
 
 #endif /* SDL_loadso_h_ */

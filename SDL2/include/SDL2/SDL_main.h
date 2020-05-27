@@ -110,6 +110,7 @@
 #endif
 
 #include "begin_code.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -118,6 +119,7 @@ extern "C" {
  *  The prototype for the application's main() function
  */
 typedef int (*SDL_main_func)(int argc, char *argv[]);
+
 extern SDLMAIN_DECLSPEC int SDL_main(int argc, char *argv[]);
 
 
@@ -173,6 +175,7 @@ extern DECLSPEC int SDLCALL SDL_UIKitRunApp(int argc, char *argv[], SDL_main_fun
 #ifdef __cplusplus
 }
 #endif
+
 #include "close_code.h"
 
 #endif /* SDL_main_h_ */

@@ -61,8 +61,7 @@ extern "C" {
  *  at the VERBOSE level and all other categories are enabled at the
  *  CRITICAL level.
  */
-typedef enum
-{
+typedef enum {
     SDL_LOG_CATEGORY_APPLICATION,
     SDL_LOG_CATEGORY_ERROR,
     SDL_LOG_CATEGORY_ASSERT,
@@ -99,8 +98,7 @@ typedef enum
 /**
  *  \brief The predefined log priorities
  */
-typedef enum
-{
+typedef enum {
     SDL_LOG_PRIORITY_VERBOSE = 1,
     SDL_LOG_PRIORITY_DEBUG,
     SDL_LOG_PRIORITY_INFO,
@@ -142,32 +140,38 @@ extern DECLSPEC void SDLCALL SDL_Log(SDL_PRINTF_FORMAT_STRING const char *fmt, .
 /**
  *  \brief Log a message with SDL_LOG_PRIORITY_VERBOSE
  */
-extern DECLSPEC void SDLCALL SDL_LogVerbose(int category, SDL_PRINTF_FORMAT_STRING const char *fmt, ...) SDL_PRINTF_VARARG_FUNC(2);
+extern DECLSPEC void SDLCALL
+SDL_LogVerbose(int category, SDL_PRINTF_FORMAT_STRING const char *fmt, ...) SDL_PRINTF_VARARG_FUNC(2);
 
 /**
  *  \brief Log a message with SDL_LOG_PRIORITY_DEBUG
  */
-extern DECLSPEC void SDLCALL SDL_LogDebug(int category, SDL_PRINTF_FORMAT_STRING const char *fmt, ...) SDL_PRINTF_VARARG_FUNC(2);
+extern DECLSPEC void SDLCALL
+SDL_LogDebug(int category, SDL_PRINTF_FORMAT_STRING const char *fmt, ...) SDL_PRINTF_VARARG_FUNC(2);
 
 /**
  *  \brief Log a message with SDL_LOG_PRIORITY_INFO
  */
-extern DECLSPEC void SDLCALL SDL_LogInfo(int category, SDL_PRINTF_FORMAT_STRING const char *fmt, ...) SDL_PRINTF_VARARG_FUNC(2);
+extern DECLSPEC void SDLCALL
+SDL_LogInfo(int category, SDL_PRINTF_FORMAT_STRING const char *fmt, ...) SDL_PRINTF_VARARG_FUNC(2);
 
 /**
  *  \brief Log a message with SDL_LOG_PRIORITY_WARN
  */
-extern DECLSPEC void SDLCALL SDL_LogWarn(int category, SDL_PRINTF_FORMAT_STRING const char *fmt, ...) SDL_PRINTF_VARARG_FUNC(2);
+extern DECLSPEC void SDLCALL
+SDL_LogWarn(int category, SDL_PRINTF_FORMAT_STRING const char *fmt, ...) SDL_PRINTF_VARARG_FUNC(2);
 
 /**
  *  \brief Log a message with SDL_LOG_PRIORITY_ERROR
  */
-extern DECLSPEC void SDLCALL SDL_LogError(int category, SDL_PRINTF_FORMAT_STRING const char *fmt, ...) SDL_PRINTF_VARARG_FUNC(2);
+extern DECLSPEC void SDLCALL
+SDL_LogError(int category, SDL_PRINTF_FORMAT_STRING const char *fmt, ...) SDL_PRINTF_VARARG_FUNC(2);
 
 /**
  *  \brief Log a message with SDL_LOG_PRIORITY_CRITICAL
  */
-extern DECLSPEC void SDLCALL SDL_LogCritical(int category, SDL_PRINTF_FORMAT_STRING const char *fmt, ...) SDL_PRINTF_VARARG_FUNC(2);
+extern DECLSPEC void SDLCALL
+SDL_LogCritical(int category, SDL_PRINTF_FORMAT_STRING const char *fmt, ...) SDL_PRINTF_VARARG_FUNC(2);
 
 /**
  *  \brief Log a message with the specified category and priority.
@@ -186,7 +190,8 @@ extern DECLSPEC void SDLCALL SDL_LogMessageV(int category,
 /**
  *  \brief The prototype for the log output function
  */
-typedef void (SDLCALL *SDL_LogOutputFunction)(void *userdata, int category, SDL_LogPriority priority, const char *message);
+typedef void (SDLCALL *SDL_LogOutputFunction)(void *userdata, int category, SDL_LogPriority priority,
+                                              const char *message);
 
 /**
  *  \brief Get the current log output function.
@@ -204,6 +209,7 @@ extern DECLSPEC void SDLCALL SDL_LogSetOutputFunction(SDL_LogOutputFunction call
 #ifdef __cplusplus
 }
 #endif
+
 #include "close_code.h"
 
 #endif /* SDL_log_h_ */

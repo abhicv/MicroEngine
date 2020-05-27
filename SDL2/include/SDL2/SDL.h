@@ -129,6 +129,7 @@ extern DECLSPEC void SDLCALL SDL_Quit(void);
 #ifdef __cplusplus
 }
 #endif
+
 #include "close_code.h"
 
 #endif /* SDL_h_ */

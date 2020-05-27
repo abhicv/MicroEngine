@@ -3,8 +3,7 @@
 
 #include <SDL2/SDL.h>
 
-typedef struct
-{
+typedef struct {
     SDL_Texture *texture;
     SDL_Rect *srcRect;
     SDL_Rect *destRect;
@@ -18,7 +17,7 @@ void ME_CreateRenderRequest(SDL_Texture *,
                             SDL_Rect *,
                             SDL_Rect *,
                             SDL_RendererFlip,
-                            SDL_Point *,double);
+                            SDL_Point *, double);
 
 void ME_HandleRenderRequest();
 

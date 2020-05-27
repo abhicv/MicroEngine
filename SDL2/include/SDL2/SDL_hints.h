@@ -915,7 +915,7 @@ extern "C" {
  * By default this hint is not set and the APK expansion files are not searched.
  */
 #define SDL_HINT_ANDROID_APK_EXPANSION_MAIN_FILE_VERSION "SDL_ANDROID_APK_EXPANSION_MAIN_FILE_VERSION"
- 
+
 /**
  * \brief Android APK expansion patch file version. Should be a string number like "1", "2" etc.
  *
@@ -968,16 +968,16 @@ extern "C" {
  */
 #define SDL_HINT_ANDROID_BLOCK_ON_PAUSE "SDL_ANDROID_BLOCK_ON_PAUSE"
 
- /**
- * \brief A variable to control whether the return key on the soft keyboard
- *        should hide the soft keyboard on Android and iOS.
- *
- * The variable can be set to the following values:
- *   "0"       - The return key will be handled as a key event. This is the behaviour of SDL <= 2.0.3. (default)
- *   "1"       - The return key will hide the keyboard.
- *
- * The value of this hint is used at runtime, so it can be changed at any time.
- */
+/**
+* \brief A variable to control whether the return key on the soft keyboard
+*        should hide the soft keyboard on Android and iOS.
+*
+* The variable can be set to the following values:
+*   "0"       - The return key will be handled as a key event. This is the behaviour of SDL <= 2.0.3. (default)
+*   "1"       - The return key will hide the keyboard.
+*
+* The value of this hint is used at runtime, so it can be changed at any time.
+*/
 #define SDL_HINT_RETURN_KEY_HIDES_IME "SDL_RETURN_KEY_HIDES_IME"
 
 /**
@@ -1275,8 +1275,7 @@ extern "C" {
 /**
  *  \brief  An enumeration of hint priorities
  */
-typedef enum
-{
+typedef enum {
     SDL_HINT_DEFAULT,
     SDL_HINT_NORMAL,
     SDL_HINT_OVERRIDE
@@ -1309,7 +1308,7 @@ extern DECLSPEC SDL_bool SDLCALL SDL_SetHint(const char *name,
  *
  *  \return The string value of a hint variable.
  */
-extern DECLSPEC const char * SDLCALL SDL_GetHint(const char *name);
+extern DECLSPEC const char *SDLCALL SDL_GetHint(const char *name);
 
 /**
  *  \brief Get a hint
@@ -1357,6 +1356,7 @@ extern DECLSPEC void SDLCALL SDL_ClearHints(void);
 #ifdef __cplusplus
 }
 #endif
+
 #include "close_code.h"
 
 #endif /* SDL_hints_h_ */

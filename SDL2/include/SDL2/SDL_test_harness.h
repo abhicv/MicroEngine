@@ -120,13 +120,15 @@ char *SDLTest_GenerateRunSeed(const int length);
  *
  * \returns Test run result; 0 when all tests passed, 1 if any tests failed.
  */
-int SDLTest_RunSuites(SDLTest_TestSuiteReference *testSuites[], const char *userRunSeed, Uint64 userExecKey, const char *filter, int testIterations);
+int SDLTest_RunSuites(SDLTest_TestSuiteReference *testSuites[], const char *userRunSeed, Uint64 userExecKey,
+                      const char *filter, int testIterations);
 
 
 /* Ends C function definitions when using C++ */
 #ifdef __cplusplus
 }
 #endif
+
 #include "close_code.h"
 
 #endif /* SDL_test_h_arness_h */

@@ -26,7 +26,6 @@
 #include "SDL_platform.h"
 
 
-
 #ifdef __GNUC__
 #define HAVE_GCC_SYNC_LOCK_TEST_AND_SET 1
 #endif

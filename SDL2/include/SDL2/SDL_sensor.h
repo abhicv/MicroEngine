@@ -66,8 +66,7 @@ typedef Sint32 SDL_SensorID;
  * Hare are the additional Android sensors:
  * https://developer.android.com/reference/android/hardware/SensorEvent.html#values
  */
-typedef enum
-{
+typedef enum {
     SDL_SENSOR_INVALID = -1,    /**< Returned for an invalid sensor */
     SDL_SENSOR_UNKNOWN,         /**< Unknown sensor type */
     SDL_SENSOR_ACCEL,           /**< Accelerometer */
@@ -221,12 +220,12 @@ extern DECLSPEC SDL_SensorID SDLCALL SDL_SensorGetInstanceID(SDL_Sensor *sensor)
  *
  *  \return 0 or -1 if an error occurred.
  */
-extern DECLSPEC int SDLCALL SDL_SensorGetData(SDL_Sensor * sensor, float *data, int num_values);
+extern DECLSPEC int SDLCALL SDL_SensorGetData(SDL_Sensor *sensor, float *data, int num_values);
 
 /**
  *  Close a sensor previously opened with SDL_SensorOpen()
  */
-extern DECLSPEC void SDLCALL SDL_SensorClose(SDL_Sensor * sensor);
+extern DECLSPEC void SDLCALL SDL_SensorClose(SDL_Sensor *sensor);
 
 /**
  *  Update the current state of the open sensors.
@@ -244,6 +243,7 @@ extern DECLSPEC void SDLCALL SDL_SensorUpdate(void);
 }
 /* *INDENT-ON* */
 #endif
+
 #include "close_code.h"
 
 #endif /* SDL_sensor_h_ */

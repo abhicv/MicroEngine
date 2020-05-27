@@ -67,7 +67,7 @@ typedef enum {
  *  The function passed to SDL_CreateThread().
  *  It is passed a void* user context parameter and returns an int.
  */
-typedef int (SDLCALL * SDL_ThreadFunction) (void *data);
+typedef int (SDLCALL *SDL_ThreadFunction)(void *data);
 
 #if defined(__WIN32__)
 /**
@@ -236,7 +236,7 @@ extern DECLSPEC SDL_threadID SDLCALL SDL_ThreadID(void);
  *
  *  Equivalent to SDL_ThreadID() if the specified thread is NULL.
  */
-extern DECLSPEC SDL_threadID SDLCALL SDL_GetThreadID(SDL_Thread * thread);
+extern DECLSPEC SDL_threadID SDLCALL SDL_GetThreadID(SDL_Thread *thread);
 
 /**
  *  Set the priority for the current thread
@@ -261,7 +261,7 @@ extern DECLSPEC int SDLCALL SDL_SetThreadPriority(SDL_ThreadPriority priority);
  *
  *  It is safe to pass NULL to this function; it is a no-op.
  */
-extern DECLSPEC void SDLCALL SDL_WaitThread(SDL_Thread * thread, int *status);
+extern DECLSPEC void SDLCALL SDL_WaitThread(SDL_Thread *thread, int *status);
 
 /**
  *  A thread may be "detached" to signify that it should not remain until
@@ -289,7 +289,7 @@ extern DECLSPEC void SDLCALL SDL_WaitThread(SDL_Thread * thread, int *status);
  *
  *  It is safe to pass NULL to this function; it is a no-op.
  */
-extern DECLSPEC void SDLCALL SDL_DetachThread(SDL_Thread * thread);
+extern DECLSPEC void SDLCALL SDL_DetachThread(SDL_Thread *thread);
 
 /**
  *  \brief Create an identifier that is globally visible to all threads but refers to data that is thread-specific.
@@ -333,7 +333,7 @@ extern DECLSPEC SDL_TLSID SDLCALL SDL_TLSCreate(void);
  *  \sa SDL_TLSCreate()
  *  \sa SDL_TLSSet()
  */
-extern DECLSPEC void * SDLCALL SDL_TLSGet(SDL_TLSID id);
+extern DECLSPEC void *SDLCALL SDL_TLSGet(SDL_TLSID id);
 
 /**
  *  \brief Set the value associated with a thread local storage ID for the current thread.
@@ -347,13 +347,14 @@ extern DECLSPEC void * SDLCALL SDL_TLSGet(SDL_TLSID id);
  *  \sa SDL_TLSCreate()
  *  \sa SDL_TLSGet()
  */
-extern DECLSPEC int SDLCALL SDL_TLSSet(SDL_TLSID id, const void *value, void (SDLCALL *destructor)(void*));
+extern DECLSPEC int SDLCALL SDL_TLSSet(SDL_TLSID id, const void *value, void (SDLCALL *destructor)(void *));
 
 
 /* Ends C function definitions when using C++ */
 #ifdef __cplusplus
 }
 #endif
+
 #include "close_code.h"
 
 #endif /* SDL_thread_h_ */

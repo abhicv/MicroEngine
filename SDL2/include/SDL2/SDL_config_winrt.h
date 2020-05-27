@@ -162,21 +162,21 @@ typedef unsigned int uintptr_t;
 #define HAVE__FSEEKI64 1
 
 /* Enable various audio drivers */
-#define SDL_AUDIO_DRIVER_XAUDIO2	1
-#define SDL_AUDIO_DRIVER_DISK	1
-#define SDL_AUDIO_DRIVER_DUMMY	1
+#define SDL_AUDIO_DRIVER_XAUDIO2    1
+#define SDL_AUDIO_DRIVER_DISK    1
+#define SDL_AUDIO_DRIVER_DUMMY    1
 
 /* Enable various input drivers */
 #if WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP
 #define SDL_JOYSTICK_DISABLED 1
-#define SDL_HAPTIC_DISABLED	1
+#define SDL_HAPTIC_DISABLED    1
 #else
 #define SDL_JOYSTICK_XINPUT 1
 #define SDL_HAPTIC_XINPUT   1
 #endif
 
 /* Enable various shared object loading systems */
-#define SDL_LOADSO_WINDOWS	1
+#define SDL_LOADSO_WINDOWS    1
 
 /* Enable various threading systems */
 #if (NTDDI_VERSION >= NTDDI_WINBLUE)
@@ -187,10 +187,10 @@ typedef unsigned int uintptr_t;
 #endif
 
 /* Enable various timer systems */
-#define SDL_TIMER_WINDOWS	1
+#define SDL_TIMER_WINDOWS    1
 
 /* Enable various video drivers */
-#define SDL_VIDEO_DRIVER_WINRT	1
+#define SDL_VIDEO_DRIVER_WINRT    1
 #define SDL_VIDEO_DRIVER_DUMMY  1
 
 /* Enable OpenGL ES 2.0 (via a modified ANGLE library) */
@@ -209,7 +209,7 @@ typedef unsigned int uintptr_t;
 
 /* Enable assembly routines (Win64 doesn't have inline asm) */
 #ifndef _WIN64
-#define SDL_ASSEMBLY_ROUTINES	1
+#define SDL_ASSEMBLY_ROUTINES    1
 #endif
 
 #endif /* SDL_config_winrt_h_ */

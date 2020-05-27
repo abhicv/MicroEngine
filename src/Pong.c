@@ -2,8 +2,7 @@
 #include <MicroUI.h>
 
 //Game states
-enum GameState
-{
+enum GameState {
     MENU,
     PLAY_MODE
 };
@@ -17,7 +16,7 @@ float playerSpeed = 0;
 int pScore = 0;
 int cScore = 0;
 
-SDL_Color white = {255,255,255,255};
+SDL_Color white = {255, 255, 255, 255};
 
 //UI elements
 MUI_Button play;
@@ -36,31 +35,29 @@ ME_GameObject *ball;
 SDL_Texture *grid;
 SDL_Rect gridRect;
 
-Vector2 CalculateMovDir(Vector2 velocity, Vector2 position)
-{
+Vector2 CalculateMovDir(Vector2 velocity, Vector2 position) {
     Vector2 tmpVelocity = velocity;
     Vector2 movDir = velocity;
 
-    if(position.x <= 0.0)
-        movDir = ReflectDir(tmpVelocity,NewVector2(1,0));
+    if (position.x <= 0.0)
+        movDir = ReflectDir(tmpVelocity, NewVector2(1, 0));
 
-    else if(position.x + 15.0 > ME_GetScreenWidth())
-        movDir = ReflectDir(tmpVelocity,NewVector2(-1,0));
+    else if (position.x + 15.0 > ME_GetScreenWidth())
+        movDir = ReflectDir(tmpVelocity, NewVector2(-1, 0));
 
-    else if(position.y <= 20.0)
-        movDir = ReflectDir(tmpVelocity,NewVector2(0,1));
+    else if (position.y <= 20.0)
+        movDir = ReflectDir(tmpVelocity, NewVector2(0, 1));
 
-    else if(position.y + 15.0 > ME_GetScreenHeight() - 15)
-        movDir = ReflectDir(tmpVelocity,NewVector2(0,-1));
+    else if (position.y + 15.0 > ME_GetScreenHeight() - 15)
+        movDir = ReflectDir(tmpVelocity, NewVector2(0, -1));
 
     Vector2Normalize(&movDir);
-    Vector2Scale(&movDir,400);
+    Vector2Scale(&movDir, 400);
 
     return movDir;
 }
 
-void ResetBall(Vector2 *position, Vector2 *velocity)
-{
+void ResetBall(Vector2 *position, Vector2 *velocity) {
     position->x = 400;
     position->y = 300;
 
@@ -70,150 +67,132 @@ void ResetBall(Vector2 *position, Vector2 *velocity)
     velocity->x = cos(angle);
     velocity->y = sin(angle);
 
-    Vector2Scale(velocity,400);
+    Vector2Scale(velocity, 400);
 }
 
-void HandleEvents(SDL_Event event)
-{
-    if(MUI_ButtonPressed(&play,event))
+void HandleEvents(SDL_Event event) {
+    if (MUI_ButtonPressed(&play, event))
         gameState = PLAY_MODE;
 
-    switch (event.type)
-    {
-    case SDL_KEYDOWN:
-        switch (event.key.keysym.scancode)
-        {
-        case SDL_SCANCODE_W:
-        case SDL_SCANCODE_UP:
-            playerSpeed = -600;
+    switch (event.type) {
+        case SDL_KEYDOWN:
+            switch (event.key.keysym.scancode) {
+                case SDL_SCANCODE_W:
+                case SDL_SCANCODE_UP:
+                    playerSpeed = -600;
+                    break;
+
+                case SDL_SCANCODE_A:
+                case SDL_SCANCODE_LEFT:
+                    break;
+
+                case SDL_SCANCODE_S:
+                case SDL_SCANCODE_DOWN:
+                    playerSpeed = 600;
+                    break;
+
+                case SDL_SCANCODE_D:
+                case SDL_SCANCODE_RIGHT:
+                    break;
+
+                case SDL_SCANCODE_SPACE:
+                    pause = !pause;
+                    break;
+
+            }
             break;
 
-        case SDL_SCANCODE_A:
-        case SDL_SCANCODE_LEFT:
-            break;
+        case SDL_KEYUP:
+            switch (event.key.keysym.scancode) {
+                case SDL_SCANCODE_W:
+                case SDL_SCANCODE_UP:
+                    playerSpeed = 0;
+                    break;
 
-        case SDL_SCANCODE_S:
-        case SDL_SCANCODE_DOWN:
-            playerSpeed = 600;
-            break;
+                case SDL_SCANCODE_A:
+                case SDL_SCANCODE_LEFT:
+                    break;
 
-        case SDL_SCANCODE_D:
-        case SDL_SCANCODE_RIGHT:
-            break;
+                case SDL_SCANCODE_S:
+                case SDL_SCANCODE_DOWN:
+                    playerSpeed = 0;
+                    break;
 
-        case SDL_SCANCODE_SPACE:
-            pause = !pause;
+                case SDL_SCANCODE_D:
+                case SDL_SCANCODE_RIGHT:
+                    break;
+            }
             break;
-
-        }
-        break;
-
-    case SDL_KEYUP:
-        switch (event.key.keysym.scancode)
-        {
-        case SDL_SCANCODE_W:
-        case SDL_SCANCODE_UP:
-            playerSpeed = 0;
-            break;
-
-        case SDL_SCANCODE_A:
-        case SDL_SCANCODE_LEFT:
-            break;
-
-        case SDL_SCANCODE_S:
-        case SDL_SCANCODE_DOWN:
-            playerSpeed = 0;
-            break;
-
-        case SDL_SCANCODE_D:
-        case SDL_SCANCODE_RIGHT:
-            break;
-        }
-        break;
     }
 
 }
 
-void Update(float deltaTime)
-{
-    switch(gameState)
-    {
-    case PLAY_MODE:
+void Update(float deltaTime) {
+    switch (gameState) {
+        case PLAY_MODE:
 
-        if(pause)
-            deltaTime = 0.0;
+            if (pause)
+                deltaTime = 0.0;
 
-        if(ball->position.x <= 0)
-        {
-            pScore++;
-            sprintf(playerScore.textString,"%d", pScore);
-            ResetBall(&ball->position, &ballVelocity);
+            if (ball->position.x <= 0) {
+                pScore++;
+                sprintf(playerScore.textString, "%d", pScore);
+                ResetBall(&ball->position, &ballVelocity);
 
-            SDL_Delay(500);
-        }
-        else if(ball->position.x >= ME_GetScreenWidth() - 15)
-        {
-            cScore++;
-            sprintf(computerScore.textString,"%d", cScore);
-            ResetBall(&ball->position, &ballVelocity);
+                SDL_Delay(500);
+            } else if (ball->position.x >= ME_GetScreenWidth() - 15) {
+                cScore++;
+                sprintf(computerScore.textString, "%d", cScore);
+                ResetBall(&ball->position, &ballVelocity);
 
-            SDL_Delay(500);
-        }
-        else if(SDL_HasIntersection(&player->destRect,&ball->destRect))
-        {
-            ballVelocity = ReflectDir(ballVelocity,NewVector2(-1,0));
-        }
-        else if(SDL_HasIntersection(&computer->destRect,&ball->destRect))
-        {
-            ballVelocity = ReflectDir(ballVelocity,NewVector2(1,0));
-        }
-        else
-            ballVelocity = CalculateMovDir(ballVelocity, ball->position);
+                SDL_Delay(500);
+            } else if (SDL_HasIntersection(&player->destRect, &ball->destRect)) {
+                ballVelocity = ReflectDir(ballVelocity, NewVector2(-1, 0));
+            } else if (SDL_HasIntersection(&computer->destRect, &ball->destRect)) {
+                ballVelocity = ReflectDir(ballVelocity, NewVector2(1, 0));
+            } else
+                ballVelocity = CalculateMovDir(ballVelocity, ball->position);
 
-        ball->position.x += ballVelocity.x * deltaTime;
-        ball->position.y += ballVelocity.y * deltaTime;
-        player->position.y += playerSpeed * deltaTime;
-        computer->position.y += (ball->position.y - computer->position.y) * 5 * deltaTime;
+            ball->position.x += ballVelocity.x * deltaTime;
+            ball->position.y += ballVelocity.y * deltaTime;
+            player->position.y += playerSpeed * deltaTime;
+            computer->position.y += (ball->position.y - computer->position.y) * 5 * deltaTime;
 
-        ME_UpdateGameObject(player);
-        ME_UpdateGameObject(computer);
-        ME_UpdateGameObject(ball);
+            ME_UpdateGameObject(player);
+            ME_UpdateGameObject(computer);
+            ME_UpdateGameObject(ball);
     }
 }
 
-void Render(SDL_Renderer *renderer)
-{
-    switch(gameState)
-    {
-    case MENU:
+void Render(SDL_Renderer *renderer) {
+    switch (gameState) {
+        case MENU:
 
-        MUI_RenderButton(&play,renderer);
-        MUI_RenderTextBox(&creditText,renderer,MUI_TEXT_SOLID);
-        MUI_RenderTextBox(&pongTitle,renderer, MUI_TEXT_SOLID);
+            MUI_RenderButton(&play, renderer);
+            MUI_RenderTextBox(&creditText, renderer, MUI_TEXT_SOLID);
+            MUI_RenderTextBox(&pongTitle, renderer, MUI_TEXT_SOLID);
 
-        break;
+            break;
 
-    case PLAY_MODE:
-        //Rendering GameObjects
-        ME_RenderGameObject(player, renderer);
-        ME_RenderGameObject(computer, renderer);
-        ME_RenderGameObject(ball, renderer);
+        case PLAY_MODE:
+            //Rendering GameObjects
+            ME_RenderGameObject(player, renderer);
+            ME_RenderGameObject(computer, renderer);
+            ME_RenderGameObject(ball, renderer);
 
-        SDL_RenderCopy(renderer, grid, NULL, &gridRect);
+            SDL_RenderCopy(renderer, grid, NULL, &gridRect);
 
-        //Rendering UI
-        MUI_RenderTextBox(&playerScore,renderer, MUI_TEXT_SOLID);
-        MUI_RenderTextBox(&computerScore,renderer, MUI_TEXT_SOLID);
+            //Rendering UI
+            MUI_RenderTextBox(&playerScore, renderer, MUI_TEXT_SOLID);
+            MUI_RenderTextBox(&computerScore, renderer, MUI_TEXT_SOLID);
 
-        break;
+            break;
     }
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     //Initialization of micro engine
-    if(!ME_Init("Pong Game", 800, 600))
-    {
+    if (!ME_Init("Pong Game", 800, 600)) {
         ME_Quit();
         return EXIT_FAILURE;
     }
@@ -241,18 +220,18 @@ int main(int argc, char *argv[])
     playerScore.textColor = white;
 
     computerScore = MUI_CreateTextBox(ME_GetScreenWidth() / 2 - 50, 60, 60);
-    sprintf(computerScore.textString,"0");
+    sprintf(computerScore.textString, "0");
     computerScore.textColor = white;
 
     //Game objects initialization
     mainTexture = IMG_LoadTexture(mainRenderer, "assets/Sprites/pongTexture.png");
 
-    player = ME_CreateGameObject(ME_GetScreenWidth() - 20,ME_GetScreenHeight() / 2);
+    player = ME_CreateGameObject(ME_GetScreenWidth() - 20, ME_GetScreenHeight() / 2);
     player->destRect.w = 20;
     player->destRect.h = 120;
     player->texture = mainTexture;
 
-    computer = ME_CreateGameObject(20,ME_GetScreenHeight() / 2 - 60);
+    computer = ME_CreateGameObject(20, ME_GetScreenHeight() / 2 - 60);
     computer->destRect.w = 20;
     computer->destRect.h = 120;
     computer->texture = mainTexture;

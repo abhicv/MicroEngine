@@ -8,8 +8,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-typedef struct
-{
+typedef struct {
     SDL_Rect borderRect;
     SDL_Rect slidingRect;
     SDL_Rect sliderHandleRect;

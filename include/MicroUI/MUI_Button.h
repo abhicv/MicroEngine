@@ -14,8 +14,7 @@
 #define DEFAULT_BUTTON_HEIGHT 30
 #define DEFAULT_BUTTON_FONT_SIZE 20
 
-typedef enum
-{
+typedef enum {
 
     CLICKED,
     ACTIVE,
@@ -23,8 +22,7 @@ typedef enum
 
 } MUI_ButtonState;
 
-typedef struct
-{
+typedef struct {
     SDL_Texture *bgTexture;
     SDL_Rect rect;
     MUI_TextBox label;
@@ -45,9 +43,9 @@ void MUI_SetButtonLabel(MUI_Button *button, const char *label);
 
 void MUI_SetButtonLabelFont(MUI_Button *button, TTF_Font *font);
 
-void MUI_RenderButton(MUI_Button* button, SDL_Renderer *renderer);
+void MUI_RenderButton(MUI_Button *button, SDL_Renderer *renderer);
 
-void MUI_DestroyButton(MUI_Button* button);
+void MUI_DestroyButton(MUI_Button *button);
 
 
 #endif //MUI_BUTTON_H

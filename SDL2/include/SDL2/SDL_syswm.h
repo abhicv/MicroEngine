@@ -52,7 +52,9 @@ struct SDL_SysWMinfo;
 #ifndef NOMINMAX   /* don't define min() and max(). */
 #define NOMINMAX
 #endif
+
 #include <windows.h>
+
 #endif
 
 #if defined(SDL_VIDEO_DRIVER_WINRT)
@@ -119,8 +121,7 @@ extern "C" {
 /**
  *  These are the various supported windowing subsystems
  */
-typedef enum
-{
+typedef enum {
     SDL_SYSWM_UNKNOWN,
     SDL_SYSWM_WINDOWS,
     SDL_SYSWM_X11,
@@ -139,12 +140,10 @@ typedef enum
 /**
  *  The custom event structure.
  */
-struct SDL_SysWMmsg
-{
+struct SDL_SysWMmsg {
     SDL_version version;
     SDL_SYSWM_TYPE subsystem;
-    union
-    {
+    union {
 #if defined(SDL_VIDEO_DRIVER_WINDOWS)
         struct {
             HWND hwnd;                  /**< The window for the message */
@@ -198,15 +197,12 @@ struct SDL_SysWMmsg
  *  When this structure is returned, it holds information about which
  *  low level system it is using, and will be one of SDL_SYSWM_TYPE.
  */
-struct SDL_SysWMinfo
-{
+struct SDL_SysWMinfo {
     SDL_version version;
     SDL_SYSWM_TYPE subsystem;
-    union
-    {
+    union {
 #if defined(SDL_VIDEO_DRIVER_WINDOWS)
-        struct
-        {
+        struct {
             HWND window;                /**< The window handle */
             HDC hdc;                    /**< The window device context */
             HINSTANCE hinstance;        /**< The instance handle */
@@ -316,14 +312,15 @@ typedef struct SDL_SysWMinfo SDL_SysWMinfo;
  *  if ( SDL_GetWindowWMInfo(window, &info) ) { ... }
  *  \endcode
  */
-extern DECLSPEC SDL_bool SDLCALL SDL_GetWindowWMInfo(SDL_Window * window,
-                                                     SDL_SysWMinfo * info);
+extern DECLSPEC SDL_bool SDLCALL SDL_GetWindowWMInfo(SDL_Window *window,
+                                                     SDL_SysWMinfo *info);
 
 
 /* Ends C function definitions when using C++ */
 #ifdef __cplusplus
 }
 #endif
+
 #include "close_code.h"
 
 #endif /* SDL_syswm_h_ */

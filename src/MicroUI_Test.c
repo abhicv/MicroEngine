@@ -9,42 +9,35 @@ MUI_TextBox text;
 MUI_CheckBox checkBox;
 MUI_Slider slider;
 
-void HandleEvents(SDL_Event event)
-{
-    if(MUI_CheckBoxEvent(&checkBox, event))
-    {
+void HandleEvents(SDL_Event event) {
+    if (MUI_CheckBoxEvent(&checkBox, event)) {
         SDL_Log("Check box event\n");
     }
 
-    if(MUI_ButtonPressed(&button, event))
-    {
+    if (MUI_ButtonPressed(&button, event)) {
         SDL_Log("%s Button press\n", button.label);
     }
 
-    if(MUI_ButtonPressed(&b2, event))
-    {
+    if (MUI_ButtonPressed(&b2, event)) {
         SDL_Log("%s Button press\n", b2.label);
     }
 
-    if(MUI_OnSliderValueChange(&slider, event))
-    {
+    if (MUI_OnSliderValueChange(&slider, event)) {
         printf("slider value : %f\n", slider.value);
     }
 
 }
 
-void Update(float deltaTime)
-{
-    if(checkBox.checked)
+void Update(float deltaTime) {
+    if (checkBox.checked)
         text.enabled = true;
     else
         text.enabled = false;
 
-    sprintf(text.textString, "fps : %0.2f", 1/deltaTime);
+    sprintf(text.textString, "fps : %0.2f", 1 / deltaTime);
 }
 
-void Render(SDL_Renderer *renderer)
-{
+void Render(SDL_Renderer *renderer) {
     MUI_RenderButton(&button, renderer);
     MUI_RenderButton(&b2, renderer);
     MUI_RenderTextBox(&text, renderer, MUI_TEXT_SOLID);
@@ -52,11 +45,9 @@ void Render(SDL_Renderer *renderer)
     MUI_RenderSlider(&slider, renderer);
 }
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char *argv[]) {
     //Intialization
-    if(!ME_Init("MicroUI test",800,600))
-    {
+    if (!ME_Init("MicroUI test", 800, 600)) {
         SDL_Quit();
         return EXIT_FAILURE;
     }
@@ -64,18 +55,18 @@ int main(int argc, char* argv[])
     SDL_Renderer *mainRenderer = ME_GetRenderer();
 
     //UI Elements
-    button = MUI_CreateButton(300,100);
+    button = MUI_CreateButton(300, 100);
     MUI_SetButtonLabelFont(&button, TTF_OpenFont(BIT_5x3_FONT_FILE, 25));
     MUI_SetButtonLabel(&button, "Play");
 
     b2 = MUI_CreateButton(300, 150);
     MUI_SetButtonLabel(&b2, "Quit");
 
-    text = MUI_CreateTextBox(100,100,20);
+    text = MUI_CreateTextBox(100, 100, 20);
     text.textColor = ME_HexToSdlColor(0xffffff);
     text.font = TTF_OpenFont("assets/Font/OpenSans-Regular.ttf", 20);
 
-    checkBox = MUI_CreateCheckBox(200,200);
+    checkBox = MUI_CreateCheckBox(200, 200);
     //checkBox.bgTexture = IMG_LoadTexture(mainRenderer, "assets/Sprites/grey_circle.png");
     //checkBox.tickTexture = IMG_LoadTexture(mainRenderer, "assets/Sprites/checkmark.png");
     checkBox.checked = true;

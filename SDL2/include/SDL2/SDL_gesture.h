@@ -65,7 +65,7 @@ extern DECLSPEC int SDLCALL SDL_SaveAllDollarTemplates(SDL_RWops *dst);
  *
  *
  */
-extern DECLSPEC int SDLCALL SDL_SaveDollarTemplate(SDL_GestureID gestureId,SDL_RWops *dst);
+extern DECLSPEC int SDLCALL SDL_SaveDollarTemplate(SDL_GestureID gestureId, SDL_RWops *dst);
 
 
 /**
@@ -80,6 +80,7 @@ extern DECLSPEC int SDLCALL SDL_LoadDollarTemplates(SDL_TouchID touchId, SDL_RWo
 #ifdef __cplusplus
 }
 #endif
+
 #include "close_code.h"
 
 #endif /* SDL_gesture_h_ */

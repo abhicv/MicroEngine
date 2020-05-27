@@ -74,6 +74,7 @@ void SDLTest_CleanupTextDrawing(void);
 #ifdef __cplusplus
 }
 #endif
+
 #include "close_code.h"
 
 #endif /* SDL_test_font_h_ */

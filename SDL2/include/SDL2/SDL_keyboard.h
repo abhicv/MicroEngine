@@ -44,8 +44,7 @@ extern "C" {
  *
  *  \note  If you are looking for translated character input, see the ::SDL_TEXTINPUT event.
  */
-typedef struct SDL_Keysym
-{
+typedef struct SDL_Keysym {
     SDL_Scancode scancode;      /**< SDL physical key code - see ::SDL_Scancode for details */
     SDL_Keycode sym;            /**< SDL virtual key code - see ::SDL_Keycode for details */
     Uint16 mod;                 /**< current key modifiers */
@@ -57,7 +56,7 @@ typedef struct SDL_Keysym
 /**
  *  \brief Get the window which currently has keyboard focus.
  */
-extern DECLSPEC SDL_Window * SDLCALL SDL_GetKeyboardFocus(void);
+extern DECLSPEC SDL_Window *SDLCALL SDL_GetKeyboardFocus(void);
 
 /**
  *  \brief Get a snapshot of the current state of the keyboard.
@@ -210,6 +209,7 @@ extern DECLSPEC SDL_bool SDLCALL SDL_IsScreenKeyboardShown(SDL_Window *window);
 #ifdef __cplusplus
 }
 #endif
+
 #include "close_code.h"
 
 #endif /* SDL_keyboard_h_ */

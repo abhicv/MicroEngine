@@ -5,8 +5,7 @@
 
 #include "../MicroEngine/ME_Vector2D.h"
 
-typedef struct
-{
+typedef struct {
     int objectID;
     SDL_Rect collisionRect;
     float mass;
@@ -14,10 +13,9 @@ typedef struct
 
 } MP_DynamicObject;
 
-MP_DynamicObject MP_CreateDynamic(float,SDL_Rect);
+MP_DynamicObject MP_CreateDynamic(float, SDL_Rect);
 
-typedef struct
-{
+typedef struct {
     int objectID;
     SDL_Rect collisionRect;
 

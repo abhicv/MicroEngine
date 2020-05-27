@@ -50,7 +50,7 @@ extern DECLSPEC int SDLCALL SDL_SetClipboardText(const char *text);
  *
  * \sa SDL_SetClipboardText()
  */
-extern DECLSPEC char * SDLCALL SDL_GetClipboardText(void);
+extern DECLSPEC char *SDLCALL SDL_GetClipboardText(void);
 
 /**
  * \brief Returns a flag indicating whether the clipboard exists and contains a text string that is non-empty
@@ -64,6 +64,7 @@ extern DECLSPEC SDL_bool SDLCALL SDL_HasClipboardText(void);
 #ifdef __cplusplus
 }
 #endif
+
 #include "close_code.h"
 
 #endif /* SDL_clipboard_h_ */

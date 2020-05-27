@@ -153,6 +153,7 @@ extern _inline void SDL_CompilerBarrier (void);
  * http://preshing.com/20120913/acquire-and-release-semantics
  */
 extern DECLSPEC void SDLCALL SDL_MemoryBarrierReleaseFunction(void);
+
 extern DECLSPEC void SDLCALL SDL_MemoryBarrierAcquireFunction(void);
 
 #if defined(__GNUC__) && (defined(__powerpc__) || defined(__ppc__))
@@ -213,7 +214,9 @@ typedef void (*SDL_KernelMemoryBarrierFunc)();
  * \brief A type representing an atomic integer value.  It is a struct
  *        so people don't accidentally use numeric operations on it.
  */
-typedef struct { int value; } SDL_atomic_t;
+typedef struct {
+    int value;
+} SDL_atomic_t;
 
 /**
  * \brief Set an atomic variable to a new value if it is currently an old value.
@@ -276,12 +279,12 @@ extern DECLSPEC SDL_bool SDLCALL SDL_AtomicCASPtr(void **a, void *oldval, void *
  *
  * \return The previous value of the pointer.
  */
-extern DECLSPEC void* SDLCALL SDL_AtomicSetPtr(void **a, void* v);
+extern DECLSPEC void *SDLCALL SDL_AtomicSetPtr(void **a, void *v);
 
 /**
  * \brief Get the value of a pointer atomically.
  */
-extern DECLSPEC void* SDLCALL SDL_AtomicGetPtr(void **a);
+extern DECLSPEC void *SDLCALL SDL_AtomicGetPtr(void **a);
 
 /* Ends C function definitions when using C++ */
 #ifdef __cplusplus

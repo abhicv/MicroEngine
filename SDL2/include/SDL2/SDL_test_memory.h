@@ -56,6 +56,7 @@ void SDLTest_LogAllocations(void);
 #ifdef __cplusplus
 }
 #endif
+
 #include "close_code.h"
 
 #endif /* SDL_test_memory_h_ */

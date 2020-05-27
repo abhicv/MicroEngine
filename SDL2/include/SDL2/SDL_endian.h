@@ -106,11 +106,12 @@ extern _inline Uint16 SDL_Swap16(Uint16);
   parm   [ax]   \
   modify [ax];
 #else
+
 SDL_FORCE_INLINE Uint16
-SDL_Swap16(Uint16 x)
-{
+SDL_Swap16(Uint16 x) {
     return SDL_static_cast(Uint16, ((x << 8) | (x >> 8)));
 }
+
 #endif
 
 #if defined(__GNUC__) && defined(__i386__)
@@ -161,12 +162,13 @@ extern _inline Uint32 SDL_Swap32(Uint32);
   modify [eax];
 #endif
 #else
+
 SDL_FORCE_INLINE Uint32
-SDL_Swap32(Uint32 x)
-{
+SDL_Swap32(Uint32 x) {
     return SDL_static_cast(Uint32, ((x << 24) | ((x << 8) & 0x00FF0000) |
                                     ((x >> 8) & 0x0000FF00) | (x >> 24)));
 }
+
 #endif
 
 #if defined(__GNUC__) && defined(__i386__)
@@ -195,9 +197,9 @@ SDL_Swap64(Uint64 x)
     return x;
 }
 #else
+
 SDL_FORCE_INLINE Uint64
-SDL_Swap64(Uint64 x)
-{
+SDL_Swap64(Uint64 x) {
     Uint32 hi, lo;
 
     /* Separate into high and low 32-bit values and swap them */
@@ -209,14 +211,13 @@ SDL_Swap64(Uint64 x)
     x |= SDL_Swap32(hi);
     return (x);
 }
+
 #endif
 
 
 SDL_FORCE_INLINE float
-SDL_SwapFloat(float x)
-{
-    union
-    {
+SDL_SwapFloat(float x) {
+    union {
         float f;
         Uint32 ui32;
     } swapper;
@@ -256,6 +257,7 @@ SDL_SwapFloat(float x)
 #ifdef __cplusplus
 }
 #endif
+
 #include "close_code.h"
 
 #endif /* SDL_endian_h_ */

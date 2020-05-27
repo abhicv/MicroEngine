@@ -129,6 +129,7 @@ extern DECLSPEC char *SDLCALL SDL_GetPrefPath(const char *org, const char *app);
 #ifdef __cplusplus
 }
 #endif
+
 #include "close_code.h"
 
 #endif /* SDL_filesystem_h_ */

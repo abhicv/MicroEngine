@@ -16,40 +16,35 @@ SDL_Event event;
 
 float pauseFactor = 1;
 
-const SDL_Color dfDrawColor = {0,0,0,255};
+const SDL_Color dfDrawColor = {0, 0, 0, 255};
 
-void Pause()
-{
+void Pause() {
     pauseFactor = 0.0f;
 }
 
-void UnPause()
-{
+void UnPause() {
     pauseFactor = 1.0f;
 }
 
-int ME_Init(const char *title, int screenWidth, int screenHeight)
-{
+int ME_Init(const char *title, int screenWidth, int screenHeight) {
     width = screenWidth;
     height = screenHeight;
 
-    if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
-    {
-        SDL_Log("Failed to initiate SDL : %s\n",SDL_GetError());
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+        SDL_Log("Failed to initiate SDL : %s\n", SDL_GetError());
         return 0;
     }
 
-    if(TTF_Init() != 0)
-        SDL_Log("Failed to initiate TTF : %s\n",SDL_GetError());
+    if (TTF_Init() != 0)
+        SDL_Log("Failed to initiate TTF : %s\n", SDL_GetError());
 
-    if(IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG) == 0)
-        SDL_Log("Failed to initiate IMG : %s\n",IMG_GetError());
+    if (IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG) == 0)
+        SDL_Log("Failed to initiate IMG : %s\n", IMG_GetError());
 
     window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
 
-    if(window == NULL)
-    {
-        SDL_Log("Failed to create SDL window : %s\n",SDL_GetError());
+    if (window == NULL) {
+        SDL_Log("Failed to create SDL window : %s\n", SDL_GetError());
         return 0;
     }
 
@@ -60,27 +55,25 @@ int ME_Init(const char *title, int screenWidth, int screenHeight)
     SDL_GetRendererInfo(renderer, &rendererInfo);
 
 
-    if(renderer == NULL)
-    {
-        SDL_Log("Failed to create SDL renderer : %s\n",SDL_GetError());
+    if (renderer == NULL) {
+        SDL_Log("Failed to create SDL renderer : %s\n", SDL_GetError());
         return 0;
     }
 
     ME_SetRenderColor(renderer, dfDrawColor);
 
-    SDL_Log("MicroEngine :: Renderer : %s",rendererInfo.name);
-    SDL_Log("MicroEngine :: Window dimensions : %d x %d",width, height);
+    SDL_Log("MicroEngine :: Renderer : %s", rendererInfo.name);
+    SDL_Log("MicroEngine :: Window dimensions : %d x %d", width, height);
 
     return 1;
 }
 
 void ME_Run(void (*HandleEvents)(SDL_Event event),
             void (*Update)(float deltaTime),
-            void (*Render)(SDL_Renderer *renderer))
-{
+            void (*Render)(SDL_Renderer *renderer)) {
     //Spalsh screen
     SDL_Texture *splashTextre = IMG_LoadTexture(renderer, "assets/MicroEngine_SplashScreen_2.png");
-    SDL_Rect splashRect = {0,0, width, height};
+    SDL_Rect splashRect = {0, 0, width, height};
 
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer, splashTextre, NULL, &splashRect);
@@ -92,18 +85,15 @@ void ME_Run(void (*HandleEvents)(SDL_Event event),
     MUI_SetTextBoxColor(&fpsText, ME_HexToSdlColor(0xffff00));
 
     //main loop
-    while(!quit)
-    {
+    while (!quit) {
         startTime = SDL_GetPerformanceCounter();
 
         //Event handling
-        while(SDL_PollEvent(&event))
-        {
-            switch(event.type)
-            {
-            case SDL_QUIT:
-                quit = true;
-                break;
+        while (SDL_PollEvent(&event)) {
+            switch (event.type) {
+                case SDL_QUIT:
+                    quit = true;
+                    break;
             }
 
             HandleEvents(event);
@@ -120,11 +110,11 @@ void ME_Run(void (*HandleEvents)(SDL_Event event),
 
         //Calculating delta time
         endTime = SDL_GetPerformanceCounter();
-        deltaTime = (float)((endTime - startTime) * 1000 / SDL_GetPerformanceFrequency());
+        deltaTime = (float) ((endTime - startTime) * 1000 / SDL_GetPerformanceFrequency());
         deltaTime *= 0.001f;
         deltaTime *= pauseFactor;
 
-        sprintf(fpsText.textString, "%0.2f", 1/deltaTime);
+        sprintf(fpsText.textString, "%0.2f", 1 / deltaTime);
         //deltaTime = deltaTime < 0.016f ? 0.016f : deltaTime;
     }
 
@@ -132,8 +122,7 @@ void ME_Run(void (*HandleEvents)(SDL_Event event),
     MUI_DestroyTextBox(&fpsText);
 }
 
-void ME_Quit()
-{
+void ME_Quit() {
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
 
@@ -145,22 +134,18 @@ void ME_Quit()
     SDL_Quit();
 }
 
-SDL_Window* ME_GetWindow()
-{
+SDL_Window *ME_GetWindow() {
     return window;
 }
 
-SDL_Renderer* ME_GetRenderer()
-{
+SDL_Renderer *ME_GetRenderer() {
     return renderer;
 }
 
-int ME_GetScreenWidth()
-{
+int ME_GetScreenWidth() {
     return width;
 }
 
-int ME_GetScreenHeight()
-{
+int ME_GetScreenHeight() {
     return height;
 }

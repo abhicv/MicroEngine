@@ -8,8 +8,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-typedef struct
-{
+typedef struct {
     SDL_Texture *bgTexture;
     SDL_Texture *tickTexture;
     SDL_Rect rect;

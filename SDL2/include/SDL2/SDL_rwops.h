@@ -49,12 +49,11 @@ extern "C" {
 /**
  * This is the read/write operation structure -- very basic.
  */
-typedef struct SDL_RWops
-{
+typedef struct SDL_RWops {
     /**
      *  Return the size of the file in this rwops, or -1 if unknown
      */
-    Sint64 (SDLCALL * size) (struct SDL_RWops * context);
+    Sint64 (SDLCALL *size)(struct SDL_RWops *context);
 
     /**
      *  Seek to \c offset relative to \c whence, one of stdio's whence values:
@@ -62,8 +61,8 @@ typedef struct SDL_RWops
      *
      *  \return the final offset in the data stream, or -1 on error.
      */
-    Sint64 (SDLCALL * seek) (struct SDL_RWops * context, Sint64 offset,
-                             int whence);
+    Sint64 (SDLCALL *seek)(struct SDL_RWops *context, Sint64 offset,
+                           int whence);
 
     /**
      *  Read up to \c maxnum objects each of size \c size from the data
@@ -71,8 +70,8 @@ typedef struct SDL_RWops
      *
      *  \return the number of objects read, or 0 at error or end of file.
      */
-    size_t (SDLCALL * read) (struct SDL_RWops * context, void *ptr,
-                             size_t size, size_t maxnum);
+    size_t (SDLCALL *read)(struct SDL_RWops *context, void *ptr,
+                           size_t size, size_t maxnum);
 
     /**
      *  Write exactly \c num objects each of size \c size from the area
@@ -80,19 +79,18 @@ typedef struct SDL_RWops
      *
      *  \return the number of objects written, or 0 at error or end of file.
      */
-    size_t (SDLCALL * write) (struct SDL_RWops * context, const void *ptr,
-                              size_t size, size_t num);
+    size_t (SDLCALL *write)(struct SDL_RWops *context, const void *ptr,
+                            size_t size, size_t num);
 
     /**
      *  Close and free an allocated SDL_RWops structure.
      *
      *  \return 0 if successful or -1 on write error when flushing data.
      */
-    int (SDLCALL * close) (struct SDL_RWops * context);
+    int (SDLCALL *close)(struct SDL_RWops *context);
 
     Uint32 type;
-    union
-    {
+    union {
 #if defined(__ANDROID__)
         struct
         {
@@ -127,14 +125,12 @@ typedef struct SDL_RWops
             FILE *fp;
         } stdio;
 #endif
-        struct
-        {
+        struct {
             Uint8 *base;
             Uint8 *here;
             Uint8 *stop;
         } mem;
-        struct
-        {
+        struct {
             void *data1;
             void *data2;
         } unknown;
@@ -157,11 +153,14 @@ extern DECLSPEC SDL_RWops *SDLCALL SDL_RWFromFile(const char *file,
 extern DECLSPEC SDL_RWops *SDLCALL SDL_RWFromFP(FILE * fp,
                                                 SDL_bool autoclose);
 #else
-extern DECLSPEC SDL_RWops *SDLCALL SDL_RWFromFP(void * fp,
+
+extern DECLSPEC SDL_RWops *SDLCALL SDL_RWFromFP(void *fp,
                                                 SDL_bool autoclose);
+
 #endif
 
 extern DECLSPEC SDL_RWops *SDLCALL SDL_RWFromMem(void *mem, int size);
+
 extern DECLSPEC SDL_RWops *SDLCALL SDL_RWFromConstMem(const void *mem,
                                                       int size);
 
@@ -169,7 +168,8 @@ extern DECLSPEC SDL_RWops *SDLCALL SDL_RWFromConstMem(const void *mem,
 
 
 extern DECLSPEC SDL_RWops *SDLCALL SDL_AllocRW(void);
-extern DECLSPEC void SDLCALL SDL_FreeRW(SDL_RWops * area);
+
+extern DECLSPEC void SDLCALL SDL_FreeRW(SDL_RWops *area);
 
 #define RW_SEEK_SET 0       /**< Seek from the beginning of data */
 #define RW_SEEK_CUR 1       /**< Seek relative to current read point */
@@ -232,8 +232,8 @@ extern DECLSPEC int SDLCALL SDL_RWclose(SDL_RWops *context);
  *
  *  \return the data, or NULL if there was an error.
  */
-extern DECLSPEC void *SDLCALL SDL_LoadFile_RW(SDL_RWops * src, size_t *datasize,
-                                                    int freesrc);
+extern DECLSPEC void *SDLCALL SDL_LoadFile_RW(SDL_RWops *src, size_t *datasize,
+                                              int freesrc);
 
 /**
  *  Load an entire file.
@@ -256,13 +256,19 @@ extern DECLSPEC void *SDLCALL SDL_LoadFile(const char *file, size_t *datasize);
  *  Read an item of the specified endianness and return in native format.
  */
 /* @{ */
-extern DECLSPEC Uint8 SDLCALL SDL_ReadU8(SDL_RWops * src);
-extern DECLSPEC Uint16 SDLCALL SDL_ReadLE16(SDL_RWops * src);
-extern DECLSPEC Uint16 SDLCALL SDL_ReadBE16(SDL_RWops * src);
-extern DECLSPEC Uint32 SDLCALL SDL_ReadLE32(SDL_RWops * src);
-extern DECLSPEC Uint32 SDLCALL SDL_ReadBE32(SDL_RWops * src);
-extern DECLSPEC Uint64 SDLCALL SDL_ReadLE64(SDL_RWops * src);
-extern DECLSPEC Uint64 SDLCALL SDL_ReadBE64(SDL_RWops * src);
+extern DECLSPEC Uint8 SDLCALL SDL_ReadU8(SDL_RWops *src);
+
+extern DECLSPEC Uint16 SDLCALL SDL_ReadLE16(SDL_RWops *src);
+
+extern DECLSPEC Uint16 SDLCALL SDL_ReadBE16(SDL_RWops *src);
+
+extern DECLSPEC Uint32 SDLCALL SDL_ReadLE32(SDL_RWops *src);
+
+extern DECLSPEC Uint32 SDLCALL SDL_ReadBE32(SDL_RWops *src);
+
+extern DECLSPEC Uint64 SDLCALL SDL_ReadLE64(SDL_RWops *src);
+
+extern DECLSPEC Uint64 SDLCALL SDL_ReadBE64(SDL_RWops *src);
 /* @} *//* Read endian functions */
 
 /**
@@ -271,19 +277,26 @@ extern DECLSPEC Uint64 SDLCALL SDL_ReadBE64(SDL_RWops * src);
  *  Write an item of native format to the specified endianness.
  */
 /* @{ */
-extern DECLSPEC size_t SDLCALL SDL_WriteU8(SDL_RWops * dst, Uint8 value);
-extern DECLSPEC size_t SDLCALL SDL_WriteLE16(SDL_RWops * dst, Uint16 value);
-extern DECLSPEC size_t SDLCALL SDL_WriteBE16(SDL_RWops * dst, Uint16 value);
-extern DECLSPEC size_t SDLCALL SDL_WriteLE32(SDL_RWops * dst, Uint32 value);
-extern DECLSPEC size_t SDLCALL SDL_WriteBE32(SDL_RWops * dst, Uint32 value);
-extern DECLSPEC size_t SDLCALL SDL_WriteLE64(SDL_RWops * dst, Uint64 value);
-extern DECLSPEC size_t SDLCALL SDL_WriteBE64(SDL_RWops * dst, Uint64 value);
+extern DECLSPEC size_t SDLCALL SDL_WriteU8(SDL_RWops *dst, Uint8 value);
+
+extern DECLSPEC size_t SDLCALL SDL_WriteLE16(SDL_RWops *dst, Uint16 value);
+
+extern DECLSPEC size_t SDLCALL SDL_WriteBE16(SDL_RWops *dst, Uint16 value);
+
+extern DECLSPEC size_t SDLCALL SDL_WriteLE32(SDL_RWops *dst, Uint32 value);
+
+extern DECLSPEC size_t SDLCALL SDL_WriteBE32(SDL_RWops *dst, Uint32 value);
+
+extern DECLSPEC size_t SDLCALL SDL_WriteLE64(SDL_RWops *dst, Uint64 value);
+
+extern DECLSPEC size_t SDLCALL SDL_WriteBE64(SDL_RWops *dst, Uint64 value);
 /* @} *//* Write endian functions */
 
 /* Ends C function definitions when using C++ */
 #ifdef __cplusplus
 }
 #endif
+
 #include "close_code.h"
 
 #endif /* SDL_rwops_h_ */
