@@ -30,7 +30,7 @@ void render(SDL_Renderer *renderer)
     }
 }
 
-//Game specific
+//ME_Game specific
 internal void PlaceVectors(const u32 size)
 {
     u32 x = 0, y = 0;

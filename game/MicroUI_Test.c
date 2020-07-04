@@ -1,85 +1,72 @@
 #include "../src/MicroEngine.c"
 
-global Game game = {0};
-global MUI ui = {0};
+#define MUI_ORIGIN_ID 3000
+
+global ME_Game game = {0};
+global MUI ui = {.fontFile = BIT_5x3_FONT_FILE};
 global MUI_Input uiInput = {0};
 global SDL_Rect rect = {400, 300, 100, 100};
 global SDL_Color color = {100, 100, 100, 100};
 
-void handleEvent(SDL_Event event)
+global char valueX[10] = "ValueX";
+global char valueY[10] = "ValueY";
+
+void HandleEvent(SDL_Event event)
 {
-    uiInput.mouseX = event.motion.x;
-    uiInput.mouseY = event.motion.y;
-
-    if (event.type == SDL_MOUSEBUTTONDOWN)
-    {
-        if (event.button.button == SDL_BUTTON_LEFT)
-        {
-            uiInput.leftMouseButtonDown = true;
-        }
-        else if (event.button.button == SDL_BUTTON_RIGHT)
-        {
-            uiInput.rightMouseButtonDown = true;
-        }
-    }
-
-    if (event.type == SDL_MOUSEBUTTONUP)
-    {
-        if (event.button.button == SDL_BUTTON_LEFT)
-        {
-            uiInput.leftMouseButtonDown = false;
-        }
-        else if (event.button.button == SDL_BUTTON_RIGHT)
-        {
-            uiInput.rightMouseButtonDown = false;
-        }
-    }
+    MUI_GetInput(&uiInput, &event);
 }
 
-void update(float deltaTime)
+void Update(float deltaTime)
 {
     MUI_BeginFrame(&ui, &uiInput);
 
     MUI_Rect bRect = {200, 30, 120, 30};
-    MUI_Rect b2Rect = {200, 80, 120, 30};
-    MUI_Id id = {10, 10};
-    MUI_Id id2 = {20, 20};
 
-    if (MUI_ButtonP(&ui, id, "Hello", bRect))
+    local_persist f32 vx = 0.4f;
+    local_persist f32 vy = 0.3f;
+
+    MUI_PushColumnLayout(&ui, bRect, 5);
+    if (MUI_ButtonA(&ui, GEN_MUI_ID(), "change color"))
     {
-        printf("button pressed : %d\n", id.primary);
         color = ME_RandomSdlColor();
     }
 
-    local_persist f32 v = 0;
-    v = MUI_SliderP(&ui, id2, v, b2Rect);
-    rect.w = v * 100.0f;
-    rect.h = v * 100.0f;
+    MUI_PushRowLayout(&ui, MUI_GetNextAutoLayoutRect(&ui), 5);
+    sprintf(valueX, "X = %0.2f", vx * 1000.0f);
+    MUI_TextA(&ui, GEN_MUI_ID(), valueX, 15);
+    vx = MUI_SliderA(&ui, GEN_MUI_ID(), vx);
+    MUI_PopLayout(&ui);
+
+    MUI_PushRowLayout(&ui, MUI_GetNextAutoLayoutRect(&ui), 5);
+    sprintf(valueY, "Y = %0.2f", vy * 1000.0f);
+    MUI_TextA(&ui, GEN_MUI_ID(), valueY, 15);
+    vy = MUI_SliderA(&ui, GEN_MUI_ID(), vy);
+    MUI_PopLayout(&ui);
+
+    rect.x = vx * 1000.0f;
+    rect.y = vy * 1000.0f;
+
+    MUI_PopLayout(&ui);
 }
 
-void render(SDL_Renderer *renderer)
+void Render(SDL_Renderer *renderer)
 {
+    ME_RenderFillRect(renderer, &rect, color);
     MUI_EndFrame(&ui, renderer);
-    // ME_RenderDrawRect(renderer, &rect, color);
-
-    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
-    SDL_RenderFillRect(renderer, &rect);
 }
 
 int main(int argc, char *argv[])
 {
     //Intialization
-    Game game = ME_CreateGame("MicroUI test", 800, 600);
+    ME_Game game = ME_CreateGame("MicroUI test", 1280, 720);
 
-    game.handleEvent = handleEvent;
-    game.update = update;
-    game.render = render;
-
-    SDL_Renderer *mainRenderer = ME_GetRenderer();
+    game.handleEvent = HandleEvent;
+    game.update = Update;
+    game.render = Render;
 
     ME_RunGame(&game);
 
-    ME_Quit();
+    ME_QuitGame(&game);
 
     return 0;
 }

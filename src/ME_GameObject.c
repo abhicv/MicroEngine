@@ -13,7 +13,7 @@ ME_GameObject *ME_CreateGameObject(int xPos, int yPos)
     gameObject->angle = 0;
 
     gameObject->destRect.x = xPos;
-    gameObject->destRect.y = yPos; 
+    gameObject->destRect.y = yPos;
     gameObject->destRect.w = 32;
     gameObject->destRect.h = 32;
     gameObject->srcRect.x = 0;
@@ -28,10 +28,15 @@ ME_GameObject *ME_CreateGameObject(int xPos, int yPos)
 
 void ME_UpdateGameObject(ME_GameObject *gameObject)
 {
-    if (gameObject->animate && gameObject->nFrames > 0)
-        gameObject->srcRect.x = gameObject->srcRect.w * (((int)SDL_GetTicks() / TIME_BTW_FRAMES) % gameObject->nFrames);
+    if (gameObject->animate && gameObject->nFrames > 0 && gameObject->enabled)
+    {
+        u32 index = (int)(SDL_GetTicks() / TIME_BTW_FRAMES) % gameObject->nFrames;
+        gameObject->srcRect.x = gameObject->srcRect.w * index;
+    }
     else
+    {
         gameObject->srcRect.x = 0;
+    }
 }
 
 void ME_RenderGameObject(ME_GameObject *gameObject, SDL_Renderer *renderer)

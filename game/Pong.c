@@ -1,39 +1,44 @@
 #include "../src/MicroEngine.c"
 
-//Game states
+#define MUI_ORIGIN_ID 2000
+
+//ME_Game states
 typedef enum
 {
     MENU,
     PLAY_MODE
+
 } GameState;
 
+global ME_Game game = {0};
+global MUI ui = {.fontFile = BIT_5x3_FONT_FILE};
+global MUI_Input uiInput = {0};
 global GameState gameState = MENU;
 global bool pause = false;
 
-global Vector2 ballVelocity = {400.0f, 400.0f};
-global float playerSpeed = 0;
+global Vector2 ballVelocity = {400.0f, 300.0f};
+global f32 playerSpeed = 0;
 
-int pScore = 0;
-int cScore = 0;
+global u32 pScore = 0; //player score
+global u32 cScore = 0; //computer score
 
 SDL_Color white = {255, 255, 255, 255};
 
 //UI elements
-MUI_Button play;
-MUI_TextBox pongTitle;
-MUI_TextBox creditText;
-MUI_TextBox playerScore;
-MUI_TextBox computerScore;
+global char playerScoreText[10] = "0";
+global char computerScoreText[10] = "0";
 
-//Game objects
-SDL_Texture *mainTexture;
-ME_GameObject *player;
-ME_GameObject *computer;
-ME_GameObject *ball;
+global f32 computerPerformance = 5.0f;
+
+//ME_Game objects
+SDL_Texture *mainTexture = NULL;
+ME_GameObject *player = NULL;
+ME_GameObject *computer = NULL;
+ME_GameObject *ball = NULL;
 
 //Background grid
-SDL_Texture *grid;
-SDL_Rect gridRect;
+SDL_Texture *grid = NULL;
+SDL_Rect gridRect = {0};
 
 Vector2 CalculateMovDir(Vector2 velocity, Vector2 position)
 {
@@ -43,13 +48,13 @@ Vector2 CalculateMovDir(Vector2 velocity, Vector2 position)
     if (position.x <= 0.0)
         movDir = ReflectDir(tmpVelocity, NewVector2(1, 0));
 
-    else if (position.x + 15.0 > ME_GetScreenWidth())
+    else if (position.x + 15.0 > game.windowWidth)
         movDir = ReflectDir(tmpVelocity, NewVector2(-1, 0));
 
     else if (position.y <= 20.0)
         movDir = ReflectDir(tmpVelocity, NewVector2(0, 1));
 
-    else if (position.y + 15.0 > ME_GetScreenHeight() - 15)
+    else if (position.y + 15.0 > game.windowHeight - 15)
         movDir = ReflectDir(tmpVelocity, NewVector2(0, -1));
 
     Vector2Normalize(&movDir);
@@ -74,8 +79,7 @@ void ResetBall(Vector2 *position, Vector2 *velocity)
 
 void HandleEvent(SDL_Event event)
 {
-    if (MUI_ButtonPressed(&play, event))
-        gameState = PLAY_MODE;
+    MUI_GetInput(&uiInput, &event);
 
     switch (event.type)
     {
@@ -133,27 +137,30 @@ void HandleEvent(SDL_Event event)
 
 void Update(float deltaTime)
 {
+
+    MUI_BeginFrame(&ui, &uiInput);
+
     switch (gameState)
     {
     case PLAY_MODE:
 
         if (pause)
-            deltaTime = 0.0;
+            deltaTime = 0.0f;
 
         if (ball->position.x <= 0)
         {
             pScore++;
-            sprintf(playerScore.textString, "%d", pScore);
+            sprintf(playerScoreText, "%d", pScore);
             ResetBall(&ball->position, &ballVelocity);
-
+            // computerPerformance = ME_Random(2, 6) * 1.0f;
             SDL_Delay(500);
         }
-        else if (ball->position.x >= ME_GetScreenWidth() - 15)
+        else if (ball->position.x >= game.windowWidth - 15)
         {
             cScore++;
-            sprintf(computerScore.textString, "%d", cScore);
+            sprintf(computerScoreText, "%d", cScore);
             ResetBall(&ball->position, &ballVelocity);
-
+            // computerPerformance = ME_Random(2, 6) * 1.0f;
             SDL_Delay(500);
         }
         else if (SDL_HasIntersection(&player->destRect, &ball->destRect))
@@ -170,11 +177,40 @@ void Update(float deltaTime)
         ball->position.x += ballVelocity.x * deltaTime;
         ball->position.y += ballVelocity.y * deltaTime;
         player->position.y += playerSpeed * deltaTime;
-        computer->position.y += (ball->position.y - computer->position.y) * 5 * deltaTime;
+
+        computer->position.y += (ball->position.y - computer->position.y) * computerPerformance * deltaTime;
 
         ME_UpdateGameObject(player);
         ME_UpdateGameObject(computer);
         ME_UpdateGameObject(ball);
+
+        MUI_TextP(&ui, GEN_MUI_ID(),
+                  MUI_RectInit(game.windowWidth / 2 + 50, 60, 120, 30),
+                  playerScoreText, 60);
+
+        MUI_TextP(&ui, GEN_MUI_ID(),
+                  MUI_RectInit(game.windowWidth / 2 - 50, 60, 120, 30),
+                  computerScoreText, 60);
+
+        break;
+    case MENU:
+
+        MUI_TextP(&ui, GEN_MUI_ID(),
+                  MUI_RectInit(game.windowWidth / 2, game.windowHeight / 2 - 100, 120, 30), "Pong", 140);
+
+        MUI_TextP(&ui, GEN_MUI_ID(),
+                  MUI_RectInit(game.windowWidth / 2, game.windowHeight / 2 + 100, 120, 30),
+                  "Made with MicroEngine", 20);
+
+        if (MUI_ButtonP(&ui, GEN_MUI_ID(), "Play",
+                        MUI_RectInit(game.windowWidth / 2, game.windowHeight / 2, 120, 30)))
+        {
+            gameState = PLAY_MODE;
+        }
+
+        break;
+    default:
+        break;
     }
 }
 
@@ -183,10 +219,6 @@ void Render(SDL_Renderer *renderer)
     switch (gameState)
     {
     case MENU:
-
-        MUI_RenderButton(&play, renderer);
-        MUI_RenderTextBox(&creditText, renderer, MUI_TEXT_SOLID);
-        MUI_RenderTextBox(&pongTitle, renderer, MUI_TEXT_SOLID);
 
         break;
 
@@ -197,64 +229,40 @@ void Render(SDL_Renderer *renderer)
         ME_RenderGameObject(ball, renderer);
 
         SDL_RenderCopy(renderer, grid, NULL, &gridRect);
-
-        //Rendering UI
-        MUI_RenderTextBox(&playerScore, renderer, MUI_TEXT_SOLID);
-        MUI_RenderTextBox(&computerScore, renderer, MUI_TEXT_SOLID);
-
         break;
     }
+
+    MUI_EndFrame(&ui, renderer);
 }
 
 int main(int argc, char *argv[])
 {
-    //Initialization of micro engine
-    if (!ME_Init("Pong Game", 800, 600))
-    {
-        ME_Quit();
-        return 1;
-    }
 
-    SDL_Renderer *mainRenderer = ME_GetRenderer();
+    game = ME_CreateGame("Pong", 800, 600);
+    game.handleEvent = HandleEvent;
+    game.update = Update;
+    game.render = Render;
 
-    gridRect.w = ME_GetScreenWidth();
-    gridRect.h = ME_GetScreenHeight();
+    SDL_Renderer *mainRenderer = game.platform.renderer;
+
+    gridRect.w = game.windowWidth;
+    gridRect.h = game.windowHeight;
     gridRect.x = gridRect.y = 0;
 
-    //UI elements initialization
-    play = MUI_CreateButton(ME_GetScreenWidth() / 2, ME_GetScreenHeight() / 2);
-    MUI_SetButtonLabel(&play, "Play");
-
-    pongTitle = MUI_CreateTextBox(play.rect.x, play.rect.y - 100, 140);
-    strcpy(pongTitle.textString, "PONG");
-    pongTitle.textColor = white;
-
-    creditText = MUI_CreateTextBox(play.rect.x, play.rect.y + 200, 20);
-    strcpy(creditText.textString, "Made With MicroEngine");
-    creditText.textColor = white;
-
-    playerScore = MUI_CreateTextBox(ME_GetScreenWidth() / 2 + 50, 60, 60);
-    sprintf(playerScore.textString, "0");
-    playerScore.textColor = white;
-
-    computerScore = MUI_CreateTextBox(ME_GetScreenWidth() / 2 - 50, 60, 60);
-    sprintf(computerScore.textString, "0");
-    computerScore.textColor = white;
-
-    //Game objects initialization
+    //ME_Game objects initialization
     mainTexture = IMG_LoadTexture(mainRenderer, "assets/Sprites/pongTexture.png");
 
-    player = ME_CreateGameObject(ME_GetScreenWidth() - 20, ME_GetScreenHeight() / 2);
+    player = ME_CreateGameObject(game.windowWidth - 20, game.windowHeight / 2);
     player->destRect.w = 20;
     player->destRect.h = 120;
     player->texture = mainTexture;
 
-    computer = ME_CreateGameObject(20, ME_GetScreenHeight() / 2 - 60);
+    computer = ME_CreateGameObject(20, game.windowHeight / 2 - 60);
     computer->destRect.w = 20;
     computer->destRect.h = 120;
     computer->texture = mainTexture;
 
-    ball = ME_CreateGameObject(ME_GetScreenWidth() / 2, ME_GetScreenHeight() / 2);
+    ball = ME_CreateGameObject(game.windowWidth / 2, game.windowHeight / 2);
     ball->destRect.w = 15;
     ball->destRect.h = 15;
     ball->texture = mainTexture;
@@ -262,21 +270,14 @@ int main(int argc, char *argv[])
     //Background grid
     grid = IMG_LoadTexture(mainRenderer, "assets/Sprites/grid.png");
 
-    ME_Run(HandleEvent, Update, Render);
+    ME_RunGame(&game);
 
     //Cleaning up everything
     ME_DestroyGameObject(player);
     ME_DestroyGameObject(computer);
     ME_DestroyGameObject(ball);
 
-    //Cleaning up gui components
-    MUI_DestroyButton(&play);
-    MUI_DestroyTextBox(&playerScore);
-    MUI_DestroyTextBox(&computerScore);
-    MUI_DestroyTextBox(&pongTitle);
-    MUI_DestroyTextBox(&creditText);
-
-    ME_Quit();
+    ME_QuitGame(&game);
 
     return 0;
 }

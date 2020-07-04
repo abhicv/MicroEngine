@@ -44,7 +44,8 @@
 #include "begin_code.h"
 /* Set up for C function definitions, even when using C++ */
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /**
@@ -62,7 +63,7 @@ extern "C" {
  *  By default SDL tries to make a best guess for each platform whether
  *  to use acceleration or not.
  */
-#define SDL_HINT_FRAMEBUFFER_ACCELERATION   "SDL_FRAMEBUFFER_ACCELERATION"
+#define SDL_HINT_FRAMEBUFFER_ACCELERATION "SDL_FRAMEBUFFER_ACCELERATION"
 
 /**
  *  \brief  A variable specifying which render driver to use.
@@ -82,7 +83,7 @@ extern "C" {
  *  The default varies by platform, but it's the first one in the list that
  *  is available on the current platform.
  */
-#define SDL_HINT_RENDER_DRIVER              "SDL_RENDER_DRIVER"
+#define SDL_HINT_RENDER_DRIVER "SDL_RENDER_DRIVER"
 
 /**
  *  \brief  A variable controlling whether the OpenGL render driver uses shaders if they are available.
@@ -93,7 +94,7 @@ extern "C" {
  *
  *  By default shaders are used if OpenGL supports them.
  */
-#define SDL_HINT_RENDER_OPENGL_SHADERS      "SDL_RENDER_OPENGL_SHADERS"
+#define SDL_HINT_RENDER_OPENGL_SHADERS "SDL_RENDER_OPENGL_SHADERS"
 
 /**
  *  \brief  A variable controlling whether the Direct3D device is initialized for thread-safe operations.
@@ -117,7 +118,7 @@ extern "C" {
  *
  *  By default, SDL does not use Direct3D Debug Layer.
  */
-#define SDL_HINT_RENDER_DIRECT3D11_DEBUG    "SDL_RENDER_DIRECT3D11_DEBUG"
+#define SDL_HINT_RENDER_DIRECT3D11_DEBUG "SDL_RENDER_DIRECT3D11_DEBUG"
 
 /**
  *  \brief  A variable controlling the scaling policy for SDL_RenderSetLogicalSize.
@@ -128,7 +129,7 @@ extern "C" {
  *
  *  By default letterbox is used
  */
-#define SDL_HINT_RENDER_LOGICAL_SIZE_MODE       "SDL_RENDER_LOGICAL_SIZE_MODE"
+#define SDL_HINT_RENDER_LOGICAL_SIZE_MODE "SDL_RENDER_LOGICAL_SIZE_MODE"
 
 /**
  *  \brief  A variable controlling the scaling quality
@@ -140,7 +141,7 @@ extern "C" {
  *
  *  By default nearest pixel sampling is used
  */
-#define SDL_HINT_RENDER_SCALE_QUALITY       "SDL_RENDER_SCALE_QUALITY"
+#define SDL_HINT_RENDER_SCALE_QUALITY "SDL_RENDER_SCALE_QUALITY"
 
 /**
  *  \brief  A variable controlling whether updates to the SDL screen surface should be synchronized with the vertical refresh, to avoid tearing.
@@ -151,7 +152,7 @@ extern "C" {
  *
  *  By default SDL does not sync screen surface updates with vertical refresh.
  */
-#define SDL_HINT_RENDER_VSYNC               "SDL_RENDER_VSYNC"
+#define SDL_HINT_RENDER_VSYNC "SDL_RENDER_VSYNC"
 
 /**
  *  \brief  A variable controlling whether the screensaver is enabled. 
@@ -162,7 +163,7 @@ extern "C" {
  *
  *  By default SDL will disable the screensaver.
  */
-#define SDL_HINT_VIDEO_ALLOW_SCREENSAVER    "SDL_VIDEO_ALLOW_SCREENSAVER"
+#define SDL_HINT_VIDEO_ALLOW_SCREENSAVER "SDL_VIDEO_ALLOW_SCREENSAVER"
 
 /**
  * \brief A variable controlling whether the graphics context is externally managed.
@@ -177,7 +178,7 @@ extern "C" {
  * behavior, which is desireable when the application manages the graphics context, such as
  * an externally managed OpenGL context or attaching a Vulkan surface to the window.
  */
-#define SDL_HINT_VIDEO_EXTERNAL_CONTEXT    "SDL_VIDEO_EXTERNAL_CONTEXT"
+#define SDL_HINT_VIDEO_EXTERNAL_CONTEXT "SDL_VIDEO_EXTERNAL_CONTEXT"
 
 /**
  *  \brief  A variable controlling whether the X11 VidMode extension should be used.
@@ -188,7 +189,7 @@ extern "C" {
  *
  *  By default SDL will use XVidMode if it is available.
  */
-#define SDL_HINT_VIDEO_X11_XVIDMODE         "SDL_VIDEO_X11_XVIDMODE"
+#define SDL_HINT_VIDEO_X11_XVIDMODE "SDL_VIDEO_X11_XVIDMODE"
 
 /**
  *  \brief  A variable controlling whether the X11 Xinerama extension should be used.
@@ -199,7 +200,7 @@ extern "C" {
  *
  *  By default SDL will use Xinerama if it is available.
  */
-#define SDL_HINT_VIDEO_X11_XINERAMA         "SDL_VIDEO_X11_XINERAMA"
+#define SDL_HINT_VIDEO_X11_XINERAMA "SDL_VIDEO_X11_XINERAMA"
 
 /**
  *  \brief  A variable controlling whether the X11 XRandR extension should be used.
@@ -210,13 +211,13 @@ extern "C" {
  *
  *  By default SDL will not use XRandR because of window manager issues.
  */
-#define SDL_HINT_VIDEO_X11_XRANDR           "SDL_VIDEO_X11_XRANDR"
+#define SDL_HINT_VIDEO_X11_XRANDR "SDL_VIDEO_X11_XRANDR"
 
 /**
  *  \brief  A variable forcing the visual ID chosen for new X11 windows
  *
  */
-#define SDL_HINT_VIDEO_X11_WINDOW_VISUALID      "SDL_VIDEO_X11_WINDOW_VISUALID"
+#define SDL_HINT_VIDEO_X11_WINDOW_VISUALID "SDL_VIDEO_X11_WINDOW_VISUALID"
 
 /**
  *  \brief  A variable controlling whether the X11 _NET_WM_PING protocol should be supported.
@@ -230,7 +231,7 @@ extern "C" {
  *  turn it off to avoid the window manager thinking the app is hung.
  *  The hint is checked in CreateWindow.
  */
-#define SDL_HINT_VIDEO_X11_NET_WM_PING      "SDL_VIDEO_X11_NET_WM_PING"
+#define SDL_HINT_VIDEO_X11_NET_WM_PING "SDL_VIDEO_X11_NET_WM_PING"
 
 /**
  * \brief A variable controlling whether the X11 _NET_WM_BYPASS_COMPOSITOR hint should be used.
@@ -264,12 +265,12 @@ extern "C" {
  *
  *  By default SDL will allow interaction with the window frame when the cursor is hidden
  */
-#define SDL_HINT_WINDOW_FRAME_USABLE_WHILE_CURSOR_HIDDEN    "SDL_WINDOW_FRAME_USABLE_WHILE_CURSOR_HIDDEN"
+#define SDL_HINT_WINDOW_FRAME_USABLE_WHILE_CURSOR_HIDDEN "SDL_WINDOW_FRAME_USABLE_WHILE_CURSOR_HIDDEN"
 
 /**
  * \brief A variable to specify custom icon resource id from RC file on Windows platform 
  */
-#define SDL_HINT_WINDOWS_INTRESOURCE_ICON       "SDL_WINDOWS_INTRESOURCE_ICON"
+#define SDL_HINT_WINDOWS_INTRESOURCE_ICON "SDL_WINDOWS_INTRESOURCE_ICON"
 #define SDL_HINT_WINDOWS_INTRESOURCE_ICON_SMALL "SDL_WINDOWS_INTRESOURCE_ICON_SMALL"
 
 /**
@@ -292,27 +293,27 @@ extern "C" {
  *
  *  By default SDL will not grab the keyboard so system shortcuts still work.
  */
-#define SDL_HINT_GRAB_KEYBOARD              "SDL_GRAB_KEYBOARD"
+#define SDL_HINT_GRAB_KEYBOARD "SDL_GRAB_KEYBOARD"
 
 /**
  *  \brief  A variable setting the double click time, in milliseconds.
  */
-#define SDL_HINT_MOUSE_DOUBLE_CLICK_TIME    "SDL_MOUSE_DOUBLE_CLICK_TIME"
+#define SDL_HINT_MOUSE_DOUBLE_CLICK_TIME "SDL_MOUSE_DOUBLE_CLICK_TIME"
 
 /**
  *  \brief  A variable setting the double click radius, in pixels.
  */
-#define SDL_HINT_MOUSE_DOUBLE_CLICK_RADIUS    "SDL_MOUSE_DOUBLE_CLICK_RADIUS"
+#define SDL_HINT_MOUSE_DOUBLE_CLICK_RADIUS "SDL_MOUSE_DOUBLE_CLICK_RADIUS"
 
 /**
  *  \brief  A variable setting the speed scale for mouse motion, in floating point, when the mouse is not in relative mode
  */
-#define SDL_HINT_MOUSE_NORMAL_SPEED_SCALE    "SDL_MOUSE_NORMAL_SPEED_SCALE"
+#define SDL_HINT_MOUSE_NORMAL_SPEED_SCALE "SDL_MOUSE_NORMAL_SPEED_SCALE"
 
 /**
  *  \brief  A variable setting the scale for mouse motion, in floating point, when the mouse is in relative mode
  */
-#define SDL_HINT_MOUSE_RELATIVE_SPEED_SCALE    "SDL_MOUSE_RELATIVE_SPEED_SCALE"
+#define SDL_HINT_MOUSE_RELATIVE_SPEED_SCALE "SDL_MOUSE_RELATIVE_SPEED_SCALE"
 
 /**
  *  \brief  A variable controlling whether relative mouse mode is implemented using mouse warping
@@ -323,7 +324,7 @@ extern "C" {
  *
  *  By default SDL will use raw input for relative mouse mode
  */
-#define SDL_HINT_MOUSE_RELATIVE_MODE_WARP    "SDL_MOUSE_RELATIVE_MODE_WARP"
+#define SDL_HINT_MOUSE_RELATIVE_MODE_WARP "SDL_MOUSE_RELATIVE_MODE_WARP"
 
 /**
  *  \brief Allow mouse click events when clicking to focus an SDL window
@@ -345,9 +346,9 @@ extern "C" {
  *
  *  By default SDL will generate mouse events for touch events
  */
-#define SDL_HINT_TOUCH_MOUSE_EVENTS    "SDL_TOUCH_MOUSE_EVENTS"
+#define SDL_HINT_TOUCH_MOUSE_EVENTS "SDL_TOUCH_MOUSE_EVENTS"
 
-/**
+   /**
  *  \brief  A variable controlling whether mouse events should generate synthetic touch events
  *
  *  This variable can be set to the following values:
@@ -355,13 +356,13 @@ extern "C" {
  *    "1"       - Mouse events will generate touch events (default for mobile platforms, such as Android and iOS)
  */
 
-#define SDL_HINT_MOUSE_TOUCH_EVENTS    "SDL_MOUSE_TOUCH_EVENTS"
+#define SDL_HINT_MOUSE_TOUCH_EVENTS "SDL_MOUSE_TOUCH_EVENTS"
 
 /**
  *  \brief Minimize your SDL_Window if it loses key focus when in fullscreen mode. Defaults to true.
  *
  */
-#define SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS   "SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS"
+#define SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS "SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS"
 
 /**
  *  \brief  A variable controlling whether the idle timer is disabled on iOS.
@@ -507,7 +508,7 @@ extern "C" {
 #define SDL_HINT_GAMECONTROLLERCONFIG_FILE "SDL_GAMECONTROLLERCONFIG_FILE"
 
 /**
- *  \brief  A variable containing a list of devices to skip when scanning for game controllers.
+ *  \brief  A variable containing a list of devices to skip when scanning for ME_Game controllers.
  *
  *  The format of the string is a comma separated list of USB VID/PID pairs
  *  in hexadecimal form, e.g.
@@ -520,7 +521,7 @@ extern "C" {
 #define SDL_HINT_GAMECONTROLLER_IGNORE_DEVICES "SDL_GAMECONTROLLER_IGNORE_DEVICES"
 
 /**
- *  \brief  If set, all devices will be skipped when scanning for game controllers except for the ones listed in this variable.
+ *  \brief  If set, all devices will be skipped when scanning for ME_Game controllers except for the ones listed in this variable.
  *
  *  The format of the string is a comma separated list of USB VID/PID pairs
  *  in hexadecimal form, e.g.
@@ -533,7 +534,7 @@ extern "C" {
 #define SDL_HINT_GAMECONTROLLER_IGNORE_DEVICES_EXCEPT "SDL_GAMECONTROLLER_IGNORE_DEVICES_EXCEPT"
 
 /**
- *  \brief  If set, game controller face buttons report their values according to their labels instead of their positional layout.
+ *  \brief  If set, ME_Game controller face buttons report their values according to their labels instead of their positional layout.
  * 
  *  For example, on Nintendo Switch controllers, normally you'd get:
  *
@@ -636,7 +637,7 @@ extern "C" {
  *
  *  The default is the value of SDL_HINT_JOYSTICK_HIDAPI
  */
-#define SDL_HINT_JOYSTICK_HIDAPI_XBOX   "SDL_JOYSTICK_HIDAPI_XBOX"
+#define SDL_HINT_JOYSTICK_HIDAPI_XBOX "SDL_JOYSTICK_HIDAPI_XBOX"
 
 /**
  *  \brief  A variable controlling whether the HIDAPI driver for Nintendo GameCube controllers should be used.
@@ -650,7 +651,7 @@ extern "C" {
 #define SDL_HINT_JOYSTICK_HIDAPI_GAMECUBE "SDL_JOYSTICK_HIDAPI_GAMECUBE"
 
 /**
- *  \brief  A variable that controls whether Steam Controllers should be exposed using the SDL joystick and game controller APIs
+ *  \brief  A variable that controls whether Steam Controllers should be exposed using the SDL joystick and ME_Game controller APIs
  *
  *  The variable can be set to the following values:
  *    "0"       - Do not scan for Steam Controllers
@@ -659,7 +660,6 @@ extern "C" {
  *  The default value is "1".  This hint must be set before initializing the joystick subsystem.
  */
 #define SDL_HINT_ENABLE_STEAM_CONTROLLERS "SDL_ENABLE_STEAM_CONTROLLERS"
-
 
 /**
  *  \brief If set to "0" then never set the top most bit on a SDL Window, even if the video mode expects it.
@@ -686,7 +686,6 @@ extern "C" {
  *  The default value is "1". This hint may be set at any time.
  */
 #define SDL_HINT_TIMER_RESOLUTION "SDL_TIMER_RESOLUTION"
-
 
 /**
  *  \brief  A variable describing the content orientation on QtWayland-based platforms.
@@ -728,7 +727,7 @@ extern "C" {
 *  SDL_CreateThreadWithStackSize(). This hint only works with the classic
 *  SDL_CreateThread().
 */
-#define SDL_HINT_THREAD_STACK_SIZE              "SDL_THREAD_STACK_SIZE"
+#define SDL_HINT_THREAD_STACK_SIZE "SDL_THREAD_STACK_SIZE"
 
 /**
  *  \brief If set to 1, then do not allow high-DPI windows. ("Retina" on Mac and iOS)
@@ -757,7 +756,7 @@ extern "C" {
 *    "none" - do not load any library, useful if you compiled ANGLE from source and included the compiler in your binaries.
 *
 */
-#define SDL_HINT_VIDEO_WIN_D3DCOMPILER              "SDL_VIDEO_WIN_D3DCOMPILER"
+#define SDL_HINT_VIDEO_WIN_D3DCOMPILER "SDL_VIDEO_WIN_D3DCOMPILER"
 
 /**
 *  \brief  A variable that is the address of another SDL_Window* (as a hex string formatted with "%p").
@@ -776,7 +775,7 @@ extern "C" {
 *    The address (as a string "%p") of the SDL_Window* that new windows created with SDL_CreateWindowFrom() should
 *    share a pixel format with.
 */
-#define SDL_HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT    "SDL_VIDEO_WINDOW_SHARE_PIXEL_FORMAT"
+#define SDL_HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT "SDL_VIDEO_WINDOW_SHARE_PIXEL_FORMAT"
 
 /**
  *  \brief A URL to a WinRT app's privacy policy
@@ -894,7 +893,7 @@ extern "C" {
  *   the OS isn't at least Mac OS X Lion (10.7). This hint must be set before
  *   any windows are created.
  */
-#define SDL_HINT_VIDEO_MAC_FULLSCREEN_SPACES    "SDL_VIDEO_MAC_FULLSCREEN_SPACES"
+#define SDL_HINT_VIDEO_MAC_FULLSCREEN_SPACES "SDL_VIDEO_MAC_FULLSCREEN_SPACES"
 
 /**
 *  \brief  When set don't force the SDL app to become a foreground process
@@ -902,7 +901,7 @@ extern "C" {
 *  This hint only applies to Mac OS X.
 *
 */
-#define SDL_HINT_MAC_BACKGROUND_APP    "SDL_MAC_BACKGROUND_APP"
+#define SDL_HINT_MAC_BACKGROUND_APP "SDL_MAC_BACKGROUND_APP"
 
 /**
  * \brief Android APK expansion main file version. Should be a string number like "1", "2" etc.
@@ -992,7 +991,7 @@ extern "C" {
  *    "#canvas"      - the WebGL canvas element
  *    any other string without a leading # sign applies to the element on the page with that ID.
  */
-#define SDL_HINT_EMSCRIPTEN_KEYBOARD_ELEMENT   "SDL_EMSCRIPTEN_KEYBOARD_ELEMENT"
+#define SDL_HINT_EMSCRIPTEN_KEYBOARD_ELEMENT "SDL_EMSCRIPTEN_KEYBOARD_ELEMENT"
 
 /**
  *  \brief Tell SDL not to catch the SIGINT or SIGTERM signals.
@@ -1004,7 +1003,7 @@ extern "C" {
  *               catches a signal, convert it into an SDL_QUIT event.
  *   "1"       - SDL will not install a signal handler at all.
  */
-#define SDL_HINT_NO_SIGNAL_HANDLERS   "SDL_NO_SIGNAL_HANDLERS"
+#define SDL_HINT_NO_SIGNAL_HANDLERS "SDL_NO_SIGNAL_HANDLERS"
 
 /**
  *  \brief Tell SDL not to generate window-close events for Alt+F4 on Windows.
@@ -1056,7 +1055,7 @@ extern "C" {
  * Also known as Z-order. The variable can take a negative or positive value.
  * The default is 10000.
  */
-#define SDL_HINT_RPI_VIDEO_LAYER           "SDL_RPI_VIDEO_LAYER"
+#define SDL_HINT_RPI_VIDEO_LAYER "SDL_RPI_VIDEO_LAYER"
 
 /**
  * \brief Tell the video driver that we only want a double buffer.
@@ -1074,7 +1073,7 @@ extern "C" {
  * - KMSDRM (kmsdrm)
  * - Raspberry Pi (raspberrypi)
  */
-#define SDL_HINT_VIDEO_DOUBLE_BUFFER      "SDL_VIDEO_DOUBLE_BUFFER"
+#define SDL_HINT_VIDEO_DOUBLE_BUFFER "SDL_VIDEO_DOUBLE_BUFFER"
 
 /**
  *  \brief  A variable controlling what driver to use for OpenGL ES contexts.
@@ -1105,7 +1104,7 @@ extern "C" {
  *    "1"       - Load OpenGL ES library using the default library names.
  *
  */
-#define SDL_HINT_OPENGL_ES_DRIVER   "SDL_OPENGL_ES_DRIVER"
+#define SDL_HINT_OPENGL_ES_DRIVER "SDL_OPENGL_ES_DRIVER"
 
 /**
  *  \brief  A variable controlling speed/quality tradeoff of audio resampling.
@@ -1131,7 +1130,7 @@ extern "C" {
  *    "2" or "medium"  - Use medium quality resampling, if available
  *    "3" or "best"    - Use high quality resampling, if available
  */
-#define SDL_HINT_AUDIO_RESAMPLING_MODE   "SDL_AUDIO_RESAMPLING_MODE"
+#define SDL_HINT_AUDIO_RESAMPLING_MODE "SDL_AUDIO_RESAMPLING_MODE"
 
 /**
  *  \brief  A variable controlling the audio category on iOS and Mac OS X
@@ -1144,7 +1143,7 @@ extern "C" {
  *  For more information, see Apple's documentation:
  *  https://developer.apple.com/library/content/documentation/Audio/Conceptual/AudioSessionProgrammingGuide/AudioSessionCategoriesandModes/AudioSessionCategoriesandModes.html
  */
-#define SDL_HINT_AUDIO_CATEGORY   "SDL_AUDIO_CATEGORY"
+#define SDL_HINT_AUDIO_CATEGORY "SDL_AUDIO_CATEGORY"
 
 /**
  *  \brief  A variable controlling whether the 2D render API is compatible or efficient.
@@ -1168,8 +1167,7 @@ extern "C" {
  *  batch goes to the GPU before your work begins. Not following this contract
  *  will result in undefined behavior.
  */
-#define SDL_HINT_RENDER_BATCHING  "SDL_RENDER_BATCHING"
-
+#define SDL_HINT_RENDER_BATCHING "SDL_RENDER_BATCHING"
 
 /**
  *  \brief  A variable controlling whether SDL logs all events pushed onto its internal queue.
@@ -1190,9 +1188,7 @@ extern "C" {
  *  This hint can be toggled on and off at runtime, if you only need to log
  *  events for a small subset of program execution.
  */
-#define SDL_HINT_EVENT_LOGGING   "SDL_EVENT_LOGGING"
-
-
+#define SDL_HINT_EVENT_LOGGING "SDL_EVENT_LOGGING"
 
 /**
  *  \brief  Controls how the size of the RIFF chunk affects the loading of a WAVE file.
@@ -1213,7 +1209,7 @@ extern "C" {
  *    "ignore"       - Ignore the RIFF chunk size and always search up to 4 GiB
  *    "maximum"      - Search for chunks until the end of file (not recommended)
  */
-#define SDL_HINT_WAVE_RIFF_CHUNK_SIZE   "SDL_WAVE_RIFF_CHUNK_SIZE"
+#define SDL_HINT_WAVE_RIFF_CHUNK_SIZE "SDL_WAVE_RIFF_CHUNK_SIZE"
 
 /**
  *  \brief  Controls how a truncated WAVE file is handled.
@@ -1229,7 +1225,7 @@ extern "C" {
  *    "dropframe"  - Decode until the first incomplete sample frame
  *    "dropblock"  - Decode until the first incomplete block (default)
  */
-#define SDL_HINT_WAVE_TRUNCATION   "SDL_WAVE_TRUNCATION"
+#define SDL_HINT_WAVE_TRUNCATION "SDL_WAVE_TRUNCATION"
 
 /**
  *  \brief  Controls how the fact chunk affects the loading of a WAVE file.
@@ -1256,7 +1252,7 @@ extern "C" {
  *                    samples is zero
  *    "ignore"      - Ignore fact chunk entirely (default)
  */
-#define SDL_HINT_WAVE_FACT_CHUNK   "SDL_WAVE_FACT_CHUNK"
+#define SDL_HINT_WAVE_FACT_CHUNK "SDL_WAVE_FACT_CHUNK"
 
 /*
  *  \brief Override for SDL_GetDisplayUsableBounds()
@@ -1272,17 +1268,17 @@ extern "C" {
  */
 #define SDL_HINT_DISPLAY_USABLE_BOUNDS "SDL_DISPLAY_USABLE_BOUNDS"
 
-/**
+   /**
  *  \brief  An enumeration of hint priorities
  */
-typedef enum {
-    SDL_HINT_DEFAULT,
-    SDL_HINT_NORMAL,
-    SDL_HINT_OVERRIDE
-} SDL_HintPriority;
+   typedef enum
+   {
+      SDL_HINT_DEFAULT,
+      SDL_HINT_NORMAL,
+      SDL_HINT_OVERRIDE
+   } SDL_HintPriority;
 
-
-/**
+   /**
  *  \brief Set a hint with a specific priority
  *
  *  The priority controls the behavior when setting a hint that already
@@ -1291,66 +1287,65 @@ typedef enum {
  *
  *  \return SDL_TRUE if the hint was set, SDL_FALSE otherwise
  */
-extern DECLSPEC SDL_bool SDLCALL SDL_SetHintWithPriority(const char *name,
-                                                         const char *value,
-                                                         SDL_HintPriority priority);
+   extern DECLSPEC SDL_bool SDLCALL SDL_SetHintWithPriority(const char *name,
+                                                            const char *value,
+                                                            SDL_HintPriority priority);
 
-/**
+   /**
  *  \brief Set a hint with normal priority
  *
  *  \return SDL_TRUE if the hint was set, SDL_FALSE otherwise
  */
-extern DECLSPEC SDL_bool SDLCALL SDL_SetHint(const char *name,
-                                             const char *value);
+   extern DECLSPEC SDL_bool SDLCALL SDL_SetHint(const char *name,
+                                                const char *value);
 
-/**
+   /**
  *  \brief Get a hint
  *
  *  \return The string value of a hint variable.
  */
-extern DECLSPEC const char *SDLCALL SDL_GetHint(const char *name);
+   extern DECLSPEC const char *SDLCALL SDL_GetHint(const char *name);
 
-/**
+   /**
  *  \brief Get a hint
  *
  *  \return The boolean value of a hint variable.
  */
-extern DECLSPEC SDL_bool SDLCALL SDL_GetHintBoolean(const char *name, SDL_bool default_value);
+   extern DECLSPEC SDL_bool SDLCALL SDL_GetHintBoolean(const char *name, SDL_bool default_value);
 
-/**
+   /**
  * \brief type definition of the hint callback function.
  */
-typedef void (SDLCALL *SDL_HintCallback)(void *userdata, const char *name, const char *oldValue, const char *newValue);
+   typedef void(SDLCALL *SDL_HintCallback)(void *userdata, const char *name, const char *oldValue, const char *newValue);
 
-/**
+   /**
  *  \brief Add a function to watch a particular hint
  *
  *  \param name The hint to watch
  *  \param callback The function to call when the hint value changes
  *  \param userdata A pointer to pass to the callback function
  */
-extern DECLSPEC void SDLCALL SDL_AddHintCallback(const char *name,
-                                                 SDL_HintCallback callback,
-                                                 void *userdata);
+   extern DECLSPEC void SDLCALL SDL_AddHintCallback(const char *name,
+                                                    SDL_HintCallback callback,
+                                                    void *userdata);
 
-/**
+   /**
  *  \brief Remove a function watching a particular hint
  *
  *  \param name The hint being watched
  *  \param callback The function being called when the hint value changes
  *  \param userdata A pointer being passed to the callback function
  */
-extern DECLSPEC void SDLCALL SDL_DelHintCallback(const char *name,
-                                                 SDL_HintCallback callback,
-                                                 void *userdata);
+   extern DECLSPEC void SDLCALL SDL_DelHintCallback(const char *name,
+                                                    SDL_HintCallback callback,
+                                                    void *userdata);
 
-/**
+   /**
  *  \brief  Clear all hints
  *
  *  This function is called during SDL_Quit() to free stored hints.
  */
-extern DECLSPEC void SDLCALL SDL_ClearHints(void);
-
+   extern DECLSPEC void SDLCALL SDL_ClearHints(void);
 
 /* Ends C function definitions when using C++ */
 #ifdef __cplusplus

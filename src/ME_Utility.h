@@ -4,9 +4,6 @@
 #include <SDL2\SDL.h>
 #include <stdio.h>
 
-#define DEBUG_PRINT_COLOR(Color) printf("r: %d, g: %d, b: %d\n",Color.r,Color.g,Color.b)
-#define DEBUG_LOG_COORDINATES(position) printf("x : %d, y : %d\n", position.x, position.y)
-
 typedef unsigned int ME_Color;
 
 float MapFloat(float x, float in_min, float in_max, float out_min, float out_max);
@@ -26,6 +23,5 @@ SDL_Color ME_GetRenderColor(SDL_Renderer *);
 void ME_RenderDrawRect(SDL_Renderer *, const SDL_Rect *, SDL_Color);
 
 void ME_RenderFillRect(SDL_Renderer *, const SDL_Rect *, SDL_Color);
-
 
 #endif // ME_UTILITY_H

@@ -5,23 +5,24 @@
     int i = 0;            \
     for (i = 0; i < count; i++)
 
-#define obstacle_max_count 4
-#define distance_btw_obstacles 250
+#define OBSTACLE_MAX_COUNT 4
+#define DISTANCE_BTW_OBSTACLES 250
 
+global ME_Game game = {0};
 global ME_GameObject *player = NULL;
-global ME_GameObject *obstacles[obstacle_max_count] = {NULL};
+global ME_GameObject *obstacles[OBSTACLE_MAX_COUNT] = {NULL};
 global SDL_Texture *backgroundLayer = NULL;
 
 global f32 time = 0.0f;
 
 //UI elements
-static MUI_TextBox scoreText;
-static MUI_TextBox gameOverText;
+global MUI_TextBox scoreText;
+global MUI_TextBox gameOverText;
 
-static Vector2 velocity = {0.0f, 0.0f};
-static f32 gravity = 200.0f;
-static u32 score = 0;
-static u32 toCheck = 0;
+global Vector2 velocity = {0.0f, 0.0f};
+global f32 gravity = 200.0f;
+global u32 score = 0;
+global u32 toCheck = 0;
 
 void handleEvent(SDL_Event event)
 {
@@ -47,10 +48,10 @@ void update(float deltaTime)
 
     ME_UpdateGameObject(player);
 
-    if (player->position.y > ME_GetScreenHeight())
+    if (player->position.y > game.windowHeight)
     {
         velocity.y = 0;
-        player->position.y = ME_GetScreenHeight();
+        player->position.y = game.windowHeight;
         gameOverText.enabled = true;
     }
 
@@ -64,28 +65,28 @@ void update(float deltaTime)
     velocity.y += gravity * deltaTime;
     player->position.y += velocity.y * deltaTime;
 
-    foreach (i, obstacle_max_count)
+    foreach (i, OBSTACLE_MAX_COUNT)
     {
         obstacles[i]->position.x += -200.0f * deltaTime;
 
         //reseting position of obstacles
         if (obstacles[i]->position.x <= -100)
         {
-            obstacles[i]->position.y = ME_Random(ME_GetScreenHeight() - 200, ME_GetScreenHeight() + 30);
+            obstacles[i]->position.y = ME_Random(game.windowHeight - 200, game.windowHeight + 30);
 
             if (i != 0)
             {
-                obstacles[i]->position.x = obstacles[i - 1]->position.x + distance_btw_obstacles;
+                obstacles[i]->position.x = obstacles[i - 1]->position.x + DISTANCE_BTW_OBSTACLES;
             }
 
             if (i == 0)
             {
-                obstacles[0]->position.x = obstacles[obstacle_max_count - 1]->position.x + distance_btw_obstacles;
+                obstacles[0]->position.x = obstacles[OBSTACLE_MAX_COUNT - 1]->position.x + DISTANCE_BTW_OBSTACLES;
             }
 
             obstacles[i]->enabled = false;
         }
-        else if (obstacles[i]->position.x > ME_GetScreenWidth() + 100)
+        else if (obstacles[i]->position.x > game.windowWidth + 100)
         {
             obstacles[i]->enabled = false;
         }
@@ -101,7 +102,7 @@ void update(float deltaTime)
         score += 1;
         toCheck += 1;
 
-        if (toCheck >= obstacle_max_count)
+        if (toCheck >= OBSTACLE_MAX_COUNT)
             toCheck = 0;
     }
 
@@ -121,7 +122,7 @@ void render(SDL_Renderer *renderer)
 
     int y = 0;
 
-    foreach (i, obstacle_max_count)
+    foreach (i, OBSTACLE_MAX_COUNT)
     {
         ME_RenderGameObject(obstacles[i], renderer);
         y = obstacles[i]->position.y;
@@ -139,19 +140,20 @@ void render(SDL_Renderer *renderer)
 
 int main(int argc, char *argv[])
 {
-    //---MicroEngine initialization---
-    if (!ME_Init("Flappy Bird Clone", 400, 600))
-    {
-        ME_Quit();
-        return 1;
-    }
 
-    ME_SetRenderColor(ME_GetRenderer(), ME_HexToSdlColor(0x5fcde4));
+    game = ME_CreateGame("Flappy Bird clone", 400, 600);
+    game.handleEvent = handleEvent;
+    game.update = update;
+    game.render = render;
 
-    //Game objects Initialization
+    SDL_Renderer *mainRenderer = game.platform.renderer;
+
+    ME_SetRenderColor(mainRenderer, ME_HexToSdlColor(0x5fcde4));
+
+    //game objects Initialization
     //player
-    player = ME_CreateGameObject(ME_GetScreenWidth() / 2, ME_GetScreenHeight() / 2);
-    player->texture = IMG_LoadTexture(ME_GetRenderer(), "assets/Sprites/flappy.png");
+    player = ME_CreateGameObject(game.windowWidth / 2, game.windowHeight / 2);
+    player->texture = IMG_LoadTexture(mainRenderer, "assets/Sprites/flappy.png");
     player->animate = true;
     player->nFrames = 3;
     player->srcRect.w = 34;
@@ -159,14 +161,14 @@ int main(int argc, char *argv[])
 
     player->destRect.w = 34 * 1.5;
     player->destRect.h = 24 * 1.5;
-    backgroundLayer = IMG_LoadTexture(ME_GetRenderer(), "assets/Sprites/background-night.png");
+    backgroundLayer = IMG_LoadTexture(mainRenderer, "assets/Sprites/background-night.png");
 
     //obstacles
-    foreach (i, obstacle_max_count)
+    foreach (i, OBSTACLE_MAX_COUNT)
     {
-        obstacles[i] = ME_CreateGameObject(ME_GetScreenWidth() + 100,
-                                           ME_Random(ME_GetScreenHeight() - 200, ME_GetScreenHeight()));
-        obstacles[i]->texture = IMG_LoadTexture(ME_GetRenderer(), "assets/Sprites/pipe-green.png");
+        obstacles[i] = ME_CreateGameObject(game.windowWidth + 100,
+                                           ME_Random(game.windowHeight - 200, game.windowHeight));
+        obstacles[i]->texture = IMG_LoadTexture(mainRenderer, "assets/Sprites/pipe-green.png");
         obstacles[i]->destRect.w = 100;
         obstacles[i]->destRect.h = 400;
 
@@ -174,33 +176,33 @@ int main(int argc, char *argv[])
 
         if (i != 0)
         {
-            obstacles[i]->position.x = obstacles[i - 1]->position.x + distance_btw_obstacles;
+            obstacles[i]->position.x = obstacles[i - 1]->position.x + DISTANCE_BTW_OBSTACLES;
         }
     }
 
     //User interface
     //Score text
-    scoreText = MUI_CreateTextBox(ME_GetScreenWidth() / 2, 50, 50);
+    scoreText = MUI_CreateTextBox(game.windowWidth / 2, 50, 50);
     MUI_SetTextBoxColor(&scoreText, ME_HexToSdlColor(0xffffff));
 
-    gameOverText = MUI_CreateTextBox(ME_GetScreenWidth() / 2, 300, 60);
+    gameOverText = MUI_CreateTextBox(game.windowWidth / 2, 300, 60);
     MUI_SetTextBoxColor(&gameOverText, ME_HexToSdlColor(0xff0000));
     sprintf(gameOverText.textString, "GameOver");
     gameOverText.enabled = false;
 
-    //Game loop
-    ME_Run(handleEvent, update, render);
+    //game loop
+    ME_RunGame(&game);
 
-    //Destroying        
+    //Destroying
     ME_DestroyGameObject(player);
 
-    foreach (n, obstacle_max_count)
+    foreach (n, OBSTACLE_MAX_COUNT)
     {
         ME_DestroyGameObject(obstacles[n]);
     }
 
     MUI_DestroyTextBox(&scoreText);
-    ME_Quit();
+    ME_QuitGame(&game);
 
     return 0;
 }

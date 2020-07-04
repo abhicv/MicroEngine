@@ -1,24 +1,29 @@
 #ifndef ME_RENDERER_H
 #define ME_RENDERER_H
 
+#include "types.h"
+
 #include <SDL2/SDL.h>
 
-typedef struct {
+//NOTE(Lonecoder) : For SDL2 hardware acceleration rendering
+typedef struct
+{
     SDL_Texture *texture;
-    SDL_Rect *srcRect;
-    SDL_Rect *destRect;
+    SDL_Rect srcRect;
+    SDL_Rect destRect;
     SDL_RendererFlip flipFlag;
-    SDL_Point *rotationCenter;
-    double angle;
+    SDL_Point rotationCenter;
+    f32 angle;
+    SDL_Renderer *targetRenderer;
 
-} ME_RenderRequest;
+} ME_RenderData;
 
-void ME_CreateRenderRequest(SDL_Texture *,
-                            SDL_Rect *,
-                            SDL_Rect *,
-                            SDL_RendererFlip,
-                            SDL_Point *, double);
+void ME_CreateRenderData(SDL_Texture *texture,
+                         SDL_Rect srcRect,
+                         SDL_Rect destRect,
+                         SDL_RendererFlip flipFlag,
+                         SDL_Point rotationCenter, f32 angle);
 
-void ME_HandleRenderRequest();
+void Render(ME_RenderData *renderData);
 
 #endif // ME_RENDERER_H

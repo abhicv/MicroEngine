@@ -24,21 +24,21 @@ void Render(SDL_Renderer *renderer)
 
 int main(int argc, char *argv[])
 {
-    Game game = ME_CreateGame("MicroEngine test", 800, 600);
-    SDL_Renderer *renderer = game.platform.renderer;
+    ME_Game ME_Game = ME_CreateGame("MicroEngine test", 800, 600);
+    SDL_Renderer *renderer = ME_Game.platform.renderer;
 
     // ME_Init("MicroEngine test", 800,600);
     part = ME_CreateParticleSystem(400, 300, 100);
     part->texture = IMG_LoadTexture(renderer, "assets/Sprites/Coin.png");
 
-    game.handleEvent = HandleEvent;
-    game.update = Update;
-    game.render = Render;
+    ME_Game.handleEvent = HandleEvent;
+    ME_Game.update = Update;
+    ME_Game.render = Render;
 
-    ME_RunGame(&game);
+    ME_RunGame(&ME_Game);
 
     // ME_Run(handleEvent, update, render);
     ME_DestroyParticlSystem(part);
-    ME_QuitGame(&game);
+    ME_QuitGame(&ME_Game);
     return 0;
 }

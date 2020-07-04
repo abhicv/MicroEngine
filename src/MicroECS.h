@@ -3,25 +3,27 @@
 
 //TODO(Lone-code) : Implement a entity component system
 #include "types.h"
+#include "ME_Vector2D.h"
 
-typedef struct 
+typedef struct
 {
+    Vector2 position;
+    Vector2 size;
+    f32 angle;
 
 } TransformCompnent;
 
-typedef struct 
+typedef struct
 {
 
 } SpriteComponent;
 
-
-typedef struct 
+typedef struct
 {
     TransformCompnent *transforms;
     SpriteComponent *sprites;
 
 } MicroECSWorld;
-
 
 u32 CreateEntity();
 #endif

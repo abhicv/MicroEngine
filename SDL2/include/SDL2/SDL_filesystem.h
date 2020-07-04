@@ -34,10 +34,11 @@
 
 /* Set up for C function definitions, even when using C++ */
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-/**
+   /**
  * \brief Get the path where the application resides.
  *
  * Get the "base path". This is the directory where the application was run
@@ -60,9 +61,9 @@ extern "C" {
  *
  * \sa SDL_GetPrefPath
  */
-extern DECLSPEC char *SDLCALL SDL_GetBasePath(void);
+   extern DECLSPEC char *SDLCALL SDL_GetBasePath(void);
 
-/**
+   /**
  * \brief Get the user-and-app-specific path where files can be written.
  *
  * Get the "pref dir". This is meant to be where users can write personal
@@ -97,7 +98,7 @@ extern DECLSPEC char *SDLCALL SDL_GetBasePath(void);
  *      changes for an app once you've decided on it.
  *    - Unicode characters are legal, as long as it's UTF-8 encoded, but...
  *    - ...only use letters, numbers, and spaces. Avoid punctuation like
- *      "Game Name 2: Bad Guy's Revenge!" ... "Game Name 2" is sufficient.
+ *      "ME_Game Name 2: Bad Guy's Revenge!" ... "ME_Game Name 2" is sufficient.
  *
  * This returns an absolute path in UTF-8 encoding, and is guaranteed to
  *  end with a path separator ('\\' on Windows, '/' most other places).
@@ -123,7 +124,7 @@ extern DECLSPEC char *SDLCALL SDL_GetBasePath(void);
  *
  * \sa SDL_GetBasePath
  */
-extern DECLSPEC char *SDLCALL SDL_GetPrefPath(const char *org, const char *app);
+   extern DECLSPEC char *SDLCALL SDL_GetPrefPath(const char *org, const char *app);
 
 /* Ends C function definitions when using C++ */
 #ifdef __cplusplus

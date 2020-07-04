@@ -22,7 +22,7 @@
 /**
  *  \file SDL_gamecontroller.h
  *
- *  Include file for SDL game controller event handling
+ *  Include file for SDL ME_Game controller event handling
  */
 
 #ifndef SDL_gamecontroller_h_
@@ -36,62 +36,66 @@
 #include "begin_code.h"
 /* Set up for C function definitions, even when using C++ */
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-/**
+    /**
  *  \file SDL_gamecontroller.h
  *
  *  In order to use these functions, SDL_Init() must have been called
  *  with the ::SDL_INIT_GAMECONTROLLER flag.  This causes SDL to scan the system
- *  for game controllers, and load appropriate drivers.
+ *  for ME_Game controllers, and load appropriate drivers.
  *
  *  If you would like to receive controller updates while the application
  *  is in the background, you should set the following hint before calling
  *  SDL_Init(): SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS
  */
 
-/**
- * The gamecontroller structure used to identify an SDL game controller
+    /**
+ * The gamecontroller structure used to identify an SDL ME_Game controller
  */
-struct _SDL_GameController;
-typedef struct _SDL_GameController SDL_GameController;
+    struct _SDL_GameController;
+    typedef struct _SDL_GameController SDL_GameController;
 
-typedef enum {
-    SDL_CONTROLLER_TYPE_UNKNOWN = 0,
-    SDL_CONTROLLER_TYPE_XBOX360,
-    SDL_CONTROLLER_TYPE_XBOXONE,
-    SDL_CONTROLLER_TYPE_PS3,
-    SDL_CONTROLLER_TYPE_PS4,
-    SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_PRO
-} SDL_GameControllerType;
+    typedef enum
+    {
+        SDL_CONTROLLER_TYPE_UNKNOWN = 0,
+        SDL_CONTROLLER_TYPE_XBOX360,
+        SDL_CONTROLLER_TYPE_XBOXONE,
+        SDL_CONTROLLER_TYPE_PS3,
+        SDL_CONTROLLER_TYPE_PS4,
+        SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_PRO
+    } SDL_GameControllerType;
 
-typedef enum {
-    SDL_CONTROLLER_BINDTYPE_NONE = 0,
-    SDL_CONTROLLER_BINDTYPE_BUTTON,
-    SDL_CONTROLLER_BINDTYPE_AXIS,
-    SDL_CONTROLLER_BINDTYPE_HAT
-} SDL_GameControllerBindType;
+    typedef enum
+    {
+        SDL_CONTROLLER_BINDTYPE_NONE = 0,
+        SDL_CONTROLLER_BINDTYPE_BUTTON,
+        SDL_CONTROLLER_BINDTYPE_AXIS,
+        SDL_CONTROLLER_BINDTYPE_HAT
+    } SDL_GameControllerBindType;
 
-/**
+    /**
  *  Get the SDL joystick layer binding for this controller button/axis mapping
  */
-typedef struct SDL_GameControllerButtonBind {
-    SDL_GameControllerBindType bindType;
-    union {
-        int button;
-        int axis;
-        struct {
-            int hat;
-            int hat_mask;
-        } hat;
-    } value;
+    typedef struct SDL_GameControllerButtonBind
+    {
+        SDL_GameControllerBindType bindType;
+        union {
+            int button;
+            int axis;
+            struct
+            {
+                int hat;
+                int hat_mask;
+            } hat;
+        } value;
 
-} SDL_GameControllerButtonBind;
+    } SDL_GameControllerButtonBind;
 
-
-/**
- *  To count the number of game controllers in the system for the following:
+    /**
+ *  To count the number of ME_Game controllers in the system for the following:
  *  int nJoysticks = SDL_NumJoysticks();
  *  int nGameControllers = 0;
  *  for (int i = 0; i < nJoysticks; i++) {
@@ -116,7 +120,7 @@ typedef struct SDL_GameControllerButtonBind {
  *
  */
 
-/**
+    /**
  *  Load a set of mappings from a seekable SDL data stream (memory or file), filtered by the current SDL_GetPlatform()
  *  A community sourced database of controllers is available at https://raw.github.com/gabomdq/SDL_GameControllerDB/master/gamecontrollerdb.txt
  *
@@ -124,149 +128,149 @@ typedef struct SDL_GameControllerButtonBind {
  * 
  * \return number of mappings added, -1 on error
  */
-extern DECLSPEC int SDLCALL SDL_GameControllerAddMappingsFromRW(SDL_RWops *rw, int freerw);
+    extern DECLSPEC int SDLCALL SDL_GameControllerAddMappingsFromRW(SDL_RWops *rw, int freerw);
 
 /**
  *  Load a set of mappings from a file, filtered by the current SDL_GetPlatform()
  *
  *  Convenience macro.
  */
-#define SDL_GameControllerAddMappingsFromFile(file)   SDL_GameControllerAddMappingsFromRW(SDL_RWFromFile(file, "rb"), 1)
+#define SDL_GameControllerAddMappingsFromFile(file) SDL_GameControllerAddMappingsFromRW(SDL_RWFromFile(file, "rb"), 1)
 
-/**
+    /**
  *  Add or update an existing mapping configuration
  *
  * \return 1 if mapping is added, 0 if updated, -1 on error
  */
-extern DECLSPEC int SDLCALL SDL_GameControllerAddMapping(const char *mappingString);
+    extern DECLSPEC int SDLCALL SDL_GameControllerAddMapping(const char *mappingString);
 
-/**
+    /**
  *  Get the number of mappings installed
  *
  *  \return the number of mappings
  */
-extern DECLSPEC int SDLCALL SDL_GameControllerNumMappings(void);
+    extern DECLSPEC int SDLCALL SDL_GameControllerNumMappings(void);
 
-/**
+    /**
  *  Get the mapping at a particular index.
  *
  *  \return the mapping string.  Must be freed with SDL_free().  Returns NULL if the index is out of range.
  */
-extern DECLSPEC char *SDLCALL SDL_GameControllerMappingForIndex(int mapping_index);
+    extern DECLSPEC char *SDLCALL SDL_GameControllerMappingForIndex(int mapping_index);
 
-/**
+    /**
  *  Get a mapping string for a GUID
  *
  *  \return the mapping string.  Must be freed with SDL_free().  Returns NULL if no mapping is available
  */
-extern DECLSPEC char *SDLCALL SDL_GameControllerMappingForGUID(SDL_JoystickGUID guid);
+    extern DECLSPEC char *SDLCALL SDL_GameControllerMappingForGUID(SDL_JoystickGUID guid);
 
-/**
+    /**
  *  Get a mapping string for an open GameController
  *
  *  \return the mapping string.  Must be freed with SDL_free().  Returns NULL if no mapping is available
  */
-extern DECLSPEC char *SDLCALL SDL_GameControllerMapping(SDL_GameController *gamecontroller);
+    extern DECLSPEC char *SDLCALL SDL_GameControllerMapping(SDL_GameController *gamecontroller);
 
-/**
- *  Is the joystick on this index supported by the game controller interface?
+    /**
+ *  Is the joystick on this index supported by the ME_Game controller interface?
  */
-extern DECLSPEC SDL_bool SDLCALL SDL_IsGameController(int joystick_index);
+    extern DECLSPEC SDL_bool SDLCALL SDL_IsGameController(int joystick_index);
 
-/**
- *  Get the implementation dependent name of a game controller.
+    /**
+ *  Get the implementation dependent name of a ME_Game controller.
  *  This can be called before any controllers are opened.
  *  If no name can be found, this function returns NULL.
  */
-extern DECLSPEC const char *SDLCALL SDL_GameControllerNameForIndex(int joystick_index);
+    extern DECLSPEC const char *SDLCALL SDL_GameControllerNameForIndex(int joystick_index);
 
-/**
- *  Get the type of a game controller.
+    /**
+ *  Get the type of a ME_Game controller.
  *  This can be called before any controllers are opened.
  */
-extern DECLSPEC SDL_GameControllerType SDLCALL SDL_GameControllerTypeForIndex(int joystick_index);
+    extern DECLSPEC SDL_GameControllerType SDLCALL SDL_GameControllerTypeForIndex(int joystick_index);
 
-/**
- *  Get the mapping of a game controller.
+    /**
+ *  Get the mapping of a ME_Game controller.
  *  This can be called before any controllers are opened.
  *
  *  \return the mapping string.  Must be freed with SDL_free().  Returns NULL if no mapping is available
  */
-extern DECLSPEC char *SDLCALL SDL_GameControllerMappingForDeviceIndex(int joystick_index);
+    extern DECLSPEC char *SDLCALL SDL_GameControllerMappingForDeviceIndex(int joystick_index);
 
-/**
- *  Open a game controller for use.
- *  The index passed as an argument refers to the N'th game controller on the system.
+    /**
+ *  Open a ME_Game controller for use.
+ *  The index passed as an argument refers to the N'th ME_Game controller on the system.
  *  This index is not the value which will identify this controller in future
  *  controller events.  The joystick's instance id (::SDL_JoystickID) will be
  *  used there instead.
  *
  *  \return A controller identifier, or NULL if an error occurred.
  */
-extern DECLSPEC SDL_GameController *SDLCALL SDL_GameControllerOpen(int joystick_index);
+    extern DECLSPEC SDL_GameController *SDLCALL SDL_GameControllerOpen(int joystick_index);
 
-/**
+    /**
  * Return the SDL_GameController associated with an instance id.
  */
-extern DECLSPEC SDL_GameController *SDLCALL SDL_GameControllerFromInstanceID(SDL_JoystickID joyid);
+    extern DECLSPEC SDL_GameController *SDLCALL SDL_GameControllerFromInstanceID(SDL_JoystickID joyid);
 
-/**
+    /**
  * Return the SDL_GameController associated with a player index.
  */
-extern DECLSPEC SDL_GameController *SDLCALL SDL_GameControllerFromPlayerIndex(int player_index);
+    extern DECLSPEC SDL_GameController *SDLCALL SDL_GameControllerFromPlayerIndex(int player_index);
 
-/**
+    /**
  *  Return the name for this currently opened controller
  */
-extern DECLSPEC const char *SDLCALL SDL_GameControllerName(SDL_GameController *gamecontroller);
+    extern DECLSPEC const char *SDLCALL SDL_GameControllerName(SDL_GameController *gamecontroller);
 
-/**
+    /**
  *  Return the type of this currently opened controller
  */
-extern DECLSPEC SDL_GameControllerType SDLCALL SDL_GameControllerGetType(SDL_GameController *gamecontroller);
+    extern DECLSPEC SDL_GameControllerType SDLCALL SDL_GameControllerGetType(SDL_GameController *gamecontroller);
 
-/**
- *  Get the player index of an opened game controller, or -1 if it's not available
+    /**
+ *  Get the player index of an opened ME_Game controller, or -1 if it's not available
  *
  *  For XInput controllers this returns the XInput user index.
  */
-extern DECLSPEC int SDLCALL SDL_GameControllerGetPlayerIndex(SDL_GameController *gamecontroller);
+    extern DECLSPEC int SDLCALL SDL_GameControllerGetPlayerIndex(SDL_GameController *gamecontroller);
 
-/**
- *  Set the player index of an opened game controller
+    /**
+ *  Set the player index of an opened ME_Game controller
  */
-extern DECLSPEC void SDLCALL SDL_GameControllerSetPlayerIndex(SDL_GameController *gamecontroller, int player_index);
+    extern DECLSPEC void SDLCALL SDL_GameControllerSetPlayerIndex(SDL_GameController *gamecontroller, int player_index);
 
-/**
+    /**
  *  Get the USB vendor ID of an opened controller, if available.
  *  If the vendor ID isn't available this function returns 0.
  */
-extern DECLSPEC Uint16 SDLCALL SDL_GameControllerGetVendor(SDL_GameController *gamecontroller);
+    extern DECLSPEC Uint16 SDLCALL SDL_GameControllerGetVendor(SDL_GameController *gamecontroller);
 
-/**
+    /**
  *  Get the USB product ID of an opened controller, if available.
  *  If the product ID isn't available this function returns 0.
  */
-extern DECLSPEC Uint16 SDLCALL SDL_GameControllerGetProduct(SDL_GameController *gamecontroller);
+    extern DECLSPEC Uint16 SDLCALL SDL_GameControllerGetProduct(SDL_GameController *gamecontroller);
 
-/**
+    /**
  *  Get the product version of an opened controller, if available.
  *  If the product version isn't available this function returns 0.
  */
-extern DECLSPEC Uint16 SDLCALL SDL_GameControllerGetProductVersion(SDL_GameController *gamecontroller);
+    extern DECLSPEC Uint16 SDLCALL SDL_GameControllerGetProductVersion(SDL_GameController *gamecontroller);
 
-/**
+    /**
  *  Returns SDL_TRUE if the controller has been opened and currently connected,
  *  or SDL_FALSE if it has not.
  */
-extern DECLSPEC SDL_bool SDLCALL SDL_GameControllerGetAttached(SDL_GameController *gamecontroller);
+    extern DECLSPEC SDL_bool SDLCALL SDL_GameControllerGetAttached(SDL_GameController *gamecontroller);
 
-/**
+    /**
  *  Get the underlying joystick object used by a controller
  */
-extern DECLSPEC SDL_Joystick *SDLCALL SDL_GameControllerGetJoystick(SDL_GameController *gamecontroller);
+    extern DECLSPEC SDL_Joystick *SDLCALL SDL_GameControllerGetJoystick(SDL_GameController *gamecontroller);
 
-/**
+    /**
  *  Enable/disable controller event polling.
  *
  *  If controller events are disabled, you must call SDL_GameControllerUpdate()
@@ -275,18 +279,17 @@ extern DECLSPEC SDL_Joystick *SDLCALL SDL_GameControllerGetJoystick(SDL_GameCont
  *
  *  The state can be one of ::SDL_QUERY, ::SDL_ENABLE or ::SDL_IGNORE.
  */
-extern DECLSPEC int SDLCALL SDL_GameControllerEventState(int state);
+    extern DECLSPEC int SDLCALL SDL_GameControllerEventState(int state);
 
-/**
- *  Update the current state of the open game controllers.
+    /**
+ *  Update the current state of the open ME_Game controllers.
  *
- *  This is called automatically by the event loop if any game controller
+ *  This is called automatically by the event loop if any ME_Game controller
  *  events are enabled.
  */
-extern DECLSPEC void SDLCALL SDL_GameControllerUpdate(void);
+    extern DECLSPEC void SDLCALL SDL_GameControllerUpdate(void);
 
-
-/**
+    /**
  *  The list of axes available from a controller
  *
  *  Thumbstick axis values range from SDL_JOYSTICK_AXIS_MIN to SDL_JOYSTICK_AXIS_MAX,
@@ -295,96 +298,97 @@ extern DECLSPEC void SDLCALL SDL_GameControllerUpdate(void);
  *
  *  Trigger axis values range from 0 to SDL_JOYSTICK_AXIS_MAX.
  */
-typedef enum {
-    SDL_CONTROLLER_AXIS_INVALID = -1,
-    SDL_CONTROLLER_AXIS_LEFTX,
-    SDL_CONTROLLER_AXIS_LEFTY,
-    SDL_CONTROLLER_AXIS_RIGHTX,
-    SDL_CONTROLLER_AXIS_RIGHTY,
-    SDL_CONTROLLER_AXIS_TRIGGERLEFT,
-    SDL_CONTROLLER_AXIS_TRIGGERRIGHT,
-    SDL_CONTROLLER_AXIS_MAX
-} SDL_GameControllerAxis;
+    typedef enum
+    {
+        SDL_CONTROLLER_AXIS_INVALID = -1,
+        SDL_CONTROLLER_AXIS_LEFTX,
+        SDL_CONTROLLER_AXIS_LEFTY,
+        SDL_CONTROLLER_AXIS_RIGHTX,
+        SDL_CONTROLLER_AXIS_RIGHTY,
+        SDL_CONTROLLER_AXIS_TRIGGERLEFT,
+        SDL_CONTROLLER_AXIS_TRIGGERRIGHT,
+        SDL_CONTROLLER_AXIS_MAX
+    } SDL_GameControllerAxis;
 
-/**
+    /**
  *  turn this string into a axis mapping
  */
-extern DECLSPEC SDL_GameControllerAxis SDLCALL SDL_GameControllerGetAxisFromString(const char *pchString);
+    extern DECLSPEC SDL_GameControllerAxis SDLCALL SDL_GameControllerGetAxisFromString(const char *pchString);
 
-/**
+    /**
  *  turn this axis enum into a string mapping
  */
-extern DECLSPEC const char *SDLCALL SDL_GameControllerGetStringForAxis(SDL_GameControllerAxis axis);
+    extern DECLSPEC const char *SDLCALL SDL_GameControllerGetStringForAxis(SDL_GameControllerAxis axis);
 
-/**
+    /**
  *  Get the SDL joystick layer binding for this controller button mapping
  */
-extern DECLSPEC SDL_GameControllerButtonBind SDLCALL
-SDL_GameControllerGetBindForAxis(SDL_GameController *gamecontroller,
-                                 SDL_GameControllerAxis axis);
+    extern DECLSPEC SDL_GameControllerButtonBind SDLCALL
+    SDL_GameControllerGetBindForAxis(SDL_GameController *gamecontroller,
+                                     SDL_GameControllerAxis axis);
 
-/**
- *  Get the current state of an axis control on a game controller.
+    /**
+ *  Get the current state of an axis control on a ME_Game controller.
  *
  *  The state is a value ranging from -32768 to 32767 (except for the triggers,
  *  which range from 0 to 32767).
  *
  *  The axis indices start at index 0.
  */
-extern DECLSPEC Sint16 SDLCALL
-SDL_GameControllerGetAxis(SDL_GameController *gamecontroller,
-                          SDL_GameControllerAxis axis);
+    extern DECLSPEC Sint16 SDLCALL
+    SDL_GameControllerGetAxis(SDL_GameController *gamecontroller,
+                              SDL_GameControllerAxis axis);
 
-/**
+    /**
  *  The list of buttons available from a controller
  */
-typedef enum {
-    SDL_CONTROLLER_BUTTON_INVALID = -1,
-    SDL_CONTROLLER_BUTTON_A,
-    SDL_CONTROLLER_BUTTON_B,
-    SDL_CONTROLLER_BUTTON_X,
-    SDL_CONTROLLER_BUTTON_Y,
-    SDL_CONTROLLER_BUTTON_BACK,
-    SDL_CONTROLLER_BUTTON_GUIDE,
-    SDL_CONTROLLER_BUTTON_START,
-    SDL_CONTROLLER_BUTTON_LEFTSTICK,
-    SDL_CONTROLLER_BUTTON_RIGHTSTICK,
-    SDL_CONTROLLER_BUTTON_LEFTSHOULDER,
-    SDL_CONTROLLER_BUTTON_RIGHTSHOULDER,
-    SDL_CONTROLLER_BUTTON_DPAD_UP,
-    SDL_CONTROLLER_BUTTON_DPAD_DOWN,
-    SDL_CONTROLLER_BUTTON_DPAD_LEFT,
-    SDL_CONTROLLER_BUTTON_DPAD_RIGHT,
-    SDL_CONTROLLER_BUTTON_MAX
-} SDL_GameControllerButton;
+    typedef enum
+    {
+        SDL_CONTROLLER_BUTTON_INVALID = -1,
+        SDL_CONTROLLER_BUTTON_A,
+        SDL_CONTROLLER_BUTTON_B,
+        SDL_CONTROLLER_BUTTON_X,
+        SDL_CONTROLLER_BUTTON_Y,
+        SDL_CONTROLLER_BUTTON_BACK,
+        SDL_CONTROLLER_BUTTON_GUIDE,
+        SDL_CONTROLLER_BUTTON_START,
+        SDL_CONTROLLER_BUTTON_LEFTSTICK,
+        SDL_CONTROLLER_BUTTON_RIGHTSTICK,
+        SDL_CONTROLLER_BUTTON_LEFTSHOULDER,
+        SDL_CONTROLLER_BUTTON_RIGHTSHOULDER,
+        SDL_CONTROLLER_BUTTON_DPAD_UP,
+        SDL_CONTROLLER_BUTTON_DPAD_DOWN,
+        SDL_CONTROLLER_BUTTON_DPAD_LEFT,
+        SDL_CONTROLLER_BUTTON_DPAD_RIGHT,
+        SDL_CONTROLLER_BUTTON_MAX
+    } SDL_GameControllerButton;
 
-/**
+    /**
  *  turn this string into a button mapping
  */
-extern DECLSPEC SDL_GameControllerButton SDLCALL SDL_GameControllerGetButtonFromString(const char *pchString);
+    extern DECLSPEC SDL_GameControllerButton SDLCALL SDL_GameControllerGetButtonFromString(const char *pchString);
 
-/**
+    /**
  *  turn this button enum into a string mapping
  */
-extern DECLSPEC const char *SDLCALL SDL_GameControllerGetStringForButton(SDL_GameControllerButton button);
+    extern DECLSPEC const char *SDLCALL SDL_GameControllerGetStringForButton(SDL_GameControllerButton button);
 
-/**
+    /**
  *  Get the SDL joystick layer binding for this controller button mapping
  */
-extern DECLSPEC SDL_GameControllerButtonBind SDLCALL
-SDL_GameControllerGetBindForButton(SDL_GameController *gamecontroller,
-                                   SDL_GameControllerButton button);
+    extern DECLSPEC SDL_GameControllerButtonBind SDLCALL
+    SDL_GameControllerGetBindForButton(SDL_GameController *gamecontroller,
+                                       SDL_GameControllerButton button);
 
-
-/**
- *  Get the current state of a button on a game controller.
+    /**
+ *  Get the current state of a button on a ME_Game controller.
  *
  *  The button indices start at index 0.
  */
-extern DECLSPEC Uint8 SDLCALL SDL_GameControllerGetButton(SDL_GameController *gamecontroller,
-                                                          SDL_GameControllerButton button);
+    extern DECLSPEC Uint8 SDLCALL SDL_GameControllerGetButton(SDL_GameController *gamecontroller,
+                                                              SDL_GameControllerButton button);
 
-/**
+    /**
  *  Trigger a rumble effect
  *  Each call to this function cancels any previous rumble effect, and calling it with 0 intensity stops any rumbling.
  *
@@ -395,15 +399,14 @@ extern DECLSPEC Uint8 SDLCALL SDL_GameControllerGetButton(SDL_GameController *ga
  *
  *  \return 0, or -1 if rumble isn't supported on this joystick
  */
-extern DECLSPEC int SDLCALL
-SDL_GameControllerRumble(SDL_GameController *gamecontroller, Uint16 low_frequency_rumble, Uint16 high_frequency_rumble,
-                         Uint32 duration_ms);
+    extern DECLSPEC int SDLCALL
+    SDL_GameControllerRumble(SDL_GameController *gamecontroller, Uint16 low_frequency_rumble, Uint16 high_frequency_rumble,
+                             Uint32 duration_ms);
 
-/**
+    /**
  *  Close a controller previously opened with SDL_GameControllerOpen().
  */
-extern DECLSPEC void SDLCALL SDL_GameControllerClose(SDL_GameController *gamecontroller);
-
+    extern DECLSPEC void SDLCALL SDL_GameControllerClose(SDL_GameController *gamecontroller);
 
 /* Ends C function definitions when using C++ */
 #ifdef __cplusplus

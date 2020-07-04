@@ -1,7 +1,3 @@
-/*
-MICRO ENGINE
-AUTHOR : Abhijith C V(Lone-coder)
-*/
 #ifndef MICROENGINE_H
 #define MICROENGINE_H
 
@@ -32,48 +28,34 @@ typedef struct
 
 } SDLPlatform;
 
-typedef struct Input;
+typedef struct
+{
+    u32 mouseX;
+    u32 mouseY;
+    bool leftMouseButtonDown;
+    bool rightMouseButtonDown;
 
-typedef struct 
+} MouseInputState;
+
+typedef struct
 {
     SDLPlatform platform;
-    
+
     bool isRunning;
     f32 deltaTime;
-    u32 gameWidth;
-    u32 gameHeight;
+    u32 windowWidth;
+    u32 windowHeight;
     char *gameTitle;
 
+    //NOTE(Loncoder): function pointers
     HandleEventCall handleEvent;
     UpdateCall update;
-    RenderCall render; 
+    RenderCall render;
 
-} Game;
+} ME_Game;
 
-//globals
-//TODO(Lone-coder) : remove this globals
-SDL_Window *window = NULL;
-SDL_Renderer *renderer = NULL;
-u32 width = 0;
-u32 height = 0;
+ME_Game ME_CreateGame(char *gameTitle, i32 windowWidth, i32 windowHeight);
+void ME_RunGame(ME_Game *game);
+void ME_QuitGame(ME_Game *game);
 
-bool quit = false;
-u64 startTime = 0;
-u64 endTime = 0;
-f32 deltaTime = 0.016f;
-SDL_Event event;
-
-SDL_Color defaultDrawColor = {0, 0, 0, 0};
-
-internal Game ME_CreateGame(const char *gameTitle, i32 gameWidth, i32 gameHeight);
-internal void ME_RunGame(Game *game); 
-
-internal int ME_Init(const char *title, u32 screenWidth, u32 screenHeight);
-internal void ME_Run(HandleEventCall handleEvent, UpdateCall update, RenderCall render);
-internal void ME_Quit();
-
-SDL_Window *ME_GetWindow();
-SDL_Renderer *ME_GetRenderer();
-int ME_GetScreenWidth();
-int ME_GetScreenHeight();
 #endif //GAMEENGINE_H
