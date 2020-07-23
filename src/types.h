@@ -1,6 +1,8 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#include <stdbool.h>
+
 typedef unsigned char u8;
 typedef signed char i8;
 

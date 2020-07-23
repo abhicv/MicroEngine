@@ -7,7 +7,7 @@ ME_GameObject *ME_CreateGameObject(int xPos, int yPos)
 
     gameObject->enabled = true;
     gameObject->animate = false;
-    gameObject->position = NewVector2(xPos, yPos);
+    gameObject->position = Vector2Init(xPos, yPos);
     gameObject->nFrames = 0;
     gameObject->texture = NULL;
     gameObject->angle = 0;

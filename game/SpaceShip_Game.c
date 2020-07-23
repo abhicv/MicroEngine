@@ -175,7 +175,7 @@ void Update(float deltaTime)
             explosion->position = enemySmall->position;
             explosion->enabled = true;
             enableTimer = true;
-            enemySmall->position = NewVector2(ME_Random(30, 700), 70);
+            enemySmall->position = Vector2Init(ME_Random(30, 700), 70);
             enemySmall->enabled = true;
             score += 5;
         }
@@ -281,7 +281,7 @@ int main(int argc, char *argv[])
         bullets[i]->animate = true;
         bullets[i]->nFrames = 2;
         velocity[i] = 0;
-        bulletDir[i] = NewVector2(0, 0);
+        bulletDir[i] = Vector2Init(0, 0);
     }
 
     ME_RunGame(&game);

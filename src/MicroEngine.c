@@ -5,13 +5,17 @@
 #include "ME_Utility.c"
 #include "ME_Vector2D.c"
 #include "MicroUI.c"
+#include "MicroECS.c"
+#include "MicroPhysics.c"
+#include "ME_Rect.c"
+#include "ME_TileMap.c"
 
 #include "ME_debug.h"
 #include "types.h"
 
-//NOTE(LoneCoder): For debug of performance
-global MUI uiPerf = {.fontFile = OPENSANS_FONT_FILE};
-global char fpsString[25] = "No text";
+//NOTE(LoneCoder): for performance visualisation
+global MUI uiPerf = {0};
+global char fpsString[10] = "fpsText";
 
 internal ME_Game ME_CreateGame(char *gameTitle, i32 windowWidth, i32 windowHeight)
 {
@@ -67,7 +71,7 @@ internal ME_Game ME_CreateGame(char *gameTitle, i32 windowWidth, i32 windowHeigh
     return game;
 }
 
-internal void ME_RunGame(ME_Game *game)
+internal void ME_RunGame(ME_Game *game, bool showSplashScreen)
 {
     // Spalsh screen
     SDL_Renderer *renderer = game->platform.renderer;
@@ -75,20 +79,26 @@ internal void ME_RunGame(ME_Game *game)
     u64 startTime = 0;
     u64 endTime = 0;
 
-    SDL_Texture *splashTextre = IMG_LoadTexture(renderer, "assets/MicroEngine_SplashScreen_2.png");
-    SDL_Rect splashRect = {0};
+    if (showSplashScreen)
+    {
+        SDL_Texture *splashTexture = IMG_LoadTexture(renderer, "assets/MicroEngine_SplashScreen_2.png");
+        SDL_Rect splashRect = {0};
 
-    SDL_QueryTexture(splashTextre, 0, 0, &splashRect.w, &splashRect.h);
+        SDL_QueryTexture(splashTexture, 0, 0, &splashRect.w, &splashRect.h);
 
-    splashRect.w /= 5;
-    splashRect.h /= 5;
+        splashRect.w /= 2;
+        splashRect.h /= 2;
 
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-    SDL_RenderClear(renderer);
-    // SDL_RenderCopy(renderer, splashTextre, NULL, &splashRect);
-    // SDL_RenderPresent(renderer);
-    // SDL_Delay(2000);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+        SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, splashTexture, NULL, &splashRect);
+        SDL_RenderPresent(renderer);
+        SDL_DestroyTexture(splashTexture);
 
+        SDL_Delay(1000);
+    }
+
+    uiPerf.fontFile = OPENSANS_FONT_FILE;
     MUI_Rect rect = {60, 15, 120, 30};
 
     // main loop
@@ -96,7 +106,7 @@ internal void ME_RunGame(ME_Game *game)
     {
         //for debug ui
         MUI_BeginFrame(&uiPerf, NULL);
-        MUI_TextP(&uiPerf, MUI_IdInit(__LINE__, 100), rect, fpsString, 20);
+        MUI_TextP(&uiPerf, MUI_IdInit(__LINE__, 100), rect, fpsString, 15);
 
         startTime = SDL_GetPerformanceCounter();
 
@@ -131,6 +141,7 @@ internal void ME_RunGame(ME_Game *game)
             game->render(renderer);
 
         MUI_EndFrame(&uiPerf, renderer);
+
         SDL_RenderPresent(renderer);
 
         // Calculating delta time

@@ -6,6 +6,9 @@
 #include "MUI_CheckBox.h"
 #include "MUI_Slider.h"
 
+#include "ME_Rect.h"
+typedef ME_Rect MUI_Rect;
+
 #define MUI_MAX_WIDGETS 128
 #define MUI_MAX_AUTOLAYOUT_SIZE 16
 
@@ -18,27 +21,20 @@ enum
     MUI_WIDGET_button,
     MUI_WIDGET_slider,
     MUI_Widget_text,
+    MUI_Widget_window,
 
-    MUI_WidgetCount,
+    MUI_WidgetTypeCount,
 };
 
-typedef struct
-{
-    i32 x;
-    i32 y;
-    u32 width;
-    u32 height;
 
-} MUI_Rect;
-
-typedef struct
+typedef struct MUI_Id
 {
     u32 primary;
     u32 secondary;
 
 } MUI_Id;
 
-typedef struct
+typedef struct MUI_Widget
 {
     u32 widgetType;
     MUI_Id id;
@@ -57,11 +53,17 @@ typedef struct
             u32 fontSize;
 
         } text;
+
+        struct Window
+        {
+            bool isOpened;
+        
+        } window;
     };
 
 } MUI_Widget;
 
-typedef struct
+typedef struct MUI_Input
 {
     i32 mouseX;
     i32 mouseY;
@@ -71,7 +73,7 @@ typedef struct
 
 } MUI_Input;
 
-typedef struct
+typedef struct MUI
 {
     i32 mouseX;
     i32 mouseY;
@@ -97,35 +99,28 @@ typedef struct
     char *fontFile;
 } MUI;
 
-//Init
 void MUI_BeginFrame(MUI *ui, MUI_Input *input);
 void MUI_EndFrame(MUI *ui, SDL_Renderer *renderer);
 void MUI_GetInput(MUI_Input *uiInput, SDL_Event *event);
 
-//Rect
 MUI_Id MUI_IdInit(u32 primary, u32 secondary);
 bool MUI_IdEqual(MUI_Id a, MUI_Id b);
 MUI_Id MUI_NullId(void);
 
-//Text
 MUI_TextP(MUI *ui, MUI_Id id, MUI_Rect rect, char *text, u32 fontSize);
 MUI_TextA(MUI *ui, MUI_Id id, char *text, u32 fontSize);
 
-//Button
 bool MUI_ButtonP(MUI *ui, MUI_Id id, char *text, MUI_Rect rect);
 bool MUI_ButtonA(MUI *ui, MUI_Id id, char *text);
 
-//Slider
 f32 MUI_SliderP(MUI *ui, MUI_Id id, f32 value, MUI_Rect rect);
 f32 MUI_SliderA(MUI *ui, MUI_Id id, f32 value);
 
-//Auto layout
 void MUI_PushColumnLayout(MUI *ui, MUI_Rect rect, u32 offset);
 void MUI_PushRowLayout(MUI *ui, MUI_Rect rect, u32 offset);
 void MUI_PopLayout(MUI *ui);
 MUI_Rect MUI_GetNextAutoLayoutRect(MUI *ui);
 
-//NOTE(Lonecoder) : Depends on sdl rect
 SDL_Rect MUI_RectToSDL_Rect(MUI_Rect *rect);
 
 #define GEN_MUI_ID() MUI_IdInit((u32)(__LINE__), (u32)MUI_ORIGIN_ID)

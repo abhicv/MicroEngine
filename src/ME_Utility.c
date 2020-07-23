@@ -1,5 +1,14 @@
 #include "ME_Utility.h"
 
+void PrintBinary(unsigned int integer)
+{
+    int i = 8 * sizeof(integer);
+    while(i--) {
+        putchar('0' + ((integer >> i) & 1)); 
+    }
+    putchar('\n');
+}
+
 float MapFloat(float x, float in_min, float in_max, float out_min, float out_max)
 {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
@@ -13,10 +22,12 @@ long MapInt(long x, long in_min, long in_max, long out_min, long out_max)
 SDL_Color ME_HexToSdlColor(ME_Color color)
 {
     SDL_Color sdlColor;
+    
     sdlColor.r = (color >> 16) & 0xFF;
     sdlColor.g = (color >> 8) & 0xFF;
     sdlColor.b = color & 0xFF;
     sdlColor.a = 255;
+
     return sdlColor;
 }
 
@@ -54,7 +65,7 @@ void ME_RenderDrawRect(SDL_Renderer *renderer, const SDL_Rect *rect, SDL_Color c
 
 void ME_RenderFillRect(SDL_Renderer *renderer, const SDL_Rect *rect, SDL_Color color)
 {
-    SDL_Color rendColor;
+    SDL_Color rendColor = {0};
     SDL_GetRenderDrawColor(renderer, &rendColor.r, &rendColor.g, &rendColor.b, &rendColor.a);
     ME_SetRenderColor(renderer, color);
     SDL_RenderFillRect(renderer, rect);

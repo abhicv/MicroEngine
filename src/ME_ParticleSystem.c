@@ -6,7 +6,7 @@ ME_ParticleSystem *ME_CreateParticleSystem(i32 x, i32 y, u32 numParticles)
     ME_ParticleSystem *particleSystem = (ME_ParticleSystem *)malloc(sizeof(ME_ParticleSystem));
 
     particleSystem->numParticles = numParticles;
-    particleSystem->systemPos = NewVector2(x, y);
+    particleSystem->systemPos = Vector2Init(x, y);
     particleSystem->texture = NULL;
     particleSystem->velocity = (Vector2 *)malloc(sizeof(Vector2) * numParticles);
     particleSystem->positions = (Vector2 *)malloc(sizeof(Vector2) * numParticles);
@@ -16,9 +16,9 @@ ME_ParticleSystem *ME_CreateParticleSystem(i32 x, i32 y, u32 numParticles)
 
     for (i = 0; i < particleSystem->numParticles; i++)
     {
-        particleSystem->positions[i] = NewVector2(x, y);
+        particleSystem->positions[i] = Vector2Init(x, y);
         angle = rand() % 360;
-        particleSystem->velocity[i] = NewVector2((rand() % 100) * cos(angle), (rand() % 100) * sin(angle));
+        particleSystem->velocity[i] = Vector2Init((rand() % 100) * cos(angle), (rand() % 100) * sin(angle));
     }
 
     SDL_Log("Particle system :: no of particles : %d", numParticles);

@@ -1,7 +1,7 @@
 #include "../src/MicroEngine.c"
 
 //macro definition 'for loop'
-#define foreach(i, count) \
+#define loop(i, count) \
     int i = 0;            \
     for (i = 0; i < count; i++)
 
@@ -65,7 +65,7 @@ void update(float deltaTime)
     velocity.y += gravity * deltaTime;
     player->position.y += velocity.y * deltaTime;
 
-    foreach (i, OBSTACLE_MAX_COUNT)
+    loop (i, OBSTACLE_MAX_COUNT)
     {
         obstacles[i]->position.x += -200.0f * deltaTime;
 
@@ -122,7 +122,7 @@ void render(SDL_Renderer *renderer)
 
     int y = 0;
 
-    foreach (i, OBSTACLE_MAX_COUNT)
+    loop (i, OBSTACLE_MAX_COUNT)
     {
         ME_RenderGameObject(obstacles[i], renderer);
         y = obstacles[i]->position.y;
@@ -164,7 +164,7 @@ int main(int argc, char *argv[])
     backgroundLayer = IMG_LoadTexture(mainRenderer, "assets/Sprites/background-night.png");
 
     //obstacles
-    foreach (i, OBSTACLE_MAX_COUNT)
+    loop (i, OBSTACLE_MAX_COUNT)
     {
         obstacles[i] = ME_CreateGameObject(game.windowWidth + 100,
                                            ME_Random(game.windowHeight - 200, game.windowHeight));
@@ -196,7 +196,7 @@ int main(int argc, char *argv[])
     //Destroying
     ME_DestroyGameObject(player);
 
-    foreach (n, OBSTACLE_MAX_COUNT)
+    loop (n, OBSTACLE_MAX_COUNT)
     {
         ME_DestroyGameObject(obstacles[n]);
     }

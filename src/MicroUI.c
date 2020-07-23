@@ -43,10 +43,10 @@ internal void MUI_BeginFrame(MUI *ui, MUI_Input *input)
 
 internal void MUI_EndFrame(MUI *ui, SDL_Renderer *renderer)
 {
-    int i = 0;
+    u32 i = 0;
 
     SDL_Rect rect = {0};
-    u8 r = 255, g = 255, b = 255;
+    SDL_Color color = {0};
 
     for (i = 0; i < ui->widgetCount; i++)
     {
@@ -54,54 +54,58 @@ internal void MUI_EndFrame(MUI *ui, SDL_Renderer *renderer)
         {
         case MUI_WIDGET_button:
 
-            r = -30 * (!!MUI_IdEqual(ui->hotWidgetId, ui->widgets[i].id)) + 170 - (!!MUI_IdEqual(ui->activeWidgetId, ui->widgets[i].id)) * 40;
-            g = r;
-            b = r;
+            color.r = -20 * (!!MUI_IdEqual(ui->hotWidgetId, ui->widgets[i].id)) + 50 - (!!MUI_IdEqual(ui->activeWidgetId, ui->widgets[i].id)) * 10;
+            color.g = color.r;
+            color.b = color.r;
 
             rect = MUI_RectToSDL_Rect(&ui->widgets[i].rect);
-            SDL_SetRenderDrawColor(renderer, r, g, b, 0);
-            SDL_RenderFillRect(renderer, &rect);
+            ME_RenderFillRect(renderer, &rect, color);
+            
             break;
 
         case MUI_WIDGET_slider:
-            r = -30 * (!!MUI_IdEqual(ui->hotWidgetId, ui->widgets[i].id)) + 220;
-            g = r;
-            b = r;
+        
+            color.r = -10 * (!!MUI_IdEqual(ui->hotWidgetId, ui->widgets[i].id)) + 70;
+            color.g = color.r;
+            color.b = color.r;
 
             rect = MUI_RectToSDL_Rect(&ui->widgets[i].rect);
 
             //slider rect
-            SDL_SetRenderDrawColor(renderer, r - 50, g - 50, b - 50, 0);
-            SDL_RenderFillRect(renderer, &rect);
+            SDL_Color c = color;
+            c.r -= 20;
+            c.g = c.b = c.r;
+            ME_RenderFillRect(renderer, &rect, c);
 
             //sliding rect
             SDL_Rect slideRect = rect;
             slideRect.w = (f32)rect.w * ui->widgets[i].slider.value;
-            SDL_SetRenderDrawColor(renderer, r, g, b, 0);
-            SDL_RenderFillRect(renderer, &slideRect);
+            ME_RenderFillRect(renderer, &slideRect, color);
 
             break;
 
         case MUI_Widget_text:
-            SDL_Color color = {255, 255, 255, 255};
+
+            SDL_Color textColor = {255, 255, 0, 255};
 
             TTF_Font *font = NULL;
             SDL_Surface *surface = NULL;
             SDL_Texture *tex = NULL;
 
             if (ui->fontFile != NULL)
+            {
                 font = TTF_OpenFont(ui->fontFile, ui->widgets[i].text.fontSize);
-
+            }
             if (font != NULL)
-                surface = TTF_RenderText_Blended(font, ui->widgets[i].text.text, color);
-
+            {
+                surface = TTF_RenderText_Shaded(font, ui->widgets[i].text.text, textColor, ME_GetRenderColor(renderer));
+            }
             if (surface != NULL)
+            {
                 tex = SDL_CreateTextureFromSurface(renderer, surface);
+            }
 
             rect = MUI_RectToSDL_Rect(&ui->widgets[i].rect);
-            color.r = 255;
-            color.g = 255;
-            color.b = 255;
 
             SDL_Rect tmpRect = rect;
             SDL_QueryTexture(tex, NULL, NULL, &tmpRect.w, &tmpRect.h);
@@ -110,8 +114,15 @@ internal void MUI_EndFrame(MUI *ui, SDL_Renderer *renderer)
             tmpRect.y = rect.y + (rect.h - tmpRect.h) / 2;
 
             // ME_RenderDrawRect(renderer, &tmpRect, color);
-            if (tex != NULL)
+            if (tex != NULL && renderer != NULL)
+            {
                 SDL_RenderCopy(renderer, tex, NULL, &tmpRect);
+            }
+
+            SDL_DestroyTexture(tex);
+            SDL_FreeSurface(surface);
+            TTF_CloseFont(font);
+
             break;
 
         default:
@@ -122,13 +133,19 @@ internal void MUI_EndFrame(MUI *ui, SDL_Renderer *renderer)
 
 internal MUI_TextP(MUI *ui, MUI_Id id, MUI_Rect rect, char *text, u32 fontSize)
 {
-    MUI_Widget *widget = ui->widgets + ui->widgetCount++;
-
-    widget->widgetType = MUI_Widget_text;
-    widget->id = id;
-    widget->text.text = text;
-    widget->text.fontSize = fontSize;
-    widget->rect = rect;
+    if(ui->widgetCount < MUI_MAX_WIDGETS)
+    {
+        MUI_Widget *widget = ui->widgets + ui->widgetCount++;
+        widget->widgetType = MUI_Widget_text;
+        widget->id = id;
+        widget->text.text = text;
+        widget->text.fontSize = fontSize;
+        widget->rect = rect;
+    }
+    else
+    {
+         printf("UI widget count out of bound\n");
+    }   
 }
 
 internal MUI_TextA(MUI *ui, MUI_Id id, char *text, u32 fontSize)
@@ -138,16 +155,11 @@ internal MUI_TextA(MUI *ui, MUI_Id id, char *text, u32 fontSize)
 
 internal bool MUI_ButtonP(MUI *ui, MUI_Id id, char *text, MUI_Rect rect)
 {
-    MUI_Widget *widget = ui->widgets + ui->widgetCount++;
-
-    MUI_TextP(ui, MUI_IdInit(id.primary - 10, id.secondary + 10), rect, text, 15);
 
     bool isTriggered = false;
-
-    widget->id = id;
-    widget->widgetType = MUI_WIDGET_button;
-    widget->rect = rect;
-
+    
+    MUI_TextP(ui, MUI_IdInit(id.primary - 10, id.secondary + 10), rect, text, 15);
+ 
     u32 left = rect.x - rect.width / 2;
     u32 right = rect.x + rect.width / 2;
     u32 top = rect.y - rect.height / 2;
@@ -187,6 +199,18 @@ internal bool MUI_ButtonP(MUI *ui, MUI_Id id, char *text, MUI_Rect rect)
                 ui->activeWidgetId = id;
             }
         }
+    }
+
+    if(ui->widgetCount < MUI_MAX_WIDGETS)
+    {
+        MUI_Widget *widget = ui->widgets + ui->widgetCount++;
+        widget->id = id;
+        widget->widgetType = MUI_WIDGET_button;
+        widget->rect = rect; 
+    }
+    else
+    {
+        printf("UI widget count out of bound\n");
     }
 
     return isTriggered;
@@ -247,12 +271,19 @@ internal f32 MUI_SliderP(MUI *ui, MUI_Id id, f32 value, MUI_Rect rect)
         value = 1.0f;
     }
 
-    MUI_Widget *widget = ui->widgets + ui->widgetCount++;
-    widget->id = id;
-    widget->widgetType = MUI_WIDGET_slider;
-    widget->rect = rect;
-    widget->slider.value = value;
-
+    if(ui->widgetCount < MUI_MAX_WIDGETS)
+    {
+        MUI_Widget *widget = ui->widgets + ui->widgetCount++;
+        widget->id = id;
+        widget->widgetType = MUI_WIDGET_slider;
+        widget->rect = rect;
+        widget->slider.value = value;
+    }
+    else
+    {
+        printf("UI widget count out of bound\n");
+    }
+    
     return value;
 }
 
@@ -328,9 +359,6 @@ internal void MUI_GetInput(MUI_Input *uiInput, SDL_Event *event)
 {
     uiInput->mouseX = event->motion.x;
     uiInput->mouseY = event->motion.y;
-
-    // fprintf(stdout, "x : %d, y : %d\n", uiInput.mouseX, uiInput.mouseY);
-    // fprintf(stdout, "lmb : %d, rmb : %d\n", uiInput->leftMouseButtonDown, uiInput->rightMouseButtonDown);
 
     if (event->type == SDL_MOUSEBUTTONDOWN)
     {

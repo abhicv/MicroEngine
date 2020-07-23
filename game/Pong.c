@@ -46,16 +46,16 @@ Vector2 CalculateMovDir(Vector2 velocity, Vector2 position)
     Vector2 movDir = velocity;
 
     if (position.x <= 0.0)
-        movDir = ReflectDir(tmpVelocity, NewVector2(1, 0));
+        movDir = ReflectDir(tmpVelocity, Vector2Init(1, 0));
 
     else if (position.x + 15.0 > game.windowWidth)
-        movDir = ReflectDir(tmpVelocity, NewVector2(-1, 0));
+        movDir = ReflectDir(tmpVelocity, Vector2Init(-1, 0));
 
     else if (position.y <= 20.0)
-        movDir = ReflectDir(tmpVelocity, NewVector2(0, 1));
+        movDir = ReflectDir(tmpVelocity, Vector2Init(0, 1));
 
     else if (position.y + 15.0 > game.windowHeight - 15)
-        movDir = ReflectDir(tmpVelocity, NewVector2(0, -1));
+        movDir = ReflectDir(tmpVelocity, Vector2Init(0, -1));
 
     Vector2Normalize(&movDir);
     Vector2Scale(&movDir, 400);
@@ -165,11 +165,11 @@ void Update(float deltaTime)
         }
         else if (SDL_HasIntersection(&player->destRect, &ball->destRect))
         {
-            ballVelocity = ReflectDir(ballVelocity, NewVector2(-1, 0));
+            ballVelocity = ReflectDir(ballVelocity, Vector2Init(-1, 0));
         }
         else if (SDL_HasIntersection(&computer->destRect, &ball->destRect))
         {
-            ballVelocity = ReflectDir(ballVelocity, NewVector2(1, 0));
+            ballVelocity = ReflectDir(ballVelocity, Vector2Init(1, 0));
         }
         else
             ballVelocity = CalculateMovDir(ballVelocity, ball->position);

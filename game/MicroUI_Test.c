@@ -2,7 +2,6 @@
 
 #define MUI_ORIGIN_ID 3000
 
-global ME_Game game = {0};
 global MUI ui = {.fontFile = BIT_5x3_FONT_FILE};
 global MUI_Input uiInput = {0};
 global SDL_Rect rect = {400, 300, 100, 100};

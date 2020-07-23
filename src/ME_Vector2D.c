@@ -1,10 +1,15 @@
 #include "ME_Vector2D.h"
 
-Vector2 NewVector2(float x, float y) {
+Vector2 Vector2Init(float x, float y) {
     Vector2 v;
     v.x = x;
     v.y = y;
     return v;
+}
+
+Vector2 Vector2Null()
+{
+    return Vector2Init(0.0f, 0.0f);
 }
 
 float Vector2Mag(Vector2 v) {
@@ -20,14 +25,24 @@ float Vector2Dot(Vector2 v1, Vector2 v2) {
 }
 
 void Vector2Normalize(Vector2 *v) {
-    float mag = Vector2Mag(*v);
+    f32 mag = Vector2Mag(*v);
     v->x /= mag;
     v->y /= mag;
 }
 
-void Vector2Scale(Vector2 *v, float scalaFactor) {
+void Vector2Scale(Vector2 *v, f32 scalaFactor) {
     v->x *= scalaFactor;
     v->y *= scalaFactor;
+}
+
+Vector2 Vector2ScalarMultiply(Vector2 v, f32 scalar) 
+{
+    Vector2 result;
+    
+    result.x = v.x * scalar;
+    result.y = v.y * scalar;
+
+    return result;
 }
 
 Vector2 Vector2Subtract(Vector2 v1, Vector2 v2) {
