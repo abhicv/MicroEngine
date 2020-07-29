@@ -1,5 +1,0 @@
-#ifndef ME_ASSETHANDLER_H
-#define ME_ASSETHANDLER_H
-
-
-#endif // ME_ASSETHANDLER_H
