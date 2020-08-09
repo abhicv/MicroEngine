@@ -16,7 +16,7 @@ PhysicsBody CreatePhysicsBody(Vector2 position, f32 mass, f32 width, f32 height)
 
     CollisionRect rect = {position.x, position.y, width, height};
     PhysicsBody physicsBody =  {0};
-    
+
     physicsBody.position = position;
     physicsBody.velocity = Vector2Null();
     physicsBody.acceleration = Vector2Null();
@@ -47,7 +47,7 @@ void UpdatePhysics(PhysicsBody *body, Vector2 gravity, f32 deltaTime)
 
     //NOTE(lonecoder): applying friction in x direction
     body->velocity.x -= (body->velocity.x * body->friction);
-    
+
     body->position.x += body->velocity.x * deltaTime;
     body->position.y += body->velocity.y * deltaTime;
 
@@ -95,8 +95,8 @@ CollisionInfo DetectCollision(CollisionRect *a, CollisionRect *b)
                 info.collided = true;
                 info.penetrationDepth = yOverlap;
             }
-        } 
-    } 
+        }
+    }
 
     return info;
 }
@@ -108,30 +108,27 @@ void ResolveCollision(PhysicsBody *a, PhysicsBody *b, CollisionInfo info)
     f32 impulseMag = 0.0f;
 
     if(velAlongNormal > 0.0f)
+    {
         return;
+    }
 
-    f32 minRestitution = 0.0;
-
-    if(a->restitution > b->restitution)
-        minRestitution = b->restitution;
-    else
-        minRestitution = a->restitution;
+    f32 minRestitution = a->restitution < b->restitution ? a->restitution : b->restitution;
 
     impulseMag = -(1.0f + minRestitution) * velAlongNormal / (a->inverseMass + b->inverseMass);
 
     Vector2 impulse = Vector2ScalarMultiply(info.normal , impulseMag);
 
-    a->velocity.x -= impulse.x * a->inverseMass; 
+    a->velocity.x -= impulse.x * a->inverseMass;
     a->velocity.y -= impulse.y * a->inverseMass;
 
-    b->velocity.x += impulse.x * b->inverseMass; 
+    b->velocity.x += impulse.x * b->inverseMass;
     b->velocity.y += impulse.y * b->inverseMass;
 
     f32 percent = 0.2f;
     f32 slope = 0.02f;
     f32 p = (info.penetrationDepth - slope > 0.0f) ? (info.penetrationDepth - slope) : 0.0f;
 
-    f32 inverseMassSum =  a->inverseMass + b->inverseMass; 
+    f32 inverseMassSum =  a->inverseMass + b->inverseMass;
     Vector2 correction = Vector2ScalarMultiply(info.normal, (p / inverseMassSum));
 
     a->position.x -= correction.x * a->inverseMass;

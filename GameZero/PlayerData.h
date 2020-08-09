@@ -41,6 +41,16 @@ global Animation jumpAnim = {
     .flip = false,
 };
 
+global Animation shootAnim = {
+    .frames = {
+        {48, 0},
+    },
+    .currentFrameIndex = 0,
+    .frameInterval  = 150,
+    .frameCount = 1,
+    .flip = false,
+};
+
 global AnimationComponent anim = {
     .animations = {0},
     .currentAnimationIndex = 0,

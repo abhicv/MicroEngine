@@ -17,7 +17,7 @@
 #include "types.h"
 
 #define MAX(A, B) A < B ? B : A
-#define MIN(A, B) A > B ? B : A 
+#define MIN(A, B) A > B ? B : A
 
 #define loop(i, count) for(i = 0; i < count; i++)
 

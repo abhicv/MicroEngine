@@ -53,7 +53,7 @@ typedef struct MUI_Widget
         struct Window
         {
             bool isOpened;
-        
+
         } window;
     };
 

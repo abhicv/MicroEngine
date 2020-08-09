@@ -17,7 +17,7 @@
 global MUI uiPerf = {0};
 global char fpsString[10] = "fpsText";
 
-internal ME_Game ME_CreateGame(char *gameTitle, u32 windowWidth, u32 windowHeight)
+ME_Game ME_CreateGame(char *gameTitle, u32 windowWidth, u32 windowHeight)
 {
     SDLPlatform platform = {0};
 
@@ -46,13 +46,13 @@ internal ME_Game ME_CreateGame(char *gameTitle, u32 windowWidth, u32 windowHeigh
     u32 rendflag = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
     platform.renderer = SDL_CreateRenderer(platform.window, -1, rendflag);
 
-    SDL_RendererInfo rendererInfo;
-    SDL_GetRendererInfo(platform.renderer, &rendererInfo);
-
     if (platform.renderer == NULL)
     {
         SDL_Log("Failed to create SDL renderer : %s\n", SDL_GetError());
     }
+
+    SDL_RendererInfo rendererInfo;
+    SDL_GetRendererInfo(platform.renderer, &rendererInfo);
 
     printf("MicroEngine => Window dimensions -> %d x %d\n", windowWidth, windowHeight);
     printf("MicroEngine => Renderer -> %s\n", rendererInfo.name);
@@ -71,7 +71,7 @@ internal ME_Game ME_CreateGame(char *gameTitle, u32 windowWidth, u32 windowHeigh
     return game;
 }
 
-internal void ME_RunGame(ME_Game *game, bool showSplashScreen)
+void ME_RunGame(ME_Game *game, bool showSplashScreen)
 {
     // Spalsh screen
     SDL_Renderer *renderer = game->platform.renderer;
@@ -101,7 +101,7 @@ internal void ME_RunGame(ME_Game *game, bool showSplashScreen)
     uiPerf.fontFile = AGOESTOESAN_FONT_FILE;
     MUI_Rect rect = {60, 15, 120, 30};
 
-    // main loop
+    // main game loop
     while (game->isRunning)
     {
         //for debug ui
@@ -115,11 +115,11 @@ internal void ME_RunGame(ME_Game *game, bool showSplashScreen)
         {
             switch (game->platform.event.type)
             {
-            case SDL_QUIT:
+				case SDL_QUIT:
                 game->isRunning = false;
                 break;
 
-            case SDL_KEYDOWN:
+				case SDL_KEYDOWN:
                 if (game->platform.event.key.keysym.sym == SDLK_ESCAPE)
                 {
                     game->isRunning = false;
@@ -159,7 +159,7 @@ internal void ME_RunGame(ME_Game *game, bool showSplashScreen)
     }
 }
 
-internal void ME_QuitGame(ME_Game *game)
+void ME_QuitGame(ME_Game *game)
 {
     SDL_DestroyRenderer(game->platform.renderer);
     SDL_DestroyWindow(game->platform.window);

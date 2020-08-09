@@ -40,7 +40,7 @@ global AnimationComponent lizardAnimation = {
 
 global EntityStatComponent lizardStat = {
     .EnemyStat = {
-        .health = 0.8f,
+        .health = 1.0f,
         .startPosition = {300, 300},
         .moveRight = false,
         .patrolDistance = 50,

@@ -21,14 +21,14 @@ char *EntityTagToString(u32 tag)
 
     switch (tag)
     {
-    case ENTITY_TAG_player:
-        tagName = "ENTITY_TAG_player";
+    case ENTITY_TAG_PLAYER:
+        tagName = "ENTITY_TAG_PLAYER";
         break;
-    case ENTITY_TAG_lizard:
-        tagName = "ENTITY_TAG_lizard";
+    case ENTITY_TAG_LIZARD:
+        tagName = "ENTITY_TAG_LIZARD";
         break;
-    case ENTITY_TAG_platform:
-        tagName = "ENTITY_TAG_platform";
+    case ENTITY_TAG_PLATFORM:
+        tagName = "ENTITY_TAG_PLATFORM";
         break;
     default:
         tagName = "NoTag";
@@ -67,10 +67,10 @@ void Update(float deltaTime)
 
             switch (ecsWorld.tags[i])
             {
-            case ENTITY_TAG_player:
+            case ENTITY_TAG_PLAYER:
                 if (ecsWorld.physics[player].collided)
                 {
-                    if (ecsWorld.physics[player].tagOfCollidedEntity == ENTITY_TAG_platform)
+                    if (ecsWorld.physics[player].tagOfCollidedEntity == ENTITY_TAG_PLATFORM)
                     {
                         ecsWorld.physics[player].isGrounded = true;
                     }
@@ -79,15 +79,15 @@ void Update(float deltaTime)
                         ecsWorld.physics[player].isGrounded = true;
                     }
                 }
-                PlayerControlSystem(&ecsWorld.transforms[player], &ecsWorld.animations[player], 
+                PlayerControlSystem(&ecsWorld.transforms[player], &ecsWorld.animations[player],
                                         &ecsWorld.input, &ecsWorld.physics[player], &ecsWorld.stat[player]);
                 break;
 
-            case ENTITY_TAG_lizard:
+            case ENTITY_TAG_LIZARD:
                 if (MECS_EntitySignatureEquals(ecsWorld.entitySignature[i], TRANSFORM_COMPONENT_SIGN | ANIMATION_COMPONENT_SIGN | ENTITYSTAT_COMPONENT_SIGN))
                 {
                     EnemyPatrolSystem(&ecsWorld.transforms[i], &ecsWorld.stat[i], &ecsWorld.animations[i], deltaTime);
-                    
+
                     //Enemy Health bar
                     Vector2 pos = ecsWorld.transforms[i].position;
                     MUI_Rect r = {pos.x, pos.y - 50, 60, 10};
@@ -96,7 +96,7 @@ void Update(float deltaTime)
 
                 if (ecsWorld.physics[i].collided)
                 {
-                    if (ecsWorld.physics[i].tagOfCollidedEntity == ENTITY_TAG_bullet)
+                    if (ecsWorld.physics[i].tagOfCollidedEntity == ENTITY_TAG_BULLET)
                     {
                         ecsWorld.stat[i].EnemyStat.health -= 0.1;
                     }
@@ -108,18 +108,18 @@ void Update(float deltaTime)
                 }
 
                 break;
-            
-            case ENTITY_TAG_bullet:
+
+            case ENTITY_TAG_BULLET:
                 if (ecsWorld.physics[i].collided)
                 {
-                    if (ecsWorld.physics[i].tagOfCollidedEntity == ENTITY_TAG_platform ||
-                            ecsWorld.physics[i].tagOfCollidedEntity == ENTITY_TAG_lizard )
+                    if (ecsWorld.physics[i].tagOfCollidedEntity == ENTITY_TAG_PLATFORM ||
+                            ecsWorld.physics[i].tagOfCollidedEntity == ENTITY_TAG_LIZARD )
                     {
                         ecsWorld.entityDeathFlag[i] = true;
                     }
                 }
                 break;
-            }   
+            }
         }
     }
 }
@@ -130,7 +130,7 @@ void Render(SDL_Renderer *renderer)
 
     int i = 0;
     loop(i, ecsWorld.activeEntityCount)
-    {   
+    {
         if(!IsEntityDead(i, &ecsWorld))
         {
             if (MECS_EntitySignatureEquals(ecsWorld.entitySignature[i], RenderSystemSignature))
@@ -141,7 +141,7 @@ void Render(SDL_Renderer *renderer)
             {
                 RenderSystemSimple(&ecsWorld.transforms[i], &ecsWorld.renders[i], renderer);
             }
-            
+
             //Drawing collision rect for debug
             if (MECS_EntitySignatureEquals(ecsWorld.entitySignature[i], PHYSICS_COMPONENT_SIGN))
             {
@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
     game.handleEvent = HandleEvent;
     game.update = Update;
     game.render = Render;
-    
+
     ui.fontFile = OPENSANS_FONT_FILE;
 
     //player
@@ -192,13 +192,13 @@ int main(int argc, char *argv[])
     physics.physicsBody.affectedByGravity = true;
     physics.physicsBody.restitution = 0.0f;
     physics.physicsBody.friction = 0.01f;
-    physics.excludeEntityTag = ENTITY_TAG_none;
+    physics.excludeEntityTag = ENTITY_TAG_NONE;
 
-    player = MECS_CreateEntity(&ecsWorld, ENTITY_TAG_player);
+    player = MECS_CreateEntity(&ecsWorld, ENTITY_TAG_PLAYER);
     if (player < MAX_ENTITY_COUNT)
     {
-        ecsWorld.entitySignature[player] = TRANSFORM_COMPONENT_SIGN | 
-                                            RENDER_COMPONENT_SIGN | 
+        ecsWorld.entitySignature[player] = TRANSFORM_COMPONENT_SIGN |
+                                            RENDER_COMPONENT_SIGN |
                                             ANIMATION_COMPONENT_SIGN |
                                             ENTITYSTAT_COMPONENT_SIGN |
                                             PHYSICS_COMPONENT_SIGN;
@@ -215,15 +215,15 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-#if 0    
+#if 0
     //bullet
     u32 b = 0;
     loop(b, PlayerStat.PlayerStat.bulletCount)
     {
-        Entity bullet = MECS_CreateEntity(&ecsWorld, ENTITY_TAG_bullet);
+        Entity bullet = MECS_CreateEntity(&ecsWorld, ENTITY_TAG_BULLET);
         if (ENTITY_INDEX_VALID(bullet))
         {
-            ecsWorld.entitySignature[bullet] = TRANSFORM_COMPONENT_SIGN | 
+            ecsWorld.entitySignature[bullet] = TRANSFORM_COMPONENT_SIGN |
                                                     RENDER_COMPONENT_SIGN |
                                                     PHYSICS_COMPONENT_SIGN;
 
@@ -232,20 +232,20 @@ int main(int argc, char *argv[])
             render.texture = NULL;
 
             physics.physicsBody = CreatePhysicsBody(transform.position, 4.0f, render.width, render.height);
-            physics.physicsBody.restitution = 0.0f; 
+            physics.physicsBody.restitution = 0.0f;
             physics.physicsBody.affectedByGravity = true;
-            physics.excludeEntityTag = ENTITY_TAG_player | ENTITY_TAG_bullet | ENTITY_TAG_lizard;
+            physics.excludeEntityTag = ENTITY_TAG_PLAYER | ENTITY_TAG_BULLET | ENTITY_TAG_LIZARD;
 
             ecsWorld.transforms[bullet] = transform;
             ecsWorld.physics[bullet] = physics;
-            ecsWorld.renders[bullet] = render; 
+            ecsWorld.renders[bullet] = render;
         }
         else
         {
             printf("\nECS world full!!!\n");
             return 1;
         }
-    }    
+    }
 #endif
 
     //platform
@@ -259,10 +259,10 @@ int main(int argc, char *argv[])
         u32 m = 0;
         loop(m, count)
         {
-            Entity platform = MECS_CreateEntity(&ecsWorld, ENTITY_TAG_platform);
+            Entity platform = MECS_CreateEntity(&ecsWorld, ENTITY_TAG_PLATFORM);
             if (ENTITY_INDEX_VALID(platform))
             {
-                ecsWorld.entitySignature[platform] = TRANSFORM_COMPONENT_SIGN | 
+                ecsWorld.entitySignature[platform] = TRANSFORM_COMPONENT_SIGN |
                                                         PHYSICS_COMPONENT_SIGN;
 
                 i32 x,y;
@@ -276,13 +276,13 @@ int main(int argc, char *argv[])
                 render.texture = NULL;
 
                 physics.physicsBody = CreatePhysicsBody(transform.position, 0.0f, render.width, render.height);
-                physics.physicsBody.restitution = 0.0f; 
+                physics.physicsBody.restitution = 0.0f;
                 physics.physicsBody.affectedByGravity = false;
-                physics.excludeEntityTag = ENTITY_TAG_none;
+                physics.excludeEntityTag = ENTITY_TAG_NONE;
 
                 ecsWorld.transforms[platform] = transform;
                 ecsWorld.physics[platform] = physics;
-                ecsWorld.renders[platform] = render; 
+                ecsWorld.renders[platform] = render;
             }
             else
             {
@@ -290,9 +290,9 @@ int main(int argc, char *argv[])
                 return 1;
             }
         }
-    
+
     }
-    
+
     //lizard
     lizardAnimation.animations[Idle] = lizardIdleAnim;
     lizardAnimation.animations[Walking] = lizardWalkAnim;
@@ -304,7 +304,7 @@ int main(int argc, char *argv[])
     int n = 0;
     loop(n, 3)
     {
-        u32 lizard = MECS_CreateEntity(&ecsWorld, ENTITY_TAG_lizard);
+        u32 lizard = MECS_CreateEntity(&ecsWorld, ENTITY_TAG_LIZARD);
 
         lizardTransform.position.x = ME_Random(100, 1000);
         lizardTransform.position.y = ME_Random(50, 600);
@@ -316,12 +316,12 @@ int main(int argc, char *argv[])
         physics.physicsBody = CreatePhysicsBody(lizardTransform.position, 1.0, 50, 64);
         physics.physicsBody.restitution = 0.0f;
         physics.physicsBody.friction = 0.02f;
-        physics.excludeEntityTag = ENTITY_TAG_none;
+        physics.excludeEntityTag = ENTITY_TAG_NONE;
 
         if (lizard < MAX_ENTITY_COUNT)
         {
-            ecsWorld.entitySignature[lizard] = TRANSFORM_COMPONENT_SIGN | 
-                                                RENDER_COMPONENT_SIGN | 
+            ecsWorld.entitySignature[lizard] = TRANSFORM_COMPONENT_SIGN |
+                                                RENDER_COMPONENT_SIGN |
                                                 ANIMATION_COMPONENT_SIGN |
                                                 ENTITYSTAT_COMPONENT_SIGN |
                                                 PHYSICS_COMPONENT_SIGN;

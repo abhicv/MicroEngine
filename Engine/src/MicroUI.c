@@ -1,29 +1,29 @@
 #include "MicroUI.h"
 
-internal MUI_Id MUI_IdInit(u32 primary, u32 secondary)
+MUI_Id MUI_IdInit(u32 primary, u32 secondary)
 {
     MUI_Id id = {primary, secondary};
     return id;
 }
 
-internal bool MUI_IdEqual(MUI_Id a, MUI_Id b)
+bool MUI_IdEqual(MUI_Id a, MUI_Id b)
 {
     return (a.primary == b.primary && a.secondary == b.secondary);
 }
 
-internal MUI_Id MUI_NullId(void)
+MUI_Id MUI_NullId(void)
 {
     MUI_Id id = {0, 0};
     return id;
 }
 
-internal MUI_Rect MUI_RectInit(i32 x, i32 y, u32 w, u32 h)
+MUI_Rect MUI_RectInit(i32 x, i32 y, u32 w, u32 h)
 {
     MUI_Rect rect = {x, y, w, h};
     return rect;
 }
 
-internal void MUI_BeginFrame(MUI *ui, MUI_Input *input)
+void MUI_BeginFrame(MUI *ui, MUI_Input *input)
 {
     ui->widgetCount = 0;
 
@@ -36,31 +36,38 @@ internal void MUI_BeginFrame(MUI *ui, MUI_Input *input)
     }
 }
 
-internal void MUI_EndFrame(MUI *ui, SDL_Renderer *renderer)
+void MUI_EndFrame(MUI *ui, SDL_Renderer *renderer)
 {
     u32 i = 0;
 
     SDL_Rect rect = {0};
     SDL_Color color = {0};
+    SDL_Color textColor = {255, 255, 255, 255};
+
+    TTF_Font *font = NULL;
+    SDL_Surface *surface = NULL;
+    SDL_Texture *tex = NULL;
 
     for (i = 0; i < ui->widgetCount; i++)
     {
         switch (ui->widgets[i].widgetType)
         {
-        case MUI_WIDGET_button:
+			case MUI_WIDGET_button:
 
-            color.r = -30 * (!!MUI_IdEqual(ui->hotWidgetId, ui->widgets[i].id)) + 
-                        70 - (!!MUI_IdEqual(ui->activeWidgetId, ui->widgets[i].id)) * 10;
+            color.r = -30 * (!!MUI_IdEqual(ui->hotWidgetId, ui->widgets[i].id)) +
+				70 - (!!MUI_IdEqual(ui->activeWidgetId, ui->widgets[i].id)) * 10;
             color.g = color.r;
             color.b = color.r;
 
             rect = MUI_RectToSDL_Rect(&ui->widgets[i].rect);
             ME_RenderFillRect(renderer, &rect, color);
-            
+
+			SDL_Color borderColor = {255, 255, 255, 255};
+            ME_RenderDrawRect(renderer, &rect, borderColor);
             break;
 
-        case MUI_WIDGET_slider:
-        
+			case MUI_WIDGET_slider:
+
             color.r = -10 * (!!MUI_IdEqual(ui->hotWidgetId, ui->widgets[i].id)) + 200;
             color.g = 0;
             color.b = 0;
@@ -80,13 +87,7 @@ internal void MUI_EndFrame(MUI *ui, SDL_Renderer *renderer)
 
             break;
 
-        case MUI_Widget_text:
-
-            SDL_Color textColor = {255, 255, 255, 255};
-
-            TTF_Font *font = NULL;
-            SDL_Surface *surface = NULL;
-            SDL_Texture *tex = NULL;
+			case MUI_Widget_text:
 
             if (ui->fontFile != NULL)
             {
@@ -105,7 +106,7 @@ internal void MUI_EndFrame(MUI *ui, SDL_Renderer *renderer)
 
             SDL_Rect tmpRect = rect;
             SDL_QueryTexture(tex, NULL, NULL, &tmpRect.w, &tmpRect.h);
-            
+
             tmpRect.x = rect.x + (rect.w - tmpRect.w) / 2;
             tmpRect.y = rect.y + (rect.h - tmpRect.h) / 2;
 
@@ -120,13 +121,13 @@ internal void MUI_EndFrame(MUI *ui, SDL_Renderer *renderer)
 
             break;
 
-        default:
+			default:
             break;
         }
     }
 }
 
-internal void MUI_Text(MUI *ui, MUI_Id id, MUI_Rect rect, char *text, u32 fontSize)
+void MUI_Text(MUI *ui, MUI_Id id, MUI_Rect rect, char *text, u32 fontSize)
 {
     if(ui->widgetCount < MUI_MAX_WIDGETS)
     {
@@ -139,19 +140,19 @@ internal void MUI_Text(MUI *ui, MUI_Id id, MUI_Rect rect, char *text, u32 fontSi
     }
     else
     {
-         printf("UI widget count out of bound\n");
-    }   
+		printf("UI widget count out of bound\n");
+    }
 }
 
-internal void MUI_TextA(MUI *ui, MUI_Id id, char *text, u32 fontSize)
+void MUI_TextA(MUI *ui, MUI_Id id, char *text, u32 fontSize)
 {
     MUI_Text(ui, id, MUI_GetNextAutoLayoutRect(ui), text, fontSize);
 }
 
-internal bool MUI_Button(MUI *ui, MUI_Id id, char *text, MUI_Rect rect)
+bool MUI_Button(MUI *ui, MUI_Id id, char *text, MUI_Rect rect)
 {
     bool isTriggered = false;
-     
+
     u32 left = rect.x - rect.width / 2;
     u32 right = rect.x + rect.width / 2;
     u32 top = rect.y - rect.height / 2;
@@ -198,7 +199,7 @@ internal bool MUI_Button(MUI *ui, MUI_Id id, char *text, MUI_Rect rect)
         MUI_Widget *widget = ui->widgets + ui->widgetCount++;
         widget->id = id;
         widget->widgetType = MUI_WIDGET_button;
-        widget->rect = rect; 
+        widget->rect = rect;
     }
     else
     {
@@ -210,12 +211,12 @@ internal bool MUI_Button(MUI *ui, MUI_Id id, char *text, MUI_Rect rect)
     return isTriggered;
 }
 
-internal bool MUI_ButtonA(MUI *ui, MUI_Id id, char *text)
+bool MUI_ButtonA(MUI *ui, MUI_Id id, char *text)
 {
     return MUI_Button(ui, id, text, MUI_GetNextAutoLayoutRect(ui));
 }
 
-internal f32 MUI_Slider(MUI *ui, MUI_Id id, f32 value, MUI_Rect rect)
+f32 MUI_Slider(MUI *ui, MUI_Id id, f32 value, MUI_Rect rect)
 {
     u32 left = rect.x - rect.width / 2;
     u32 right = rect.x + rect.width / 2;
@@ -277,16 +278,16 @@ internal f32 MUI_Slider(MUI *ui, MUI_Id id, f32 value, MUI_Rect rect)
     {
         printf("UI widget count out of bound\n");
     }
-    
+
     return value;
 }
 
-internal f32 MUI_SliderA(MUI *ui, MUI_Id id, f32 value)
+f32 MUI_SliderA(MUI *ui, MUI_Id id, f32 value)
 {
     return MUI_Slider(ui, id, value, MUI_GetNextAutoLayoutRect(ui));
 }
 
-internal SDL_Rect MUI_RectToSDL_Rect(MUI_Rect *rect)
+SDL_Rect MUI_RectToSDL_Rect(MUI_Rect *rect)
 {
     SDL_Rect sdlRect = {0};
 
@@ -298,7 +299,7 @@ internal SDL_Rect MUI_RectToSDL_Rect(MUI_Rect *rect)
     return sdlRect;
 }
 
-internal void MUI_PushColumnLayout(MUI *ui, MUI_Rect rect, u32 offset)
+void MUI_PushColumnLayout(MUI *ui, MUI_Rect rect, u32 offset)
 {
     u32 i = ui->autoLayOutIndex++;
     ui->autoLayOutGroup[i].rect = rect;
@@ -307,7 +308,7 @@ internal void MUI_PushColumnLayout(MUI *ui, MUI_Rect rect, u32 offset)
     ui->autoLayOutGroup[i].isColumn = true;
 }
 
-internal void MUI_PushRowLayout(MUI *ui, MUI_Rect rect, u32 offset)
+void MUI_PushRowLayout(MUI *ui, MUI_Rect rect, u32 offset)
 {
     u32 i = ui->autoLayOutIndex++;
     ui->autoLayOutGroup[i].rect = rect;
@@ -316,7 +317,7 @@ internal void MUI_PushRowLayout(MUI *ui, MUI_Rect rect, u32 offset)
     ui->autoLayOutGroup[i].isColumn = false;
 }
 
-internal void MUI_PopLayout(MUI *ui)
+void MUI_PopLayout(MUI *ui)
 {
     if (ui->autoLayOutIndex > 0)
     {
@@ -324,7 +325,7 @@ internal void MUI_PopLayout(MUI *ui)
     }
 }
 
-internal MUI_Rect MUI_GetNextAutoLayoutRect(MUI *ui)
+MUI_Rect MUI_GetNextAutoLayoutRect(MUI *ui)
 {
     MUI_Rect rect = {0};
 
@@ -349,7 +350,7 @@ internal MUI_Rect MUI_GetNextAutoLayoutRect(MUI *ui)
     return rect;
 }
 
-internal void MUI_GetInput(MUI_Input *uiInput, SDL_Event *event)
+void MUI_GetInput(MUI_Input *uiInput, SDL_Event *event)
 {
     uiInput->mouseX = event->motion.x;
     uiInput->mouseY = event->motion.y;

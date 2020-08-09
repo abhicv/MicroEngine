@@ -4,14 +4,14 @@
 ME_GameObject *ME_CreateGameObject(int xPos, int yPos)
 {
     ME_GameObject *gameObject = (ME_GameObject *)malloc(sizeof(ME_GameObject));
-
+    
     gameObject->enabled = true;
     gameObject->animate = false;
     gameObject->position = Vector2Init(xPos, yPos);
     gameObject->nFrames = 0;
     gameObject->texture = NULL;
     gameObject->angle = 0;
-
+    
     gameObject->destRect.x = xPos;
     gameObject->destRect.y = yPos;
     gameObject->destRect.w = 32;
@@ -20,9 +20,9 @@ ME_GameObject *ME_CreateGameObject(int xPos, int yPos)
     gameObject->srcRect.y = 0;
     gameObject->srcRect.w = 32;
     gameObject->srcRect.h = 32;
-
+    
     gameObject->debugColor = ME_RandomSdlColor();
-
+    
     return gameObject;
 }
 
@@ -43,11 +43,11 @@ void ME_RenderGameObject(ME_GameObject *gameObject, SDL_Renderer *renderer)
 {
     gameObject->destRect.x = (int)(gameObject->position.x - gameObject->destRect.w / 2);
     gameObject->destRect.y = (int)(gameObject->position.y - gameObject->destRect.h / 2);
-
+    
     SDL_Rect debugRect = gameObject->destRect;
     debugRect.x = gameObject->position.x;
     debugRect.y = gameObject->position.y;
-
+    
     if (gameObject->enabled)
     {
         if (gameObject->texture != NULL)

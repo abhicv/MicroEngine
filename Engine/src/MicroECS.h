@@ -2,14 +2,13 @@
 #define MICROECS_H
 
 #include "types.h"
-
 #include "ME_Vector2D.h"
 #include "MicroPhysics.h"
 #include "ME_debug.h"
 
 #include <SDL2/SDL.h>
 
-#define MAX_ENTITY_COUNT 100
+#define MAX_ENTITY_COUNT 50
 #define INVALID_ENTITY_INDEX MAX_ENTITY_COUNT
 #define ENTITY_INDEX_VALID(index) index < MAX_ENTITY_COUNT
 
@@ -20,7 +19,7 @@ typedef struct TransformComponent
     Vector2 position;
     Vector2 size;
     f32 angle;
-
+    
 } TransformComponent;
 
 typedef struct RenderComponent
@@ -28,8 +27,14 @@ typedef struct RenderComponent
     u32 width;
     u32 height;
     SDL_Texture *texture;
-
+    
 } RenderComponent;
+
+enum Direction
+{
+    Right,
+    Left,
+};
 
 //NOTE(lonecoder): Used for indexing animations in animation component
 enum AnimationState
@@ -42,12 +47,6 @@ enum AnimationState
     AnimationStateCount,
 };
 
-enum Direction
-{
-    Right,
-    Left,
-};
-
 //NOTE(lonecoder): Max number of frames an animation can have(subject to change depending on needs)
 #define MAX_FRAME_COUNT 10
 
@@ -55,7 +54,7 @@ typedef struct AnimationFrame
 {
     i32 x;
     i32 y;
-
+    
 } AnimationFrame;
 
 typedef struct Animation
@@ -65,19 +64,19 @@ typedef struct Animation
     u32 frameInterval;
     u32 frameCount;
     bool flip;
-
+    
 } Animation;
 
 typedef struct AnimationComponent
 {
     //NOTE(lonecoder): order of animations is important(should follow the order of AnimationState enum)
-    Animation animations[AnimationStateCount]; 
+    Animation animations[AnimationStateCount];
     u32 currentAnimationIndex;
     
     //NOTE(lonecoder): unit in pixels from sprite sheet
     u32 width;
     u32 height;
-
+    
 } AnimationComponent;
 
 typedef struct PhysicsComponent
@@ -88,10 +87,10 @@ typedef struct PhysicsComponent
     bool collided;
     bool isGrounded;
     u32 excludeEntityTag;
-
+    
 } PhysicsComponent;
 
-//NOTE(lonecoder): all key map needed for player movement
+//NOTE(lonecoder): all key map needed for the game control
 typedef struct InputComponent
 {
     bool upKeyDown;
@@ -99,36 +98,37 @@ typedef struct InputComponent
     bool leftKeyDown;
     bool rightKeyDown;
     bool jumpKeyDown;
-
+    
     bool leftCtrlKeyDown;
-
+    bool leftCtrlKeyHeld;
+    
     i32 mouseX;
     i32 mouseY;
-
+    
 } InputComponent;
 
 //NOTE(lonecoder): stats specifically for the game
 typedef struct EntityStatComponent
 {
-  union
-  {
-      struct
-      {
-        f32 health;
-        u32 facingDir;
-
-      } PlayerStat;
-
-      struct 
-      {
-          f32 health;
-          f32 patrolDistance;
-          Vector2 startPosition;
-          bool moveRight;
-
-      } EnemyStat;
-  };
-
+    union
+    {
+        struct
+        {
+            f32 health;
+            u32 facingDir;
+            
+        } PlayerStat;
+        
+        struct
+        {
+            f32 health;
+            f32 patrolDistance;
+            Vector2 startPosition;
+            bool moveRight;
+            
+        } EnemyStat;
+    };
+    
 } EntityStatComponent;
 
 //NOTE(lonecoder): component signature
@@ -153,22 +153,22 @@ typedef struct MicroECSWorld
     EntityStatComponent stat[MAX_ENTITY_COUNT];       //4
     
     u32 entitySignature[MAX_ENTITY_COUNT];
-    u32 tags[MAX_ENTITY_COUNT]; 
+    u32 tags[MAX_ENTITY_COUNT];
     bool entityDeathFlag[MAX_ENTITY_COUNT];
     
     u32 activeEntityCount; //number of currently active entities created
-
+    
     InputComponent input; //input only for main player
-
+    
 } MicroECSWorld;
 
 enum Entitytag
 {
-    ENTITY_TAG_player = (1 << 0),
-    ENTITY_TAG_bullet = (1 << 1),
-    ENTITY_TAG_lizard = (1 << 2),
-    ENTITY_TAG_platform = (1 << 3),
-    ENTITY_TAG_none = (1 << 4),
+    ENTITY_TAG_PLAYER =   (1 << 0),   //1
+    ENTITY_TAG_BULLET =   (1 << 1),   //2
+    ENTITY_TAG_LIZARD =   (1 << 2),   //4
+    ENTITY_TAG_PLATFORM = (1 << 3), //8
+    ENTITY_TAG_NONE =     (1 << 4),     //16
 };
 
 #endif

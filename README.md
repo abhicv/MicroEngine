@@ -7,12 +7,6 @@
 - SDL2  : https://www.libsdl.org/download-2.0.php
 - All development binaries for SDL2 are available in the repo(folder: SDL2)
 
-## Features
-- Micro UI(immediate mode gui)
-  - button
-  - slider
-  - text box
-
 ## How to build
 - Run batch file in the root directory to build examples in game folder(build.bat)
 - Require cl (Microsoft visual C compiler) to be in the path environment variable.

@@ -1,7 +1,8 @@
-*.obj 
+*.obj
 *.exe
 *.ilk
 *.pdb
+*.sln
 
 /.vscode
 /bin/.vs

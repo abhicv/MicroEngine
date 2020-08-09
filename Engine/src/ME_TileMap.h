@@ -18,15 +18,19 @@ typedef struct Tile
 typedef struct TileMap
 {
     Tile *tiles;
+    
     u32 tileMapWidth;
     u32 tileMapHeight;
+    
     u32 tileWidth;
     u32 tileHeight;
+    
     u32 tileCount;
 
-    SDL_Texture *tileSheetTexture;
     u32 tileSheetTileWidth;
     u32 tileSheetTileHeight;
+    
+    SDL_Texture *tileSheetTexture;
 
 } TileMap;
 
