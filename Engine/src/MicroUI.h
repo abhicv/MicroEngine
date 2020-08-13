@@ -17,8 +17,8 @@ enum
     MUI_WIDGET_button,
     MUI_WIDGET_slider,
     MUI_Widget_text,
-    MUI_Widget_window,
-
+    MUI_Widget_textbox,
+    
     MUI_WidgetTypeCount,
 };
 
@@ -27,7 +27,7 @@ typedef struct MUI_Id
 {
     u32 primary;
     u32 secondary;
-
+    
 } MUI_Id;
 
 typedef struct MUI_Widget
@@ -35,38 +35,33 @@ typedef struct MUI_Widget
     u32 widgetType;
     MUI_Id id;
     MUI_Rect rect;
-
-    union {
+    
+    union 
+    {
         struct Slider
         {
             f32 value;
-
+            
         } slider;
-
+        
         struct Text
         {
             char *text;
             u32 fontSize;
-
+            
         } text;
-
-        struct Window
-        {
-            bool isOpened;
-
-        } window;
     };
-
+    
 } MUI_Widget;
 
 typedef struct MUI_Input
 {
     i32 mouseX;
     i32 mouseY;
-
+    
     bool leftMouseButtonDown;
     bool rightMouseButtonDown;
-
+    
 } MUI_Input;
 
 typedef struct MUI
@@ -75,13 +70,13 @@ typedef struct MUI
     i32 mouseY;
     bool leftMouseButtonDown;
     bool rightMouseButtonDown;
-
-    int widgetCount;
+    
+    u32 widgetCount;
     MUI_Id hotWidgetId;
     MUI_Id activeWidgetId;
-
+    
     MUI_Widget widgets[MUI_MAX_WIDGETS];
-
+    
     u32 autoLayOutIndex;
     struct
     {
@@ -89,11 +84,11 @@ typedef struct MUI
         u32 progress;
         bool isColumn;
         u32 offset;
-
+        
     } autoLayOutGroup[MUI_MAX_AUTOLAYOUT_SIZE];
-
+    
     char *fontFile;
-
+    
 } MUI;
 
 void MUI_BeginFrame(MUI *ui, MUI_Input *input);

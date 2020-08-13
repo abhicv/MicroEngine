@@ -1,15 +1,15 @@
-#include "../Engine/src/MicroEngine.c"
+#include "gamezero.h"
+#include "..\Engine\src\MicroEngine.c"
 
 #include "PlayerData.h"
 #include "EnemyData.h"
 
-#define MUI_ORIGIN_ID 1080
-
-global MicroECSWorld ecsWorld;
+#define MUI_ORIGIN_ID 1020
 
 global MUI ui;
 global MUI_Input uiInput;
 
+global MicroECSWorld ecsWorld;
 global Entity player;
 
 global Vector2 gravity = {0.0f, 200.0f};
@@ -18,30 +18,107 @@ global SDL_Texture *tileMapTexture = NULL;
 
 char entityCountString[50] = "Entity_Count";
 
-char *EntityTagToString(u32 tag)
+global u32 score = 0;
+char scoreText[25] = "0";
+
+void ShowMainMenu(u32 *gameMode, SDL_Event *event, SDL_Renderer *renderer)
 {
-    char *tagName = 0;
+    ui.fontFile = AGOESTOESAN_FONT_FILE;
     
-    switch (tag)
+    bool quitMainMenu = false;
+    
+    while(!quitMainMenu)
     {
-        case ENTITY_TAG_PLAYER:
-		tagName = "ENTITY_TAG_PLAYER";
-		break;
+        while(SDL_PollEvent(event))
+        {
+            switch(event->type)
+            {
+				case SDL_QUIT:
+                quitMainMenu = true;
+                *gameMode = GAME_EXIT;
+                break;
+            }
+            MUI_GetInput(&uiInput, event);
+        }
         
-        case ENTITY_TAG_LIZARD:
-		tagName = "ENTITY_TAG_LIZARD";
-		break;
+        MUI_BeginFrame(&ui, &uiInput);
         
-        case ENTITY_TAG_PLATFORM:
-		tagName = "ENTITY_TAG_PLATFORM";
-		break;
+        //game title
+        MUI_Rect gameTitleRect = ME_RectInit(SCREEN_WIDTH / 2, 200, 100, 30);
+        MUI_Text(&ui, GEN_MUI_ID(), gameTitleRect, "Game Zero", 80);
         
-        default:
-		tagName = "NO_TAG";
-		break;
+        //menu buttons
+		MUI_Rect rect = ME_RectInit(1280 / 2, 350, 300, 40);
+        MUI_PushColumnLayout(&ui, rect, 15);
+        {
+            if(MUI_ButtonA(&ui,GEN_MUI_ID(), "Play"))
+            {
+                quitMainMenu = true;
+                *gameMode = GAME_PLAY;
+            }
+            
+            if(MUI_ButtonA(&ui,GEN_MUI_ID(), "Credits"))
+            {
+                quitMainMenu = true;
+                *gameMode = GAME_CREDITS;
+            }
+            
+            if(MUI_ButtonA(&ui,GEN_MUI_ID(), "Quit"))
+            {
+                quitMainMenu = true;
+                *gameMode = GAME_EXIT;
+            }
+        }
+        
+        MUI_PopLayout(&ui);
+        
+        SDL_SetRenderDrawColor(renderer, 34, 177, 76, 0);
+        SDL_RenderClear(renderer);
+        
+        MUI_EndFrame(&ui, renderer);
+        
+        SDL_RenderPresent(renderer);
     }
+}
+
+void ShowCredits(u32 *gameMode, SDL_Event *event, SDL_Renderer *renderer)
+{
+    ui.fontFile = AGOESTOESAN_FONT_FILE;
     
-    return tagName;
+    bool quitCredits = false;
+    while(!quitCredits)
+    {
+        while(SDL_PollEvent(event))
+        {
+            switch(event->type)
+            {
+				case SDL_QUIT:
+                quitCredits = true;
+                *gameMode = GAME_EXIT;
+                break;
+            }
+            MUI_GetInput(&uiInput, event);
+        }
+        
+        MUI_BeginFrame(&ui, &uiInput);
+        
+        //game credits
+        MUI_Rect gameCreditRect = ME_RectInit(SCREEN_WIDTH / 2, 300, 100, 30);
+        MUI_Text(&ui, GEN_MUI_ID(), gameCreditRect, "Developed by LoneCoder", 30);
+        
+        //go back to menu button
+		MUI_Rect rect = ME_RectInit(1280 / 2, 600, 300, 40);
+        if(MUI_Button(&ui, GEN_MUI_ID(),"Go Back To Main Menu", rect))
+        {
+            quitCredits = true;
+            *gameMode = GAME_MAIN_MENU;
+        }
+        
+        SDL_SetRenderDrawColor(renderer, 100, 100, 200, 0);
+        SDL_RenderClear(renderer);
+        MUI_EndFrame(&ui, renderer);
+        SDL_RenderPresent(renderer);
+    }
 }
 
 void HandleEvent(SDL_Event *event)
@@ -50,13 +127,17 @@ void HandleEvent(SDL_Event *event)
     PlayerInputSystem(&ecsWorld.input, event);
 }
 
-void GameUpdateAndRender(float deltaTime, SDL_Renderer *renderer)
+void GameUpdateAndRender(f32 deltaTime, SDL_Renderer *renderer)
 {
     MUI_BeginFrame(&ui, &uiInput);
     
     sprintf(entityCountString, "ENTITY_COUNT : %d", ecsWorld.activeEntityCount);
-    MUI_Rect textRect = {120, 20, 120, 30};
+    MUI_Rect textRect = ME_RectInit(120, 20, 120, 300);
     MUI_Text(&ui, GEN_MUI_ID(), textRect, entityCountString, 14);
+    
+    sprintf(scoreText, "SCORE : %d", score);
+    MUI_Rect scoreTextRect = ME_RectInit(400, 20, 120, 30);
+    MUI_Text(&ui, GEN_MUI_ID(), scoreTextRect, scoreText, 14);
     
     PhysicsSystem(&ecsWorld, gravity, 0.016f);
     
@@ -94,25 +175,22 @@ void GameUpdateAndRender(float deltaTime, SDL_Renderer *renderer)
                     EnemyPatrolSystem(&ecsWorld.transforms[i],
 									  &ecsWorld.stat[i],
 									  &ecsWorld.animations[i],
-									  deltaTime);
+                                      deltaTime);
                     
-                    //enemy health bar
                     Vector2 pos = ecsWorld.transforms[i].position;
-                    MUI_Rect rect = {pos.x, pos.y - 50, 60, 5};
+                    MUI_Rect rect = ME_RectInit(pos.x, pos.y - 50, 60, 8);
                     ecsWorld.stat[i].EnemyStat.health = MUI_Slider(&ui, GEN_MUI_IDi(i), ecsWorld.stat[i].EnemyStat.health, rect);
                 }
                 
-                if(ecsWorld.physics[i].collided)
+                if(ecsWorld.physics[i].collided && ecsWorld.physics[i].tagOfCollidedEntity == ENTITY_TAG_BULLET)
                 {
-                    if(ecsWorld.physics[i].tagOfCollidedEntity == ENTITY_TAG_BULLET)
-                    {
-                        ecsWorld.stat[i].EnemyStat.health -= 0.2f;
-                    }
+                    ecsWorld.stat[i].EnemyStat.health -= 0.5f;
                 }
                 
                 if(ecsWorld.stat[i].EnemyStat.health < 0.1)
                 {
                     ecsWorld.entityDeathFlag[i] = true;
+                    score += 10;
                 }
                 break;
                 
@@ -148,36 +226,37 @@ void GameUpdateAndRender(float deltaTime, SDL_Renderer *renderer)
                                               RenderSystemSignature))
                 {
                     RenderSystem(&ecsWorld.transforms[i],
-								 &ecsWorld.animations[i],
-								 &ecsWorld.renders[i],
-								 renderer);
+                                 &ecsWorld.animations[i],
+                                 &ecsWorld.renders[i],
+                                 renderer);
                 }
                 else if(MECS_EntitySignatureEquals(ecsWorld.entitySignature[i],
                                                    TRANSFORM_COMPONENT_SIGN |
                                                    RENDER_COMPONENT_SIGN))
                 {
                     RenderSystemSimple(&ecsWorld.transforms[i],
-									   &ecsWorld.renders[i],
-									   renderer);
+                                       &ecsWorld.renders[i],
+                                       renderer);
                 }
                 
 #if 0
-                //Drawing collision rect for debug
+                //NOTE(abhicv): Drawing collision rect for debug
                 if(MECS_EntitySignatureEquals(ecsWorld.entitySignature[i],
-											  PHYSICS_COMPONENT_SIGN))
+                                              PHYSICS_COMPONENT_SIGN))
                 {
-                    SDL_Color c = {255, 255, 255, 0};
+                    SDL_Color color = {255, 255, 255, 0};
                     SDL_Rect rect = {0};
                     CollisionRect cRect = ecsWorld.physics[i].physicsBody.rect;
                     rect.x = cRect.x - cRect.width / 2;
                     rect.y = cRect.y - cRect.height / 2;
                     rect.w = cRect.width;
                     rect.h = cRect.height;
-                    ME_RenderDrawRect(renderer, &rect, c);
+                    ME_RenderDrawRect(renderer, &rect, color);
                 }
 #endif
             }
         }
+        
         MUI_EndFrame(&ui, renderer);
     }
 }
@@ -205,6 +284,7 @@ void LoadEntity(SDL_Renderer *renderer, const char *fileName)
             switch (entityTag)
             {
                 case ENTITY_TAG_PLAYER:
+                
                 transform.position = Vector2Init((f32)x, (f32)y);
                 
                 render.texture = IMG_LoadTexture(renderer, "assets/Sprites/Player.png");
@@ -244,7 +324,9 @@ void LoadEntity(SDL_Renderer *renderer, const char *fileName)
                 }
                 
                 break;
+                
                 case ENTITY_TAG_LIZARD:
+                
                 lizardTransform.position = Vector2Init((f32)x, (f32)y);
                 
                 lizardAnimation.animations[Idle] = lizardIdleAnim;
@@ -292,6 +374,7 @@ void LoadEntity(SDL_Renderer *renderer, const char *fileName)
     }
 }
 
+//NOTE(abhicv): Loading tilemap as a texture
 SDL_Texture *LoadTileMapTexture(SDL_Renderer *renderer, const char *fileName)
 {
     TileMap tileMap = ME_LoadTileMap(fileName);
@@ -330,23 +413,33 @@ SDL_Texture *LoadTileMapTexture(SDL_Renderer *renderer, const char *fileName)
 
 void LoadData(SDL_Renderer *renderer)
 {
-    ecsWorld.activeEntityCount = 0;
-    
-    SDL_DestroyTexture(tileMapTexture);
-    tileMapTexture = NULL;
-    
     ui.fontFile = AGOESTOESAN_FONT_FILE;
     
-    LoadEntity(renderer, "data/level.emap");
-    tileMapTexture = LoadTileMapTexture(renderer, "data/level.tmap");
+    //cleaning while reloading
+    {
+        ecsWorld.activeEntityCount = 0;
+        SDL_DestroyTexture(tileMapTexture);
+        tileMapTexture = NULL;
+        
+        u32 n = 0;
+        for(n = 0; n < ecsWorld.activeEntityCount; n++)
+        {
+            SDL_DestroyTexture(ecsWorld.renders[n].texture);
+            ecsWorld.renders[n].texture = NULL;
+        }
+    }
     
-    //platform
+    LoadEntity(renderer, "data/levels/level.emap");
+    
+    tileMapTexture = LoadTileMapTexture(renderer, "data/levels/level.tmap");
+    
+    //platforms
     {
         TransformComponent transform = {0};
         RenderComponent render = {0};
         PhysicsComponent physics = {0};
         
-        FILE *colMapFile = fopen("data/level.cmap", "r");
+        FILE *colMapFile = fopen("data/levels/level.cmap", "r");
         if(colMapFile != NULL)
         {
             u32 platformCount = 0;
@@ -358,12 +451,11 @@ void LoadData(SDL_Renderer *renderer)
                 Entity platform = MECS_CreateEntity(&ecsWorld, ENTITY_TAG_PLATFORM);
                 if (platform < MAX_ENTITY_COUNT)
                 {
-                    ecsWorld.entitySignature[platform] = TRANSFORM_COMPONENT_SIGN |
-                        PHYSICS_COMPONENT_SIGN;
+                    ecsWorld.entitySignature[platform] = TRANSFORM_COMPONENT_SIGN | PHYSICS_COMPONENT_SIGN;
                     
-                    i32 x = 0; 
+                    i32 x = 0;
                     i32 y = 0;
-                    u32 w = 0; 
+                    u32 w = 0;
                     u32 h = 0;
                     
                     fscanf(colMapFile, "c:%d,%d,%d,%d\n", &x, &y, &w, &h);
@@ -373,10 +465,7 @@ void LoadData(SDL_Renderer *renderer)
                     render.height = h;
                     render.texture = NULL;
                     
-                    physics.physicsBody = CreatePhysicsBody(transform.position,
-                                                            0.0f,
-                                                            render.width,
-                                                            render.height);
+                    physics.physicsBody = CreatePhysicsBody(transform.position, 0.0f, render.width, render.height);
                     physics.physicsBody.restitution = 0.0f;
                     physics.physicsBody.affectedByGravity = false;
                     physics.excludeEntityTag = ENTITY_TAG_NONE;

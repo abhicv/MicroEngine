@@ -3,7 +3,8 @@
 void PrintBinary(unsigned int integer)
 {
     int i = 8 * sizeof(integer);
-    while(i--) {
+    while(i--) 
+    {
         putchar('0' + ((integer >> i) & 1)); 
     }
     putchar('\n');
@@ -27,7 +28,7 @@ SDL_Color ME_HexToSdlColor(ME_Color color)
     sdlColor.g = (color >> 8) & 0xFF;
     sdlColor.b = color & 0xFF;
     sdlColor.a = 255;
-
+    
     return sdlColor;
 }
 

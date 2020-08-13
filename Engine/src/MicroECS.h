@@ -132,11 +132,11 @@ typedef struct EntityStatComponent
 } EntityStatComponent;
 
 //NOTE(lonecoder): component signature
-#define TRANSFORM_COMPONENT_SIGN  (1 << 0)
-#define RENDER_COMPONENT_SIGN (1 << 1)
-#define ANIMATION_COMPONENT_SIGN (1 << 2)
-#define PHYSICS_COMPONENT_SIGN (1 << 3)
-#define ENTITYSTAT_COMPONENT_SIGN (1 << 4)
+#define TRANSFORM_COMPONENT_SIGN   (1 << 0)
+#define RENDER_COMPONENT_SIGN      (1 << 1)
+#define ANIMATION_COMPONENT_SIGN   (1 << 2)
+#define PHYSICS_COMPONENT_SIGN     (1 << 3)
+#define ENTITYSTAT_COMPONENT_SIGN  (1 << 4)
 
 //NOTE(lonecoder): System Signatures
 global u32 AnimationSystemSignature = ANIMATION_COMPONENT_SIGN;
@@ -167,8 +167,8 @@ enum Entitytag
     ENTITY_TAG_PLAYER =   (1 << 0),   //1
     ENTITY_TAG_BULLET =   (1 << 1),   //2
     ENTITY_TAG_LIZARD =   (1 << 2),   //4
-    ENTITY_TAG_PLATFORM = (1 << 3), //8
-    ENTITY_TAG_NONE =     (1 << 4),     //16
+    ENTITY_TAG_PLATFORM = (1 << 3),   //8
+    ENTITY_TAG_NONE =     (1 << 4),   //16
 };
 
 #endif

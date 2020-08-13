@@ -171,7 +171,6 @@ void QueryLevelDataFromCli(void)
 void RenderTileSheetDisplay(SDL_Renderer *renderer)
 {
     SDL_RenderCopy(renderer, tileSheetDisplay.displayTexture, NULL, &tileSheetDisplay.displayRect);
-    
     SDL_Color color = {255, 255, 0, 0};
     ME_RenderDrawRect(renderer, &tileSheetDisplay.tileSheetCursor, color);
 }
@@ -271,7 +270,6 @@ void WriteTileMapDataToFile(TileMap *tileMap, const char *fileName)
     FILE *tileMapFile = fopen(fileName, "w");
     
     //header for tile map file
-    fprintf(tileMapFile, "//Tile Map description file created by MicroEditor\n");
     fprintf(tileMapFile, "w:%d\n", tileMap->tileMapWidth);
     fprintf(tileMapFile, "h:%d\n", tileMap->tileMapHeight);
     fprintf(tileMapFile, "tw:%d\n", tileMap->tileWidth);

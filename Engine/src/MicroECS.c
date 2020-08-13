@@ -14,7 +14,7 @@ bool IsEntityDead(u32 index, MicroECSWorld *world)
 
 u32 MECS_CreateEntity(MicroECSWorld *world, u32 tag)
 {
-    //finding an already dead entity index
+    //NOTE(abhicv): finding an already dead entity index
     u32 i = 0;
     for(i = 0; i < world->activeEntityCount; i++)
     {
@@ -64,28 +64,6 @@ TransformComponent CreateTransformComponent(Vector2 position, Vector2 size, f32 
     return transform;
 }
 
-void MECS_GetAllEntityWithTag(const MicroECSWorld *world, u32 tag, u32 entityIndexArray[10])
-{
-    int i = 0;
-    int index = 0;
-    
-    //index MAX_ENTITY_COUNT is invalid
-    entityIndexArray[index] = MAX_ENTITY_COUNT;
-    
-    for(i = 0; i < world->activeEntityCount; i++)
-    {
-        if(world->tags[i] == tag)
-        {
-            entityIndexArray[index] = i;
-            index++;
-        }
-    }
-    
-    //to check for end of array
-    entityIndexArray[index] = MAX_ENTITY_COUNT;
-}
-
-//Systems
 void PlayerInputSystem(InputComponent *input, SDL_Event *event)
 {
     switch (event->type)
@@ -160,7 +138,7 @@ void PlayerInputSystem(InputComponent *input, SDL_Event *event)
 }
 
 #define PLAYER_MAX_SPEED_X 100.0f
-#define PLAYER_JUMP_SPEED 100.0f
+#define PLAYER_JUMP_SPEED 200.0f
 
 void PlayerControlSystem(TransformComponent *transform,
                          AnimationComponent *animation,
@@ -193,6 +171,7 @@ void PlayerControlSystem(TransformComponent *transform,
         animation->animations[Jump].flip = animation->animations[Walking].flip;
         animation->currentAnimationIndex = Jump;
         physics->physicsBody.velocity.y = -PLAYER_JUMP_SPEED;
+        //input->jumpKeyDown = false;
     }
     
     if(input->leftCtrlKeyHeld)
@@ -282,7 +261,7 @@ void PhysicsSystem(MicroECSWorld *ecsWorld, Vector2 gravity ,f32 deltaTime)
     u32 i = 0;
     u32 j = 0;
     
-    //NOTE(lc): Resetting all physics info
+    //NOTE(abhicv): Resetting all physics info
     for(i = 0; i < ecsWorld->activeEntityCount; i++)
     {
         if(MECS_EntitySignatureEquals(ecsWorld->entitySignature[i], PhysicsSystemSignature))
@@ -291,6 +270,7 @@ void PhysicsSystem(MicroECSWorld *ecsWorld, Vector2 gravity ,f32 deltaTime)
             ecsWorld->physics[i].physicsBody.rect.y = ecsWorld->transforms[i].position.y;
             ecsWorld->physics[i].physicsBody.position = ecsWorld->transforms[i].position;
             ecsWorld->physics[i].collided = false;
+            ecsWorld->physics[i].tagOfCollidedEntity = ENTITY_TAG_NONE;
             // ecsWorld->physics[i].isGrounded = false;
         }
     }
@@ -303,7 +283,7 @@ void PhysicsSystem(MicroECSWorld *ecsWorld, Vector2 gravity ,f32 deltaTime)
                MECS_EntitySignatureEquals(ecsWorld->entitySignature[j], PhysicsSystemSignature) &&
                !IsEntityDead(i, ecsWorld) && !IsEntityDead(j, ecsWorld))
             {
-                //NOTE(lc): avoiding entity in exclude entity tag
+                //NOTE(abhicv): avoiding entity in exclude entity tag
                 if(!MECS_EntitySignatureEquals(ecsWorld->physics[i].excludeEntityTag, ecsWorld->tags[j]) &&
                    !MECS_EntitySignatureEquals(ecsWorld->physics[j].excludeEntityTag, ecsWorld->tags[i]))
                 {
@@ -327,7 +307,7 @@ void PhysicsSystem(MicroECSWorld *ecsWorld, Vector2 gravity ,f32 deltaTime)
         }
     }
     
-    //NOTE(lonecoder): Applying all position changes based on physics calculations
+    //NOTE(abhicv): Applying all position changes based on physics calculations
     for(i = 0; i < ecsWorld->activeEntityCount; i++)
     {
         if(MECS_EntitySignatureEquals(ecsWorld->entitySignature[i], PhysicsSystemSignature))
@@ -350,8 +330,6 @@ void FiringSystem(MicroECSWorld *ecsWorld,
     if(input->leftCtrlKeyDown)
     {
         Entity bullet = MECS_CreateEntity(ecsWorld, ENTITY_TAG_BULLET);
-        
-        //printf("b : %d\n", bullet);
         
         if(ENTITY_INDEX_VALID(bullet))
         {
@@ -431,6 +409,7 @@ void RenderSystem(TransformComponent *transformComponent,
     }
 }
 
+//NOTE(abhicv): simple rendering for entity without animation compontent
 void RenderSystemSimple(TransformComponent *transformComponent,
                         RenderComponent *renderComponent,
                         SDL_Renderer *renderer)
