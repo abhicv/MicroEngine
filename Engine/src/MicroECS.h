@@ -8,7 +8,7 @@
 
 #include <SDL2/SDL.h>
 
-#define MAX_ENTITY_COUNT 50
+#define MAX_ENTITY_COUNT 100
 #define INVALID_ENTITY_INDEX MAX_ENTITY_COUNT
 #define ENTITY_INDEX_VALID(index) index < MAX_ENTITY_COUNT
 
@@ -36,7 +36,7 @@ enum Direction
     Left,
 };
 
-//NOTE(lonecoder): Used for indexing animations in animation component
+//NOTE(abhicv): Used for indexing animations in animation component
 enum AnimationState
 {
     Idle,
@@ -47,7 +47,7 @@ enum AnimationState
     AnimationStateCount,
 };
 
-//NOTE(lonecoder): Max number of frames an animation can have(subject to change depending on needs)
+//NOTE(abhicv): Max number of frames an animation can have(subject to change depending on needs)
 #define MAX_FRAME_COUNT 10
 
 typedef struct AnimationFrame
@@ -69,11 +69,11 @@ typedef struct Animation
 
 typedef struct AnimationComponent
 {
-    //NOTE(lonecoder): order of animations is important(should follow the order of AnimationState enum)
+    //NOTE(abhicv): order of animations is important(should follow the order of AnimationState enum)
     Animation animations[AnimationStateCount];
     u32 currentAnimationIndex;
     
-    //NOTE(lonecoder): unit in pixels from sprite sheet
+    //NOTE(abhicv): unit in pixels from sprite sheet
     u32 width;
     u32 height;
     
@@ -90,7 +90,7 @@ typedef struct PhysicsComponent
     
 } PhysicsComponent;
 
-//NOTE(lonecoder): all key map needed for the game control
+//NOTE(abhicv): all key map needed for the game control
 typedef struct InputComponent
 {
     bool upKeyDown;
@@ -98,6 +98,7 @@ typedef struct InputComponent
     bool leftKeyDown;
     bool rightKeyDown;
     bool jumpKeyDown;
+    bool jumpKeyHeld;
     
     bool leftCtrlKeyDown;
     bool leftCtrlKeyHeld;
@@ -107,7 +108,7 @@ typedef struct InputComponent
     
 } InputComponent;
 
-//NOTE(lonecoder): stats specifically for the game
+//NOTE(abhicv): stats specifically for the game
 typedef struct EntityStatComponent
 {
     union
@@ -127,48 +128,58 @@ typedef struct EntityStatComponent
             bool moveRight;
             
         } EnemyStat;
+        
+        struct 
+        {
+            Vector2 startPosition;
+            
+        } BulletStat;
     };
     
 } EntityStatComponent;
 
-//NOTE(lonecoder): component signature
+//NOTE(abhicv): component signature
 #define TRANSFORM_COMPONENT_SIGN   (1 << 0)
 #define RENDER_COMPONENT_SIGN      (1 << 1)
 #define ANIMATION_COMPONENT_SIGN   (1 << 2)
 #define PHYSICS_COMPONENT_SIGN     (1 << 3)
 #define ENTITYSTAT_COMPONENT_SIGN  (1 << 4)
 
-//NOTE(lonecoder): System Signatures
+//NOTE(abhicv): System Signatures
 global u32 AnimationSystemSignature = ANIMATION_COMPONENT_SIGN;
 global u32 RenderSystemSignature = TRANSFORM_COMPONENT_SIGN | ANIMATION_COMPONENT_SIGN | RENDER_COMPONENT_SIGN;
 global u32 PhysicsSystemSignature = TRANSFORM_COMPONENT_SIGN | PHYSICS_COMPONENT_SIGN;
 
-//NOTE(lonecoder): all components used in the game is owned by this struct
+//NOTE(abhicv): all components used in the game is owned by this struct
 typedef struct MicroECSWorld
 {
-    TransformComponent transforms[MAX_ENTITY_COUNT];  //0
-    RenderComponent renders[MAX_ENTITY_COUNT];        //1
-    AnimationComponent animations[MAX_ENTITY_COUNT];  //2
-    PhysicsComponent physics[MAX_ENTITY_COUNT];       //3
-    EntityStatComponent stat[MAX_ENTITY_COUNT];       //4
+    TransformComponent transforms[MAX_ENTITY_COUNT];  
+    RenderComponent renders[MAX_ENTITY_COUNT];        
+    AnimationComponent animations[MAX_ENTITY_COUNT];  
+    PhysicsComponent physics[MAX_ENTITY_COUNT];       
+    EntityStatComponent stat[MAX_ENTITY_COUNT];       
     
     u32 entitySignature[MAX_ENTITY_COUNT];
     u32 tags[MAX_ENTITY_COUNT];
     bool entityDeathFlag[MAX_ENTITY_COUNT];
     
-    u32 activeEntityCount; //number of currently active entities created
+    u32 activeEntityCount; 
     
-    InputComponent input; //input only for main player
+    InputComponent input; 
     
 } MicroECSWorld;
 
-enum Entitytag
+enum EntityTag
 {
-    ENTITY_TAG_PLAYER =   (1 << 0),   //1
-    ENTITY_TAG_BULLET =   (1 << 1),   //2
-    ENTITY_TAG_LIZARD =   (1 << 2),   //4
-    ENTITY_TAG_PLATFORM = (1 << 3),   //8
-    ENTITY_TAG_NONE =     (1 << 4),   //16
+    ENTITY_TAG_PLAYER =   (1 << 0),
+    ENTITY_TAG_LIZARD =   (1 << 1),  
+    ENTITY_TAG_SLIME =    (1 << 2),
+    ENTITY_TAG_COIN =     (1 << 3),
+    ENTITY_TAG_FLYEE =    (1 << 4),
+    
+    ENTITY_TAG_NONE =     (1 << 5),   
+    ENTITY_TAG_PLATFORM = (1 << 6),   
+    ENTITY_TAG_BULLET =   (1 << 7),
 };
 
-#endif
+#endif //MICROECS_H

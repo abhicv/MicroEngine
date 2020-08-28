@@ -45,16 +45,17 @@ void MUI_EndFrame(MUI *ui, SDL_Renderer *renderer)
     {
         switch (ui->widgets[i].widgetType)
         {
-			case MUI_WIDGET_button:
+			case MUI_WIDGET_BUTTON:
             
-            color.r = -20 * (!!MUI_IdEqual(ui->hotWidgetId, ui->widgets[i].id)) + 70 - (!!MUI_IdEqual(ui->activeWidgetId, ui->widgets[i].id)) * 20;
-            color.g = color.r;
-            color.b = color.r;
+            bool highlighted = MUI_IdEqual(ui->hotWidgetId, ui->widgets[i].id);
+            color.r = highlighted ? ui->widgets[i].style.buttonStyle.highlightColor.r : ui->widgets[i].style.buttonStyle.idleColor.r;
+            color.g = highlighted ? ui->widgets[i].style.buttonStyle.highlightColor.g : ui->widgets[i].style.buttonStyle.idleColor.g;
+            color.b = highlighted ? ui->widgets[i].style.buttonStyle.highlightColor.b : ui->widgets[i].style.buttonStyle.idleColor.b;
             
             rect = MUI_RectToSDL_Rect(&ui->widgets[i].rect);
             ME_RenderFillRect(renderer, &rect, color);
             
-            if(!!MUI_IdEqual(ui->hotWidgetId, ui->widgets[i].id))
+            if(MUI_IdEqual(ui->hotWidgetId, ui->widgets[i].id))
             {
                 SDL_Color borderColor = {255, 255, 255, 255};
                 ME_RenderDrawRect(renderer, &rect, borderColor);
@@ -62,20 +63,20 @@ void MUI_EndFrame(MUI *ui, SDL_Renderer *renderer)
             
             break;
             
-			case MUI_WIDGET_slider:
+            case MUI_WIDGET_SLIDER:
             
             //bg rect
-            color.r = 255;
-            color.g = 255;
-            color.b = 255;
+            color.r = ui->widgets[i].style.sliderStyle.bgColor.r;
+            color.g = ui->widgets[i].style.sliderStyle.bgColor.g;
+            color.b = ui->widgets[i].style.sliderStyle.bgColor.b;
             
             rect = MUI_RectToSDL_Rect(&ui->widgets[i].rect);
             ME_RenderFillRect(renderer, &rect, color);
             
             //sliding rect
-            color.r = -10 * (!!MUI_IdEqual(ui->hotWidgetId, ui->widgets[i].id)) + 200;
-            color.g = 0;
-            color.b = 0;
+            color.r = ui->widgets[i].style.sliderStyle.sliderColor.r;
+            color.g = ui->widgets[i].style.sliderStyle.sliderColor.g;
+            color.b = ui->widgets[i].style.sliderStyle.sliderColor.b;
             
             SDL_Rect slideRect = rect;
             slideRect.w = (f32)rect.w * ui->widgets[i].slider.value;
@@ -83,7 +84,11 @@ void MUI_EndFrame(MUI *ui, SDL_Renderer *renderer)
             
             break;
             
-			case MUI_Widget_text:
+            case MUI_WIDGET_TEXT:
+            
+            textColor.r = ui->widgets[i].style.textStyle.textColor.r;
+            textColor.g = ui->widgets[i].style.textStyle.textColor.g;
+            textColor.b = ui->widgets[i].style.textStyle.textColor.b;
             
             if (ui->fontFile != NULL)
             {
@@ -117,65 +122,23 @@ void MUI_EndFrame(MUI *ui, SDL_Renderer *renderer)
             
             break;
             
-            case MUI_Widget_textbox:
-            
-            if (ui->fontFile != NULL)
-            {
-                font = TTF_OpenFont(ui->fontFile, ui->widgets[i].text.fontSize);
-            }
-            
-            if (font != NULL)
-            {
-                surface = TTF_RenderText_Blended(font, ui->widgets[i].text.text, textColor);
-            }
-            
-            if (surface != NULL)
-            {
-                tex = SDL_CreateTextureFromSurface(renderer, surface);
-            }
-            
-            rect = MUI_RectToSDL_Rect(&ui->widgets[i].rect);
-            
-            SDL_Rect textRect = {0};
-            SDL_QueryTexture(tex, NULL, NULL, &textRect.w, &textRect.h);
-            
-            rect = MUI_RectToSDL_Rect(&ui->widgets[i].rect);
-            
-            textRect.x = rect.x + 4;
-            textRect.y = rect.y + 4;
-            
-            rect.w = textRect.w + 4;
-            rect.h = textRect.h + 4;
-            
-            ME_RenderFillRect(renderer, &rect, color);
-            
-            if (tex != NULL && renderer != NULL)
-            {
-                SDL_RenderCopy(renderer, tex, NULL, &textRect);
-            }
-            
-            SDL_DestroyTexture(tex);
-            SDL_FreeSurface(surface);
-            TTF_CloseFont(font);
-            
-            break;
-            
             default:
             break;
         }
     }
 }
 
-void MUI_Text(MUI *ui, MUI_Id id, MUI_Rect rect, char *text, u32 fontSize)
+void MUI_Text(MUI *ui, MUI_Id id, MUI_Rect rect, char *text, u32 fontSize, MUI_Style style)
 {
     if(ui->widgetCount < MUI_MAX_WIDGETS)
     {
         MUI_Widget *widget = ui->widgets + ui->widgetCount++;
-        widget->widgetType = MUI_Widget_text;
+        widget->widgetType = MUI_WIDGET_TEXT;
         widget->id = id;
         widget->text.text = text;
         widget->text.fontSize = fontSize;
         widget->rect = rect;
+        widget->style = style;
     }
     else
     {
@@ -183,29 +146,12 @@ void MUI_Text(MUI *ui, MUI_Id id, MUI_Rect rect, char *text, u32 fontSize)
     }
 }
 
-void MUI_TextA(MUI *ui, MUI_Id id, char *text, u32 fontSize)
+void MUI_TextA(MUI *ui, MUI_Id id, char *text, u32 fontSize, MUI_Style style)
 {
-    MUI_Text(ui, id, MUI_GetNextAutoLayoutRect(ui), text, fontSize);
+    MUI_Text(ui, id, MUI_GetNextAutoLayoutRect(ui), text, fontSize, style);
 }
 
-void MUI_TextBox(MUI *ui, MUI_Id id, MUI_Rect rect, char *text, u32 fontSize)
-{
-    if(ui->widgetCount < MUI_MAX_WIDGETS)
-    {
-        MUI_Widget *widget = ui->widgets + ui->widgetCount++;
-        widget->widgetType = MUI_Widget_textbox;
-        widget->id = id;
-        widget->text.text = text;
-        widget->text.fontSize = fontSize;
-        widget->rect = rect;
-    }
-    else
-    {
-		printf("UI widget count out of bound\n");
-    }
-}
-
-bool MUI_Button(MUI *ui, MUI_Id id, char *text, MUI_Rect rect)
+bool MUI_Button(MUI *ui, MUI_Id id, char *text, MUI_Rect rect, MUI_Style style)
 {
     bool isTriggered = false;
     
@@ -254,25 +200,32 @@ bool MUI_Button(MUI *ui, MUI_Id id, char *text, MUI_Rect rect)
     {
         MUI_Widget *widget = ui->widgets + ui->widgetCount++;
         widget->id = id;
-        widget->widgetType = MUI_WIDGET_button;
+        widget->widgetType = MUI_WIDGET_BUTTON;
         widget->rect = rect;
+        widget->style = style;
     }
     else
     {
-        printf("UI widget count out of bound\n");
+        printf("MUI widget count out of bound\n");
     }
     
-    MUI_Text(ui, MUI_IdInit(id.primary - 10, id.secondary + 10), rect, text, 14);
+    MUI_Style textStyle = {
+        .textStyle = {
+            .textColor = style.buttonStyle.textColor,
+        },
+    };
+    
+    MUI_Text(ui, MUI_IdInit(id.primary - 10, id.secondary + 10), rect, text, style.buttonStyle.fontSize, textStyle);
     
     return isTriggered;
 }
 
-bool MUI_ButtonA(MUI *ui, MUI_Id id, char *text)
+bool MUI_ButtonA(MUI *ui, MUI_Id id, char *text, MUI_Style style)
 {
-    return MUI_Button(ui, id, text, MUI_GetNextAutoLayoutRect(ui));
+    return MUI_Button(ui, id, text, MUI_GetNextAutoLayoutRect(ui), style);
 }
 
-f32 MUI_Slider(MUI *ui, MUI_Id id, f32 value, MUI_Rect rect)
+f32 MUI_Slider(MUI *ui, MUI_Id id, f32 value, MUI_Rect rect, MUI_Style style)
 {
     u32 left = rect.x - rect.width / 2;
     u32 right = rect.x + rect.width / 2;
@@ -326,9 +279,10 @@ f32 MUI_Slider(MUI *ui, MUI_Id id, f32 value, MUI_Rect rect)
     {
         MUI_Widget *widget = ui->widgets + ui->widgetCount++;
         widget->id = id;
-        widget->widgetType = MUI_WIDGET_slider;
+        widget->widgetType = MUI_WIDGET_SLIDER;
         widget->rect = rect;
         widget->slider.value = value;
+        widget->style = style;
     }
     else
     {
@@ -338,9 +292,9 @@ f32 MUI_Slider(MUI *ui, MUI_Id id, f32 value, MUI_Rect rect)
     return value;
 }
 
-f32 MUI_SliderA(MUI *ui, MUI_Id id, f32 value)
+f32 MUI_SliderA(MUI *ui, MUI_Id id, f32 value, MUI_Style style)
 {
-    return MUI_Slider(ui, id, value, MUI_GetNextAutoLayoutRect(ui));
+    return MUI_Slider(ui, id, value, MUI_GetNextAutoLayoutRect(ui), style);
 }
 
 SDL_Rect MUI_RectToSDL_Rect(MUI_Rect *rect)

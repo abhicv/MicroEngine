@@ -7,15 +7,12 @@
 #include "MicroUI.c"
 #include "MicroECS.c"
 #include "MicroPhysics.c"
+#include "ME_Audio.c"
 #include "ME_Rect.c"
 #include "ME_TileMap.c"
 
 #include "ME_debug.h"
 #include "types.h"
-
-//NOTE(abhicv): for performance visualisation
-global MUI uiPerf = {0};
-global char fpsString[10] = "fpsText";
 
 ME_Game ME_CreateGame(char *gameTitle, u32 windowWidth, u32 windowHeight)
 {
@@ -97,14 +94,9 @@ void ME_RunGame(ME_Game *game, bool showSplashScreen)
         SDL_Delay(1000);
     }
     
-    uiPerf.fontFile = AGOESTOESAN_FONT_FILE;
-    MUI_Rect rect = {60, 15, 120, 30};
     
     while (game->isRunning)
     {
-        MUI_BeginFrame(&uiPerf, NULL);
-        MUI_Text(&uiPerf, MUI_IdInit(__LINE__, 100), rect, fpsString, 15);
-        
         startTime = SDL_GetPerformanceCounter();
         
         while (SDL_PollEvent(&game->platform.event))
@@ -141,8 +133,6 @@ void ME_RunGame(ME_Game *game, bool showSplashScreen)
         {
             game->render(renderer);
         }
-        
-        MUI_EndFrame(&uiPerf, renderer);
         
         SDL_RenderPresent(renderer);
         

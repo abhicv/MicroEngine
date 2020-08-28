@@ -1,44 +1,14 @@
+#include "MicroEditor.h"
+#include "File.c"
+#include "Render.c"
 #include "..\Engine\src\MicroEngine.c"
 
 const u32 displayWidth = 1500;
 const u32 displayHeight = 768;
 
-global ME_Game game;
-
-enum EditorMode
-{
-    EDITOR_MODE_TILE,
-    EDITOR_MODE_COLLISION_RECT,
-    EDITOR_MODE_ENTITY,
-    EDITOR_MODE_SELECT_TILE,
-};
-
-typedef struct EntitySpace
-{
-	SDL_Point entityPositions[MAX_ENTITY_COUNT];
-	SDL_Rect entityCursor;
-	u32 entityTag[MAX_ENTITY_COUNT];
-	u32 entityCount;
-	u32 currentEntityTag;
-    
-} EntitySpace;
-
-#define MAX_COLLISION_RECTS 100
-typedef struct CollisionSpace
-{
-    SDL_Rect collisionRects[MAX_COLLISION_RECTS];
-    SDL_Rect collisionCursor;
-    u32 rectCount;
-    
-} CollisionSpace;
-
-typedef struct TileSheetDisplaySpace
-{
-    SDL_Texture *displayTexture;
-    SDL_Rect displayRect;
-    SDL_Rect tileSheetCursor;
-    
-} TileSheetDisplaySpace;
+global SDL_Window *window;
+global SDL_Renderer *renderer;
+global SDL_Event event;
 
 #define MAX_FILE_NAME_SIZE 50
 global char tileMapFileName[MAX_FILE_NAME_SIZE] = "default.tmap";
@@ -47,35 +17,60 @@ global char entityMapFileName[MAX_FILE_NAME_SIZE] = "default.emap";
 
 global TileMap tileMap;
 global SDL_Rect tileMapCursor;
-
 global TileSheetDisplaySpace tileSheetDisplay;
 global CollisionSpace collisionSpace;
 global EntitySpace entitySpace;
+global SDL_Rect deleteCursor;
+global u32 editorMode = EDITOR_MODE_TILE;
+global u32 lastEditorMode = EDITOR_MODE_TILE;
 
 #define MUI_ORIGIN_ID 2020
 global MUI ui;
 global MUI_Input uiInput;
 
-u32 editorMode = EDITOR_MODE_TILE;
+//UI Style
+MUI_Style buttonStyle = {
+    .buttonStyle = {
+        .idleColor = {100, 100, 200},
+        .highlightColor = {50, 50, 100},
+        .textColor = {255, 255, 255},
+        .fontSize  = 13,
+    },
+};
+
+MUI_Style textStyle = {
+    .textStyle = {
+        .textColor = {255, 255, 255},
+    }
+};
 
 char *EditModeToString(u32 mode)
 {
-    char *modeString;
+    char *modeString = NULL;
     
     switch (mode)
     {
 		case EDITOR_MODE_TILE:
-        modeString = "Mode : Tile";
+        modeString = "Mode : Tile Edit";
         break;
         
 		case EDITOR_MODE_ENTITY:
-        modeString = "Mode : Entity";
+        modeString = "Mode : Entity Edit";
         break;
         
 		case EDITOR_MODE_COLLISION_RECT:
-        modeString = "Mode : Collision";
+        modeString = "Mode : Collision Edit";
+        break;
+        
+        case EDITOR_MODE_SELECT_TILE:
+        modeString = "Mode : Select tile";
+        break;
+        
+        case EDITOR_MODE_DELETE:
+        modeString = "Mode : Delete";
         break;
     }
+    
     return modeString;
 }
 
@@ -92,12 +87,22 @@ char *EntityTagToString(u32 tag)
 		case ENTITY_TAG_LIZARD:
 		tagString = "Lizard";
 		break;
+        
+        case ENTITY_TAG_SLIME:
+        tagString = "Slime";
+        break;
+        
+        case ENTITY_TAG_FLYEE:
+        tagString = "flyee";
+        break;
+        
+        case ENTITY_TAG_COIN:
+        tagString = "Coin";
+        break;
 	}
+    
 	return tagString;
 }
-
-CollisionSpace LoadCollisionMap(const char *fileName);
-EntitySpace LoadEntityMap(const char *fileName);
 
 void QueryLevelDataFromCli(void)
 {
@@ -144,7 +149,6 @@ void QueryLevelDataFromCli(void)
 								   tileHeight,
 								   tileSheetTileWidth,
 								   tileSheetTileHeight);
-        
 		break;
         
         case 2:
@@ -159,7 +163,6 @@ void QueryLevelDataFromCli(void)
 		printf("Enter entity map file name to load:");
 		scanf("%s", entityMapFileName);
 		entitySpace = LoadEntityMap(entityMapFileName);
-        
 		break;
         
         default:
@@ -168,38 +171,26 @@ void QueryLevelDataFromCli(void)
     }
 }
 
-void RenderTileSheetDisplay(SDL_Renderer *renderer)
-{
-    SDL_RenderCopy(renderer, tileSheetDisplay.displayTexture, NULL, &tileSheetDisplay.displayRect);
-    SDL_Color color = {255, 255, 0, 0};
-    ME_RenderDrawRect(renderer, &tileSheetDisplay.tileSheetCursor, color);
-}
-
 void RenderEditorSpace(SDL_Renderer *renderer)
 {
-    u32 i = 0;
-    u32 j = 0;
-    
-    SDL_Color color = {255, 255, 255, 255};
+    SDL_Color color = {50, 50, 50, 255};
     
     //drawing tile map grids
-    for(j = 0; j <= tileMap.tileMapHeight; j++)
+    for(u32 j = 0; j < tileMap.tileMapHeight; j++)
     {
-        for(i = 0; i <= tileMap.tileMapWidth; i++)
+        for(u32 i = 0; i < tileMap.tileMapWidth; i++)
         {
             i32 x = i * tileMap.tileWidth;
             i32 y = j * tileMap.tileHeight;
-            ME_RenderDrawPoint(renderer, x, y, color);
+            SDL_Rect rect = {x, y, tileMap.tileWidth, tileMap.tileHeight};
+            ME_RenderDrawRect(renderer, &rect, color);
         }
     }
     
-    u32 m = 0;
-    u32 n = 0;
-    
 	//rendering tiles
-    for(m = 0; m < (tileMapCursor.h / tileMap.tileHeight); m++)
+    for(u32 m = 0; m < (tileMapCursor.h / tileMap.tileHeight); m++)
     {
-        for(n = 0; n < (tileMapCursor.w / tileMap.tileWidth); n++)
+        for(u32 n = 0; n < (tileMapCursor.w / tileMap.tileWidth); n++)
         {
             u32 x = tileMapCursor.x + (tileMap.tileWidth * n);
             u32 y = tileMapCursor.y + (tileMap.tileHeight * m);
@@ -209,11 +200,13 @@ void RenderEditorSpace(SDL_Renderer *renderer)
             
             if(xIndex >= 0 && yIndex >= 0 && xIndex < tileMap.tileMapWidth && yIndex < tileMap.tileMapHeight)
             {
-                SDL_Rect srcRect = tileSheetDisplay.tileSheetCursor;
-                srcRect.x -= tileSheetDisplay.displayRect.x;
-                srcRect.y -= tileSheetDisplay.displayRect.y;
+                SDL_Rect srcRect = {0};
+                srcRect.x = tileSheetDisplay.tileSheetCursor.x - tileSheetDisplay.displayRect.x;
+                srcRect.y = tileSheetDisplay.tileSheetCursor.y - tileSheetDisplay.displayRect.y;
+                srcRect.w = tileSheetDisplay.tileSheetCursor.w;
+                srcRect.h = tileSheetDisplay.tileSheetCursor.h;
                 
-                SDL_Rect destRect;
+                SDL_Rect destRect = {0};
                 destRect.x = x;
                 destRect.y = y;
                 destRect.w = tileMap.tileWidth;
@@ -226,184 +219,36 @@ void RenderEditorSpace(SDL_Renderer *renderer)
     
     color.r = 255;
     color.g = 255;
-    color.b = 0;
+    color.b = 255;
     
     ME_RenderDrawRect(renderer, &tileMapCursor, color);
-}
-
-void RenderCollisionSpace(CollisionSpace *colSpace, SDL_Renderer *renderer)
-{
-    SDL_Color color = {255, 255, 255, 0};
-    SDL_Color cursorColor = {255, 0, 255, 0};
     
-    u32 i = 0;
-    for (i = 0; i < colSpace->rectCount; i++)
-    {
-        ME_RenderDrawRect(renderer, &colSpace->collisionRects[i], color);
-    }
-    
-    ME_RenderDrawRect(renderer, &colSpace->collisionCursor, cursorColor);
-}
-
-void RenderEntitySpace(EntitySpace *entitySpace, SDL_Renderer *renderer)
-{
-    SDL_Color color = {0, 255, 0, 0};
-    SDL_Color cursorColor = {0, 0, 255, 0};
-    
-    u32 i = 0;
-    for (i = 0; i < entitySpace->entityCount; i++)
-    {
-        SDL_Rect rect = tileMapCursor;
-        rect.x = entitySpace->entityPositions[i].x - entitySpace->entityCursor.w / 2;
-        rect.y = entitySpace->entityPositions[i].y - entitySpace->entityCursor.h / 2;
-        rect.w = 32;
-        rect.h = 32;
-        
-        ME_RenderDrawRect(renderer, &rect, color);
-    }
-    
-    ME_RenderDrawRect(renderer, &entitySpace->entityCursor, cursorColor);
-}
-
-void WriteTileMapDataToFile(TileMap *tileMap, const char *fileName)
-{
-    FILE *tileMapFile = fopen(fileName, "w");
-    
-    //header for tile map file
-    fprintf(tileMapFile, "w:%d\n", tileMap->tileMapWidth);
-    fprintf(tileMapFile, "h:%d\n", tileMap->tileMapHeight);
-    fprintf(tileMapFile, "tw:%d\n", tileMap->tileWidth);
-    fprintf(tileMapFile, "th:%d\n", tileMap->tileHeight);
-    fprintf(tileMapFile, "sw:%d\n", tileMap->tileSheetTileWidth);
-    fprintf(tileMapFile, "sh:%d\n", tileMap->tileSheetTileHeight);
-    
-    //writing tile data
-    u32 i = 0;
-    for (i = 0; i < tileMap->tileCount; i++)
-    {
-        fprintf(tileMapFile, "t:%d,%d,%d,%d\n",
-				tileMap->tiles[i].tileMapPosX,
-				tileMap->tiles[i].tileMapPosY,
-				tileMap->tiles[i].tileSheetPosX,
-				tileMap->tiles[i].tileSheetPosY);
-    }
-    
-    fclose(tileMapFile);
-}
-
-CollisionSpace LoadCollisionMap(const char *fileName)
-{
-    FILE *colMapFile = fopen(fileName, "r");
-    
-    CollisionSpace colSpace = {0};
-    u32 count = 0;
-    
-    if(colMapFile != NULL)
-    {
-        fscanf(colMapFile, "n:%d\n", &count);
-        
-        u32 i = 0;
-        for(i = 0; i < count; i++)
-        {
-            fscanf(colMapFile, "c:%d,%d,%d,%d\n",
-				   &colSpace.collisionRects[i].x,
-				   &colSpace.collisionRects[i].y,
-				   &colSpace.collisionRects[i].w,
-				   &colSpace.collisionRects[i].h);
-        }
-        colSpace.rectCount = count;
-        fclose(colMapFile);
-    }
-    
-    return colSpace;
-}
-
-void WriteCollisionDataToFile(CollisionSpace *colSpace, const char *fileName)
-{
-    if(colSpace->rectCount > 0)
-    {
-        FILE *colMapFile = fopen(fileName, "w");
-        fprintf(colMapFile, "n:%d\n", colSpace->rectCount);
-        
-        u32 i = 0;
-        for(i = 0; i < colSpace->rectCount; i++)
-        {
-            fprintf(colMapFile, "c:%d,%d,%d,%d\n",
-					colSpace->collisionRects[i].x,
-					colSpace->collisionRects[i].y,
-					colSpace->collisionRects[i].w,
-					colSpace->collisionRects[i].h);
-        }
-        fclose(colMapFile);
-    }
-}
-
-EntitySpace LoadEntityMap(const char *fileName)
-{
-	EntitySpace eSpace = {0};
-	FILE *entityFile = fopen(fileName, "r");
-    
-	if(entityFile != NULL)
-	{
-		u32 entityCount = 0;
-		fscanf(entityFile, "n:%d\n", &entityCount);
-        
-		u32 i = 0;
-		for(i = 0; i < entityCount; i++)
-		{
-			fscanf(entityFile, "e:%d,%d,%d\n",
-				   &eSpace.entityTag[i],
-				   &eSpace.entityPositions[i].x,
-				   &eSpace.entityPositions[i].y);
-		}
-        
-		eSpace.entityCount = entityCount;
-		fclose(entityFile);
-	}
-    
-	return eSpace;
-}
-
-void WriteEntityDataToFile(EntitySpace *entitySpace, const char *fileName)
-{
-	if(entitySpace->entityCount > 0)
-	{
-		FILE *entityFile = fopen(fileName, "w");
-		fprintf(entityFile, "n:%d\n", entitySpace->entityCount);
-        
-		u32 i = 0;
-		for(i = 0; i < entitySpace->entityCount; i++)
-		{
-			fprintf(entityFile, "e:%d,%d,%d\n",
-					entitySpace->entityTag[i],
-					entitySpace->entityPositions[i].x,
-					entitySpace->entityPositions[i].y);
-		}
-        
-		fclose(entityFile);
-	}
+    color.r = 0;
+    color.g = 255;
+    color.b = 0;
+    ME_RenderDrawRect(renderer, &deleteCursor, color);
 }
 
 void CursorMovementControl(SDL_Rect *cursor, u32 deltaStep, SDL_Event *event)
 {
     switch(event->type)
     {
-		case SDL_KEYDOWN:
+        case SDL_KEYDOWN:
         switch(event->key.keysym.sym)
         {
-			case SDLK_UP:
+            case SDLK_UP:
             cursor->y -= deltaStep;
             break;
             
-			case SDLK_DOWN:
+            case SDLK_DOWN:
             cursor->y += deltaStep;
             break;
             
-			case SDLK_LEFT:
+            case SDLK_LEFT:
             cursor->x -= deltaStep;
             break;
             
-			case SDLK_RIGHT:
+            case SDLK_RIGHT:
             cursor->x += deltaStep;
             break;
         }
@@ -414,88 +259,88 @@ void CursorSizeControl(SDL_Rect *cursor, u32 deltaSize, SDL_Event *event)
 {
     switch (event->type)
     {
-		case SDL_KEYDOWN:
+        case SDL_KEYDOWN:
         switch (event->key.keysym.sym)
         {
-			case SDLK_w:
+            case SDLK_w:
             cursor->h -= deltaSize;
             break;
             
-			case SDLK_s:
+            case SDLK_s:
             cursor->h += deltaSize;
             break;
             
-			case SDLK_a:
+            case SDLK_a:
             cursor->w -= deltaSize;
             break;
             
-			case SDLK_d:
+            case SDLK_d:
             cursor->w += deltaSize;
             break;
         }
     }
 }
 
-void HandleEvent(SDL_Event event)
+void HandleEvent(SDL_Event *event)
 {
-    MUI_GetInput(&uiInput, &event);
+    MUI_GetInput(&uiInput, event);
     
     switch(editorMode)
     {
-		case EDITOR_MODE_TILE:
-        CursorMovementControl(&tileMapCursor, tileMap.tileWidth, &event);
-        CursorSizeControl(&tileMapCursor, tileMap.tileWidth, &event);
+        case EDITOR_MODE_TILE:
+        CursorMovementControl(&tileMapCursor, tileMap.tileWidth, event);
+        CursorSizeControl(&tileMapCursor, tileMap.tileWidth, event);
         break;
         
-		case EDITOR_MODE_COLLISION_RECT:
-        CursorMovementControl(&collisionSpace.collisionCursor, tileMap.tileWidth, &event);
-        CursorSizeControl(&collisionSpace.collisionCursor, tileMap.tileWidth, &event);
+        case EDITOR_MODE_COLLISION_RECT:
+        CursorMovementControl(&collisionSpace.collisionCursor, tileMap.tileWidth, event);
+        CursorSizeControl(&collisionSpace.collisionCursor, tileMap.tileWidth, event);
         break;
         
-		case EDITOR_MODE_ENTITY:
-		CursorMovementControl(&entitySpace.entityCursor, 16, &event);
-		break;
+        case EDITOR_MODE_ENTITY:
+        CursorMovementControl(&entitySpace.entityCursor, tileMap.tileWidth / 2, event);
+        break;
         
-		case EDITOR_MODE_SELECT_TILE:
-        CursorMovementControl(&tileSheetDisplay.tileSheetCursor,tileSheetDisplay.tileSheetCursor.w, &event);
+        case EDITOR_MODE_SELECT_TILE:
+        CursorMovementControl(&tileSheetDisplay.tileSheetCursor,tileSheetDisplay.tileSheetCursor.w, event);
+        break;
+        
+        case EDITOR_MODE_DELETE:
+        CursorMovementControl(&deleteCursor, tileMap.tileWidth, event);
+        CursorSizeControl(&deleteCursor, tileMap.tileWidth, event);
         break;
     }
     
-    switch (event.type)
+    switch (event->type)
     {
-		case SDL_KEYDOWN:
-        switch (event.key.keysym.sym)
+        case SDL_KEYDOWN:
+        switch (event->key.keysym.sym)
         {
-			case SDLK_TAB:
+            case SDLK_TAB:
             if(editorMode == EDITOR_MODE_TILE)
             {
                 editorMode = EDITOR_MODE_SELECT_TILE;
             }
+            if(editorMode == EDITOR_MODE_ENTITY)
+            {
+                if(entitySpace.currentEntityTag < (1 << 4))
+                {
+                    entitySpace.currentEntityTag = entitySpace.currentEntityTag << 1;
+                }
+                else
+                {
+                    entitySpace.currentEntityTag = 1;
+                }
+            }
+            break;
             
-			if(editorMode == EDITOR_MODE_ENTITY)
-			{
-				if(entitySpace.currentEntityTag < (1 << 2))
-				{
-					entitySpace.currentEntityTag = entitySpace.currentEntityTag << 1;
-				}
-				else
-				{
-					entitySpace.currentEntityTag = 1;
-				}
-			}
-            
-			break;
-            
-			case SDLK_SPACE:
+            case SDLK_SPACE:
             switch (editorMode)
             {
-				case EDITOR_MODE_TILE:
-                u32 m = 0;
-				u32 n = 0;
-                
-                for(m = 0; m < (tileMapCursor.h / tileMap.tileHeight); m++)
+                case EDITOR_MODE_TILE:
+                for(u32 m = 0; m < (tileMapCursor.h / tileMap.tileHeight); m++)
                 {
-                    for(n = 0; n < (tileMapCursor.w / tileMap.tileWidth); n++)
+                    for(u32 n = 0; n < (tileMapCursor.w / tileMap.tileWidth); n++)
                     {
                         u32 x = tileMapCursor.x + (tileMap.tileWidth * n);
                         u32 y = tileMapCursor.y + (tileMap.tileHeight * m);
@@ -519,26 +364,74 @@ void HandleEvent(SDL_Event event)
                 }
                 break;
                 
-				case EDITOR_MODE_COLLISION_RECT:
+                case EDITOR_MODE_COLLISION_RECT:
                 collisionSpace.collisionRects[collisionSpace.rectCount] = collisionSpace.collisionCursor;
                 collisionSpace.rectCount++;
                 break;
                 
-				case EDITOR_MODE_ENTITY:
-				entitySpace.entityPositions[entitySpace.entityCount].x = entitySpace.entityCursor.x + entitySpace.entityCursor.w / 2;
-				entitySpace.entityPositions[entitySpace.entityCount].y = entitySpace.entityCursor.y + entitySpace.entityCursor.h / 2;
-				entitySpace.entityTag[entitySpace.entityCount] = entitySpace.currentEntityTag;
-				entitySpace.entityCount++;
-				break;
+                case EDITOR_MODE_ENTITY:
+                entitySpace.entityPositions[entitySpace.entityCount].x = entitySpace.entityCursor.x + entitySpace.entityCursor.w / 2;
+                entitySpace.entityPositions[entitySpace.entityCount].y = entitySpace.entityCursor.y + entitySpace.entityCursor.h / 2;
+                entitySpace.entityTag[entitySpace.entityCount] = entitySpace.currentEntityTag;
+                entitySpace.entityCount++;
+                break;
+                
+                case EDITOR_MODE_DELETE:
+                switch(lastEditorMode)
+                {
+                    case EDITOR_MODE_COLLISION_RECT:
+                    for(u32 n = 0; n < collisionSpace.rectCount; n++)
+                    {
+                        i32 x = collisionSpace.collisionRects[n].x;
+                        i32 y = collisionSpace.collisionRects[n].y;
+                        
+                        if(x >= deleteCursor.x &&
+                           y >= deleteCursor.y &&
+                           x <= (deleteCursor.x + deleteCursor.w) &&
+                           y <= (deleteCursor.y + deleteCursor.h))
+                        {
+                            collisionSpace.collisionRects[n] = collisionSpace.collisionRects[collisionSpace.rectCount - 1];
+                            collisionSpace.rectCount -= 1;
+                            break;
+                        }
+                    }
+                    break;
+                    
+                    case EDITOR_MODE_ENTITY:
+                    for(u32 n = 0; n < entitySpace.entityCount; n++)
+                    {
+                        i32 x = entitySpace.entityPositions[n].x;
+                        i32 y = entitySpace.entityPositions[n].y;
+                        
+                        if(x >= deleteCursor.x &&
+                           y >= deleteCursor.y &&
+                           x <= (deleteCursor.x + deleteCursor.w) &&
+                           y <= (deleteCursor.y + deleteCursor.h))
+                        {
+                            entitySpace.entityPositions[n] = entitySpace.entityPositions[entitySpace.entityCount - 1];
+                            entitySpace.entityTag[n] = entitySpace.entityTag[entitySpace.entityCount - 1];
+                            
+                            entitySpace.entityCount -= 1;
+                            break;
+                        }
+                    }
+                    break;
+                }
+                break;
             }
+            break;
+            
+            case SDLK_e:
+            lastEditorMode = editorMode;
+            editorMode = EDITOR_MODE_DELETE;
             break;
         }
         break;
         
-		case SDL_KEYUP:
-        switch (event.key.keysym.sym)
+        case SDL_KEYUP:
+        switch (event->key.keysym.sym)
         {
-			case SDLK_TAB:
+            case SDLK_TAB:
             if (editorMode == EDITOR_MODE_SELECT_TILE)
             {
                 editorMode = EDITOR_MODE_TILE;
@@ -549,106 +442,187 @@ void HandleEvent(SDL_Event event)
     }
 }
 
-void Update(float deltaTime)
+void UpdateAndRender(float deltaTime, SDL_Renderer *renderer)
 {
     MUI_BeginFrame(&ui, &uiInput);
     
-    //entity tag text
-	u32 i = 0;
-	for(i = 0; i < entitySpace.entityCount; i++)
-	{
-		MUI_Rect r;
-		r.x = entitySpace.entityPositions[i].x;
-		r.y = entitySpace.entityPositions[i].y;
-		r.width = 120;
-		r.height = 30;
-        
-		MUI_Text(&ui, GEN_MUI_IDi(i), r, EntityTagToString(entitySpace.entityTag[i]), 10);
-	}
-    
-    MUI_Rect rect = {1250, 500, 140, 35};
-    rect.x = displayWidth - 100;
-    MUI_PushColumnLayout(&ui, rect, 5);
+    //entity tag ui text
+    for(u32 i = 0; i < entitySpace.entityCount; i++)
     {
-		MUI_TextA(&ui, GEN_MUI_ID(), EntityTagToString(entitySpace.currentEntityTag), 14);
-        MUI_TextA(&ui, GEN_MUI_ID(), EditModeToString(editorMode), 14);
+        MUI_Rect rect = {0};
+        rect.x = entitySpace.entityPositions[i].x;
+        rect.y = entitySpace.entityPositions[i].y;
+        rect.width = 120;
+        rect.height = 30;
         
-        if(MUI_ButtonA(&ui, GEN_MUI_ID(), "EDIT tilemap"))
+        MUI_Text(&ui, GEN_MUI_IDi(i), rect, EntityTagToString(entitySpace.entityTag[i]), 10, textStyle);
+    }
+    
+    MUI_Rect rect = {1250, 500, 180, 35};
+    rect.x = displayWidth - 100;
+    MUI_PushColumnLayout(&ui, rect, 8);
+    {
+        MUI_TextA(&ui, GEN_MUI_ID(), EntityTagToString(entitySpace.currentEntityTag), 14, textStyle);
+        MUI_TextA(&ui, GEN_MUI_ID(), EditModeToString(editorMode), 14, textStyle);
+        
+        if(MUI_ButtonA(&ui, GEN_MUI_ID(), "Edit tilemap", buttonStyle))
         {
             editorMode = EDITOR_MODE_TILE;
         }
         
-        if(MUI_ButtonA(&ui, GEN_MUI_ID(), "EDIT collision"))
+        if(MUI_ButtonA(&ui, GEN_MUI_ID(), "Edit collision", buttonStyle))
         {
             editorMode = EDITOR_MODE_COLLISION_RECT;
         }
         
-        if(MUI_ButtonA(&ui, GEN_MUI_ID(), "EDIT entity"))
+        if(MUI_ButtonA(&ui, GEN_MUI_ID(), "Edit entity", buttonStyle))
         {
             editorMode = EDITOR_MODE_ENTITY;
         }
         
-        if(MUI_ButtonA(&ui, GEN_MUI_ID(), "Write to File"))
+        if(MUI_ButtonA(&ui, GEN_MUI_ID(), "Write to Files", buttonStyle))
         {
             WriteTileMapDataToFile(&tileMap, tileMapFileName);
             WriteCollisionDataToFile(&collisionSpace, collisionMapFileName);
-			WriteEntityDataToFile(&entitySpace, entityMapFileName);
-			printf("Data written to files %s, %s, and %s\n", tileMapFileName, collisionMapFileName, entityMapFileName);
+            WriteEntityDataToFile(&entitySpace, entityMapFileName);
+            printf("Data written to files %s, %s, and %s\n", tileMapFileName, collisionMapFileName, entityMapFileName);
         }
     }
     
     MUI_PopLayout(&ui);
-}
-
-void Render(SDL_Renderer *renderer)
-{
+    
     ME_RenderTileMap(&tileMap, renderer);
-    RenderTileSheetDisplay(renderer);
-    RenderCollisionSpace(&collisionSpace, renderer);
     RenderEditorSpace(renderer);
-	RenderEntitySpace(&entitySpace, renderer);
+    
+    RenderTileSheetDisplay(&tileSheetDisplay, renderer);
+    RenderCollisionSpace(&collisionSpace, renderer);
+    RenderEntitySpace(&entitySpace, renderer);
+    
     MUI_EndFrame(&ui, renderer);
 }
 
 int main(int argc, char *argv[])
 {
-	QueryLevelDataFromCli();
+    QueryLevelDataFromCli();
     
-    ui.fontFile = AGOESTOESAN_FONT_FILE;
+    if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
+    {
+        SDL_Log("Failed to initialize SDL : %s\n", SDL_GetError());
+        return 1;
+    }
     
-    // tileMap = ME_CreateTileMap(42, 24, 32, 32, 16, 16);
+    if(TTF_Init() == -1)
+    {
+        SDL_Log("Failed to initialize TTF : %s\n", TTF_GetError());
+    }
     
-    tileMapCursor.x = 0;
-    tileMapCursor.y = 0;
-    tileMapCursor.w = tileMap.tileWidth;
-    tileMapCursor.h = tileMap.tileHeight;
+    if(IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG) == 0)
+    {
+        SDL_Log("Failed to initialize IMG : %s\n", IMG_GetError());
+    }
     
-    game = ME_CreateGame("MicroEditor:)", displayWidth, displayHeight);
+    window = SDL_CreateWindow("MicroEditor",
+                              SDL_WINDOWPOS_CENTERED,
+                              SDL_WINDOWPOS_CENTERED,
+                              displayWidth,
+                              displayHeight,
+                              0);
     
-    tileMap.tileSheetTexture = IMG_LoadTexture(game.platform.renderer, "assets/Sprites/tiles.png");
-    tileSheetDisplay.displayTexture = tileMap.tileSheetTexture;
+    if(window == NULL)
+    {
+        SDL_Log("Failed to create SDL window : %s\n", SDL_GetError());
+        return 1;
+    }
     
-    SDL_Rect rect = {0};
-    SDL_QueryTexture(tileMap.tileSheetTexture, NULL, NULL, &rect.w, &rect.h);
-    tileSheetDisplay.displayRect = rect;
-    tileSheetDisplay.displayRect.x = displayWidth - tileSheetDisplay.displayRect.w;
-    tileSheetDisplay.tileSheetCursor.x = tileSheetDisplay.displayRect.x;
-    tileSheetDisplay.tileSheetCursor.y = tileSheetDisplay.displayRect.y;
-    tileSheetDisplay.tileSheetCursor.w = tileMap.tileSheetTileWidth;
-    tileSheetDisplay.tileSheetCursor.h = tileMap.tileSheetTileHeight;
+    renderer = SDL_CreateRenderer(window, 3, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     
-    collisionSpace.collisionCursor = tileMapCursor;
+    if (renderer == NULL)
+    {
+        SDL_Log("Failed to create SDL renderer : %s\n", SDL_GetError());
+        return 1;
+    }
     
-	entitySpace.entityCursor = tileMapCursor;
-	entitySpace.currentEntityTag = ENTITY_TAG_PLAYER;
+    //Setting up data
+    {
+        ui.fontFile = AGOESTOESAN_FONT_FILE;
+        
+        // tileMap = ME_CreateTileMap(42, 24, 32, 32, 16, 16);
+        
+        tileMapCursor.x = 0;
+        tileMapCursor.y = 0;
+        tileMapCursor.w = tileMap.tileWidth;
+        tileMapCursor.h = tileMap.tileHeight;
+        deleteCursor = tileMapCursor;
+        
+        tileMap.tileSheetTexture = IMG_LoadTexture(renderer, "assets/Sprites/tiles.png");
+        tileSheetDisplay.displayTexture = tileMap.tileSheetTexture;
+        
+        SDL_Rect rect = {0};
+        SDL_QueryTexture(tileMap.tileSheetTexture, NULL, NULL, &rect.w, &rect.h);
+        
+        tileSheetDisplay.displayRect.w = rect.w;
+        tileSheetDisplay.displayRect.h = rect.h;
+        tileSheetDisplay.displayRect.x = displayWidth - tileSheetDisplay.displayRect.w;
+        tileSheetDisplay.displayRect.y = 0;
+        
+        tileSheetDisplay.tileSheetCursor.x = tileSheetDisplay.displayRect.x;
+        tileSheetDisplay.tileSheetCursor.y = tileSheetDisplay.displayRect.y;
+        tileSheetDisplay.tileSheetCursor.w = tileMap.tileSheetTileWidth;
+        tileSheetDisplay.tileSheetCursor.h = tileMap.tileSheetTileHeight;
+        
+        collisionSpace.collisionCursor = tileMapCursor;
+        
+        entitySpace.entityCursor = tileMapCursor;
+        entitySpace.currentEntityTag = ENTITY_TAG_PLAYER;
+    }
     
-    game.handleEvent = HandleEvent;
-    game.update = Update;
-    game.render = Render;
+    bool quit = false;
+    f32 deltaTime = 0.016f;
+    u64 startTime = 0;
+    u64 endTime = 0;
     
-    ME_RunGame(&game, false);
+    while(!quit)
+    {
+        startTime = SDL_GetPerformanceCounter();
+        
+        while(SDL_PollEvent(&event) != 0)
+        {
+            switch(event.type)
+            {
+                case SDL_QUIT:
+                quit = true;
+                break;
+                
+                case SDL_KEYDOWN:
+                if (event.key.keysym.sym == SDLK_ESCAPE)
+                {
+                    quit = true;
+                }
+            }
+            HandleEvent(&event);
+        }
+        
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+        SDL_RenderClear(renderer);
+        UpdateAndRender(deltaTime, renderer);
+        SDL_RenderPresent(renderer);
+        
+        endTime = SDL_GetPerformanceCounter();
+        u64 elapsed = (endTime - startTime) * 1000 / SDL_GetPerformanceFrequency();
+        deltaTime = (float)elapsed / 1000.0f;
+        
+        if(deltaTime > 0.016f)
+        {
+            deltaTime = 0.016f;
+        }
+    }
     
-    ME_QuitGame(&game);
+    SDL_DestroyWindow(window);
+    SDL_DestroyRenderer(renderer);
+    
+    IMG_Quit();
+    TTF_Quit();
+    SDL_Quit();
     
     return 0;
 }

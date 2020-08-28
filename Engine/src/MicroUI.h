@@ -14,14 +14,50 @@ typedef ME_Rect MUI_Rect;
 
 enum
 {
-    MUI_WIDGET_button,
-    MUI_WIDGET_slider,
-    MUI_Widget_text,
-    MUI_Widget_textbox,
-    
-    MUI_WidgetTypeCount,
+    MUI_WIDGET_BUTTON,
+    MUI_WIDGET_SLIDER,
+    MUI_WIDGET_TEXT,
+    MUI_WIDGET_ICON_TEXT,
+    MUI_WIDGET_COUNT,
 };
 
+typedef struct Color
+{
+    u8 r;
+    u8 g;
+    u8 b;
+    u8 a;
+    
+} Color;
+
+typedef struct MUI_Style
+{
+    union
+    {
+        struct ButtonStyle
+        {
+            Color idleColor;
+            Color highlightColor;
+            Color textColor;
+            u32 fontSize;
+            
+        } buttonStyle;
+        
+        struct SliderStyle
+        {
+            Color sliderColor;
+            Color bgColor;
+            
+        } sliderStyle;
+        
+        struct TextStyle
+        {
+            Color textColor;
+            
+        } textStyle;
+    };
+    
+} MUI_Style;
 
 typedef struct MUI_Id
 {
@@ -35,6 +71,7 @@ typedef struct MUI_Widget
     u32 widgetType;
     MUI_Id id;
     MUI_Rect rect;
+    MUI_Style style;
     
     union 
     {
@@ -58,7 +95,6 @@ typedef struct MUI_Input
 {
     i32 mouseX;
     i32 mouseY;
-    
     bool leftMouseButtonDown;
     bool rightMouseButtonDown;
     
@@ -78,7 +114,7 @@ typedef struct MUI
     MUI_Widget widgets[MUI_MAX_WIDGETS];
     
     u32 autoLayOutIndex;
-    struct
+    struct AutoLayOutGroup
     {
         MUI_Rect rect;
         u32 progress;
@@ -99,14 +135,14 @@ MUI_Id MUI_IdInit(u32 primary, u32 secondary);
 bool MUI_IdEqual(MUI_Id a, MUI_Id b);
 MUI_Id MUI_NullId(void);
 
-void MUI_Text(MUI *ui, MUI_Id id, MUI_Rect rect, char *text, u32 fontSize);
-void MUI_TextA(MUI *ui, MUI_Id id, char *text, u32 fontSize);
+void MUI_Text(MUI *ui, MUI_Id id, MUI_Rect rect, char *text, u32 fontSize, MUI_Style style);
+void MUI_TextA(MUI *ui, MUI_Id id, char *text, u32 fontSize, MUI_Style style);
 
-bool MUI_Button(MUI *ui, MUI_Id id, char *text, MUI_Rect rect);
-bool MUI_ButtonA(MUI *ui, MUI_Id id, char *text);
+bool MUI_Button(MUI *ui, MUI_Id id, char *text, MUI_Rect rect, MUI_Style style);
+bool MUI_ButtonA(MUI *ui, MUI_Id id, char *text, MUI_Style style);
 
-f32 MUI_Slider(MUI *ui, MUI_Id id, f32 value, MUI_Rect rect);
-f32 MUI_SliderA(MUI *ui, MUI_Id id, f32 value);
+f32 MUI_Slider(MUI *ui, MUI_Id id, f32 value, MUI_Rect rect, MUI_Style style);
+f32 MUI_SliderA(MUI *ui, MUI_Id id, f32 value, MUI_Style style);
 
 void MUI_PushColumnLayout(MUI *ui, MUI_Rect rect, u32 offset);
 void MUI_PushRowLayout(MUI *ui, MUI_Rect rect, u32 offset);

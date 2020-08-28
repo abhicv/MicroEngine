@@ -86,7 +86,8 @@ TileMap ME_LoadTileMap(const char *fileName)
                     i32 tileSheetPosX = 0;
                     i32 tileSheetPosY = 0;
                     
-                    fscanf(tileMapFile, "%d,%d,%d,%d\n", &tileMapPosX,
+                    fscanf(tileMapFile, "%d,%d,%d,%d\n",
+                           &tileMapPosX,
                            &tileMapPosY,
                            &tileSheetPosX,
                            &tileSheetPosY);
