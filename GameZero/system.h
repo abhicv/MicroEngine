@@ -2,9 +2,10 @@
 #define SYSTEM_H
 
 #include "..\Engine\src\MicroECS.h"
-#include "data.h"
+#include "..\Engine\src\ME_Vector2D.h"
 
-void PlayerInputSystem(InputComponent *input, SDL_Event *event, GameResource *gameResource);
+#include "data.h"
+void PlayerInputSystem(InputComponent *input, SDL_Event *event);
 
 void PlayerControlSystem(TransformComponent *transform,
                          AnimationComponent *animation,

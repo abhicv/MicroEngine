@@ -21,10 +21,9 @@ REM /link /SUBSYSTEM:CONSOLE /LIBPATH:..\SDL2\lib\x64 %lflags%
 REM FlappyBird_game.exe
 
 REM ui_test
-REM if exist MicroUI_test.exe del MicroUI_test.exe
-REM cl /nologo ..\game\MicroUI_test.c /I..\src  %sdl2_include% ^
-REM /link /SUBSYSTEM:CONSOLE /LIBPATH:..\SDL2\lib\x64 %lflags%
-REM if exist MicroUI_test.exe MicroUI_test.exe
+if exist MicroUI_test.exe del MicroUI_test.exe
+cl /nologo /Zi ..\Engine\game\MicroUI_test.c /I..\src  %sdl2_include% /link /incremental:no /subsystem:console /libpath:..\SDL2\lib\x64 %lflags%
+if exist MicroUI_test.exe MicroUI_test.exe
 
 REM engine_test
 REM cl /nologo ..\game\MicroEngine_test.c /I..\src %sdl2_include% ^
@@ -47,8 +46,8 @@ REM cl /nologo ..\game\Vector_Field.c /I..\src %sdl2_include% ^
 REM /link /SUBSYSTEM:CONSOLE /LIBPATH:..\SDL2\lib\x64 %lflags%
 
 REM micro_physics_test
-if exist MicroPhysics_test.exe del MicroPhysics_test.exe
-cl /nologo ..\Engine\game\MicroPhysics_test.c /I..Engine\src %sdl2_include% /link /subsystem:console %sdl2_lib% %lflags%
-if exist MicroPhysics_test.exe MicroPhysics_test.exe
+REM if exist MicroPhysics_test.exe del MicroPhysics_test.exe
+REM cl /nologo ..\Engine\game\MicroPhysics_test.c /I..Engine\src %sdl2_include% /link /subsystem:console %sdl2_lib% %lflags%
+REM if exist MicroPhysics_test.exe MicroPhysics_test.exe
 
 popd ..\bin

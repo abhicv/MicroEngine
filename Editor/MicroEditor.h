@@ -4,6 +4,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
+#include <Windows.h>
+
 #include "..\Engine\src\types.h"
 #include "..\Engine\src\ME_TileMap.h"
 
@@ -39,6 +41,7 @@ typedef struct CollisionSpace
 {
     SDL_Rect collisionRects[MAX_COLLISION_RECTS];
     SDL_Rect collisionCursor;
+    u32 highlightedColRectIndex;
     u32 rectCount;
     
 } CollisionSpace;
@@ -62,7 +65,7 @@ typedef struct Editor
     SDL_Rect deleteCursor;
     
     u32 editorMode;
-    u32 lastEditorMode; 
+    u32 lastEditorMode;
     
 } Editor;
 

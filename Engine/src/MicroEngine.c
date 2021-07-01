@@ -32,8 +32,8 @@ ME_Game ME_CreateGame(char *gameTitle, u32 windowWidth, u32 windowHeight)
     if (IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG) == 0)
         SDL_Log("Failed to initialize IMG : %s\n", IMG_GetError());
     
-    platform.window = SDL_CreateWindow(gameTitle, 10,
-                                       35, windowWidth, windowHeight, SDL_WINDOW_RESIZABLE);
+    platform.window = SDL_CreateWindow(gameTitle, SDL_WINDOWPOS_CENTERED,
+                                       SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, SDL_WINDOW_RESIZABLE);
     
     if (platform.window == NULL)
     {
@@ -93,7 +93,6 @@ void ME_RunGame(ME_Game *game, bool showSplashScreen)
         
         SDL_Delay(1000);
     }
-    
     
     while (game->isRunning)
     {

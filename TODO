@@ -1,0 +1,10 @@
+1) Make a level ending entity(a object to be fetched for finishing a level, ex: like a key or flag)
+2) Work on the game UI
+	- level select menu
+	- improve the main menu
+	- level end menu
+3) Scoring system
+4) Health system improvement for entites
+4) More behaviour for the enemy AI(now simple FSM)
+5) Add more levels
+

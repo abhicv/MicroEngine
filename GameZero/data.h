@@ -1,25 +1,25 @@
 #ifndef DATA_H
 #define DATA_H
 
-//NOTE(abhicv): all asset resources game needs 
+//NOTE(abhicv): all asset resources game ever need
 typedef struct GameResource
 {
     //entity sprite
     SDL_Texture *playerSprite;
     SDL_Texture *enemySprite;
     SDL_Texture *itemSprite;
-    
+
     //tileSheet
     SDL_Surface *tileSheetSurface;
-    
+
     //Audio
     ME_Audio coinSound;
     ME_Audio shootSound;
     ME_Audio jumpSound;
     ME_Audio hurtSound;
-    
+
     bool loaded;
-    
+
 } GameResource;
 
 typedef struct Level
@@ -28,27 +28,27 @@ typedef struct Level
     char *entityMapFile;
     char *collisionMapFile;
     char *tileMapFile;
-    
+
     SDL_Texture *tileMapTexture;
-    
-    bool completed;
+
 } Level;
 
 //NOTE(abhicv): generating all map names from level id
 #define TO_STRING(s) #s
-#define LEVE_MAP_DIR_TO_STRING(x, map) TO_STRING(data/levels/level##x##.##map)
-#define LEVEL_MAP(index) [index] = {\
-.entityMapFile = LEVE_MAP_DIR_TO_STRING(index, emap),\
-.collisionMapFile = LEVE_MAP_DIR_TO_STRING(index, cmap),\
-.tileMapFile = LEVE_MAP_DIR_TO_STRING(index, tmap),\
+#define LEVEL_MAP_DIR_TO_STRING(levelName, mapType) TO_STRING(data/levels/levelName##.##mapType)
+
+#define LEVEL_MAP(levelName) {\
+.entityMapFile = LEVEL_MAP_DIR_TO_STRING(levelName, emap),\
+.collisionMapFile = LEVEL_MAP_DIR_TO_STRING(levelName, cmap),\
+.tileMapFile = LEVEL_MAP_DIR_TO_STRING(levelName, tmap),\
 .tileMapTexture = NULL,\
 }\
 
-typedef struct GameState
+enum State
 {
-    u32 score;
-    u32 coinCount;
-    
-} GameState;
+    SHOOT,
+    PATROL,
+    CHASE,
+};
 
 #endif //DATA_H

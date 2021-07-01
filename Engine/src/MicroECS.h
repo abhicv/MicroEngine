@@ -108,7 +108,7 @@ typedef struct InputComponent
     
 } InputComponent;
 
-//NOTE(abhicv): stats specifically for the game
+//NOTE(abhicv): states specifically for the game
 typedef struct EntityStatComponent
 {
     union
@@ -117,6 +117,7 @@ typedef struct EntityStatComponent
         {
             f32 health;
             u32 facingDir;
+            f32 affectHealthDelay;
             
         } PlayerStat;
         
@@ -126,6 +127,8 @@ typedef struct EntityStatComponent
             f32 patrolDistance;
             Vector2 startPosition;
             bool moveRight;
+            u32 state;
+            f32 shootDelay;
             
         } EnemyStat;
         
@@ -146,9 +149,9 @@ typedef struct EntityStatComponent
 #define ENTITYSTAT_COMPONENT_SIGN  (1 << 4)
 
 //NOTE(abhicv): System Signatures
-global u32 AnimationSystemSignature = ANIMATION_COMPONENT_SIGN;
-global u32 RenderSystemSignature = TRANSFORM_COMPONENT_SIGN | ANIMATION_COMPONENT_SIGN | RENDER_COMPONENT_SIGN;
-global u32 PhysicsSystemSignature = TRANSFORM_COMPONENT_SIGN | PHYSICS_COMPONENT_SIGN;
+global const u32 AnimationSystemSignature = ANIMATION_COMPONENT_SIGN;
+global const u32 RenderSystemSignature = TRANSFORM_COMPONENT_SIGN | ANIMATION_COMPONENT_SIGN | RENDER_COMPONENT_SIGN;
+global const u32 PhysicsSystemSignature = TRANSFORM_COMPONENT_SIGN | PHYSICS_COMPONENT_SIGN;
 
 //NOTE(abhicv): all components used in the game is owned by this struct
 typedef struct MicroECSWorld
@@ -163,9 +166,9 @@ typedef struct MicroECSWorld
     u32 tags[MAX_ENTITY_COUNT];
     bool entityDeathFlag[MAX_ENTITY_COUNT];
     
-    u32 activeEntityCount; 
+    u32 activeEntityCount;
     
-    InputComponent input; 
+    InputComponent input;
     
 } MicroECSWorld;
 
@@ -176,10 +179,12 @@ enum EntityTag
     ENTITY_TAG_SLIME =    (1 << 2),
     ENTITY_TAG_COIN =     (1 << 3),
     ENTITY_TAG_FLYEE =    (1 << 4),
+    ENTITY_TAG_CAPTURE_FLAG = (1 << 5),
     
-    ENTITY_TAG_NONE =     (1 << 5),   
-    ENTITY_TAG_PLATFORM = (1 << 6),   
-    ENTITY_TAG_BULLET =   (1 << 7),
+    ENTITY_TAG_NONE =     (1 << 6),   
+    ENTITY_TAG_PLATFORM = (1 << 7),   
+    ENTITY_TAG_BULLET =   (1 << 8),
+    ENTITY_TAG_ENEMY_BULLET = (1 << 9),
 };
 
 #endif //MICROECS_H

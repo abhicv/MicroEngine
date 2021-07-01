@@ -27,6 +27,8 @@ void MUI_BeginFrame(MUI *ui, MUI_Input *input)
         ui->rightMouseButtonDown = input->rightMouseButtonDown;
         ui->mouseX = input->mouseX;
         ui->mouseY = input->mouseY;
+        ui->textInputChar = input->textInputChar;
+        ui->bTextInput = input->bTextInput;
     }
 }
 
@@ -40,86 +42,107 @@ void MUI_EndFrame(MUI *ui, SDL_Renderer *renderer)
     SDL_Surface *surface = NULL;
     SDL_Texture *tex = NULL;
     
+    bool highlighted = false;
+    
     u32 i = 0;
     for (i = 0; i < ui->widgetCount; i++)
     {
         switch (ui->widgets[i].widgetType)
         {
 			case MUI_WIDGET_BUTTON:
-            
-            bool highlighted = MUI_IdEqual(ui->hotWidgetId, ui->widgets[i].id);
-            color.r = highlighted ? ui->widgets[i].style.buttonStyle.highlightColor.r : ui->widgets[i].style.buttonStyle.idleColor.r;
-            color.g = highlighted ? ui->widgets[i].style.buttonStyle.highlightColor.g : ui->widgets[i].style.buttonStyle.idleColor.g;
-            color.b = highlighted ? ui->widgets[i].style.buttonStyle.highlightColor.b : ui->widgets[i].style.buttonStyle.idleColor.b;
-            
-            rect = MUI_RectToSDL_Rect(&ui->widgets[i].rect);
-            ME_RenderFillRect(renderer, &rect, color);
-            
-            if(MUI_IdEqual(ui->hotWidgetId, ui->widgets[i].id))
             {
-                SDL_Color borderColor = {255, 255, 255, 255};
-                ME_RenderDrawRect(renderer, &rect, borderColor);
+                highlighted = MUI_IdEqual(ui->hotWidgetId, ui->widgets[i].id);
+                color.r = highlighted ? ui->widgets[i].style.buttonStyle.highlightColor.r : ui->widgets[i].style.buttonStyle.idleColor.r;
+                color.g = highlighted ? ui->widgets[i].style.buttonStyle.highlightColor.g : ui->widgets[i].style.buttonStyle.idleColor.g;
+                color.b = highlighted ? ui->widgets[i].style.buttonStyle.highlightColor.b : ui->widgets[i].style.buttonStyle.idleColor.b;
+                
+                rect = MUI_RectToSDL_Rect(&ui->widgets[i].rect);
+                ME_RenderFillRect(renderer, &rect, color);
+                
+                if(MUI_IdEqual(ui->hotWidgetId, ui->widgets[i].id))
+                {
+                    SDL_Color borderColor = {255, 255, 255, 255};
+                    ME_RenderDrawRect(renderer, &rect, borderColor);
+                }
             }
-            
             break;
             
             case MUI_WIDGET_SLIDER:
+            {
+                //bg rect
+                color.r = ui->widgets[i].style.sliderStyle.bgColor.r;
+                color.g = ui->widgets[i].style.sliderStyle.bgColor.g;
+                color.b = ui->widgets[i].style.sliderStyle.bgColor.b;
+                
+                rect = MUI_RectToSDL_Rect(&ui->widgets[i].rect);
+                ME_RenderFillRect(renderer, &rect, color);
+                
+                //sliding rect
+                color.r = ui->widgets[i].style.sliderStyle.sliderColor.r;
+                color.g = ui->widgets[i].style.sliderStyle.sliderColor.g;
+                color.b = ui->widgets[i].style.sliderStyle.sliderColor.b;
+                
+                SDL_Rect slideRect = rect;
+                slideRect.w = (f32)rect.w * ui->widgets[i].slider.value;
+                ME_RenderFillRect(renderer, &slideRect, color);
+            }
+            break;
             
-            //bg rect
-            color.r = ui->widgets[i].style.sliderStyle.bgColor.r;
-            color.g = ui->widgets[i].style.sliderStyle.bgColor.g;
-            color.b = ui->widgets[i].style.sliderStyle.bgColor.b;
-            
-            rect = MUI_RectToSDL_Rect(&ui->widgets[i].rect);
-            ME_RenderFillRect(renderer, &rect, color);
-            
-            //sliding rect
-            color.r = ui->widgets[i].style.sliderStyle.sliderColor.r;
-            color.g = ui->widgets[i].style.sliderStyle.sliderColor.g;
-            color.b = ui->widgets[i].style.sliderStyle.sliderColor.b;
-            
-            SDL_Rect slideRect = rect;
-            slideRect.w = (f32)rect.w * ui->widgets[i].slider.value;
-            ME_RenderFillRect(renderer, &slideRect, color);
-            
+            case MUI_WIDGET_TEXTEDIT:
+            {
+                highlighted = MUI_IdEqual(ui->hotWidgetId, ui->widgets[i].id);
+                color.r = highlighted ? ui->widgets[i].style.buttonStyle.highlightColor.r : ui->widgets[i].style.buttonStyle.idleColor.r;
+                color.g = highlighted ? ui->widgets[i].style.buttonStyle.highlightColor.g : ui->widgets[i].style.buttonStyle.idleColor.g;
+                color.b = highlighted ? ui->widgets[i].style.buttonStyle.highlightColor.b : ui->widgets[i].style.buttonStyle.idleColor.b;
+                
+                rect = MUI_RectToSDL_Rect(&ui->widgets[i].rect);
+                ME_RenderFillRect(renderer, &rect, color);
+                
+                if(MUI_IdEqual(ui->hotWidgetId, ui->widgets[i].id))
+                {
+                    SDL_Color borderColor = {255, 255, 255, 255};
+                    ME_RenderDrawRect(renderer, &rect, borderColor);
+                }
+            }
             break;
             
             case MUI_WIDGET_TEXT:
-            
-            textColor.r = ui->widgets[i].style.textStyle.textColor.r;
-            textColor.g = ui->widgets[i].style.textStyle.textColor.g;
-            textColor.b = ui->widgets[i].style.textStyle.textColor.b;
-            
-            if (ui->fontFile != NULL)
             {
-                font = TTF_OpenFont(ui->fontFile, ui->widgets[i].text.fontSize);
+                textColor.r = ui->widgets[i].style.textStyle.textColor.r;
+                textColor.g = ui->widgets[i].style.textStyle.textColor.g;
+                textColor.b = ui->widgets[i].style.textStyle.textColor.b;
+                
+                if(ui->fontFile != NULL)
+                {
+                    font = TTF_OpenFont(ui->fontFile, ui->widgets[i].text.fontSize);
+                }
+                
+                if(font != NULL)
+                {
+                    surface = TTF_RenderText_Solid(font, ui->widgets[i].text.text, textColor);
+                }
+                if(surface != NULL)
+                {
+                    tex = SDL_CreateTextureFromSurface(renderer, surface);
+                }
+                
+                rect = MUI_RectToSDL_Rect(&ui->widgets[i].rect);
+                
+                SDL_Rect tmpRect = rect;
+                SDL_QueryTexture(tex, NULL, NULL, &tmpRect.w, &tmpRect.h);
+                
+                tmpRect.x = rect.x + (rect.w - tmpRect.w) / 2;
+                tmpRect.y = rect.y + (rect.h - tmpRect.h) / 2;
+                
+                if (tex != NULL && renderer != NULL)
+                {
+                    SDL_RenderCopy(renderer, tex, NULL, &tmpRect);
+                }
+                
+                SDL_DestroyTexture(tex);
+                SDL_FreeSurface(surface);
+                TTF_CloseFont(font);
             }
-            if (font != NULL)
-            {
-                surface = TTF_RenderText_Blended(font, ui->widgets[i].text.text, textColor);
-            }
-            if (surface != NULL)
-            {
-                tex = SDL_CreateTextureFromSurface(renderer, surface);
-            }
-            
-            rect = MUI_RectToSDL_Rect(&ui->widgets[i].rect);
-            
-            SDL_Rect tmpRect = rect;
-            SDL_QueryTexture(tex, NULL, NULL, &tmpRect.w, &tmpRect.h);
-            
-            tmpRect.x = rect.x + (rect.w - tmpRect.w) / 2;
-            tmpRect.y = rect.y + (rect.h - tmpRect.h) / 2;
-            
-            if (tex != NULL && renderer != NULL)
-            {
-                SDL_RenderCopy(renderer, tex, NULL, &tmpRect);
-            }
-            
-            SDL_DestroyTexture(tex);
-            SDL_FreeSurface(surface);
-            TTF_CloseFont(font);
-            
             break;
             
             default:
@@ -270,7 +293,7 @@ f32 MUI_Slider(MUI *ui, MUI_Id id, f32 value, MUI_Rect rect, MUI_Style style)
     {
         value = 0.0f;
     }
-    if (value > 1.0f)
+    else if (value > 1.0f)
     {
         value = 1.0f;
     }
@@ -295,6 +318,70 @@ f32 MUI_Slider(MUI *ui, MUI_Id id, f32 value, MUI_Rect rect, MUI_Style style)
 f32 MUI_SliderA(MUI *ui, MUI_Id id, f32 value, MUI_Style style)
 {
     return MUI_Slider(ui, id, value, MUI_GetNextAutoLayoutRect(ui), style);
+}
+
+void MUI_TextEdit(MUI *ui, MUI_Id id, MUI_Rect rect, MUI_Style style, TextEdit *textEdit)
+{
+    u32 left = rect.x - rect.width / 2;
+    u32 right = rect.x + rect.width / 2;
+    u32 top = rect.y - rect.height / 2;
+    u32 bottom = rect.y + rect.height / 2;
+    
+    bool isMouseOver = (ui->mouseX > left && ui->mouseX < right &&
+                        ui->mouseY > top && ui->mouseY < bottom);
+    
+    if (!MUI_IdEqual(id, ui->hotWidgetId) && isMouseOver)
+    {
+        ui->hotWidgetId = id;
+    }
+    
+    if (MUI_IdEqual(id, ui->activeWidgetId))
+    {
+        if (MUI_IdEqual(id, ui->hotWidgetId))
+        {
+            if(ui->bTextInput)
+            {
+                if(textEdit->cursorPos < MAX_TEXTEDIT_SIZE)
+                {
+                    textEdit->text[textEdit->cursorPos] = ui->textInputChar;
+                    textEdit->cursorPos++;
+                }
+            }
+        }
+    }
+    else
+    {
+        if (MUI_IdEqual(id, ui->hotWidgetId))
+        {
+            if (ui->leftMouseButtonDown)
+            {
+                ui->activeWidgetId = id;
+            }
+        }
+    }
+    
+    if(ui->widgetCount < MUI_MAX_WIDGETS)
+    {
+        MUI_Widget *widget = ui->widgets + ui->widgetCount++;
+        widget->id = id;
+        widget->widgetType = MUI_WIDGET_TEXTEDIT;
+        widget->rect = rect;
+        widget->style = style;
+    }
+    else
+    {
+        printf("UI widget count out of bound\n");
+    }
+    
+    MUI_Style textStyle = {
+        .textStyle = {
+            .textColor = (Color){255, 255, 255, 255},
+        },
+    };
+    
+    MUI_Rect textRect = {0};
+    textRect.x = rect.x;
+    MUI_Text(ui, MUI_IdInit(id.primary - 10, id.secondary + 10), rect, textEdit->text, 20, textStyle);
 }
 
 SDL_Rect MUI_RectToSDL_Rect(MUI_Rect *rect)
@@ -365,8 +452,13 @@ void MUI_GetInput(MUI_Input *uiInput, SDL_Event *event)
     uiInput->mouseX = event->motion.x;
     uiInput->mouseY = event->motion.y;
     
-    if (event->type == SDL_MOUSEBUTTONDOWN)
+    uiInput->bTextInput = false;
+    
+    SDL_StartTextInput();
+    
+    switch(event->type)
     {
+        case SDL_MOUSEBUTTONDOWN:
         if (event->button.button == SDL_BUTTON_LEFT)
         {
             uiInput->leftMouseButtonDown = true;
@@ -375,17 +467,37 @@ void MUI_GetInput(MUI_Input *uiInput, SDL_Event *event)
         {
             uiInput->rightMouseButtonDown = true;
         }
-    }
-    
-    if (event->type == SDL_MOUSEBUTTONUP)
-    {
-        if (event->button.button == SDL_BUTTON_LEFT)
+        break;
+        
+        case SDL_MOUSEBUTTONUP:
+        if(event->button.button == SDL_BUTTON_LEFT)
         {
             uiInput->leftMouseButtonDown = false;
         }
-        else if (event->button.button == SDL_BUTTON_RIGHT)
+        else if(event->button.button == SDL_BUTTON_RIGHT)
         {
             uiInput->rightMouseButtonDown = false;
         }
+        break;
+        
+        case SDL_KEYDOWN:
+        if (event->key.keysym.sym == SDLK_BACKSPACE)
+        {
+            uiInput->backSpaceDown = true;
+        }
+        break;
+        
+        case SDL_KEYUP:
+        if (event->key.keysym.sym == SDLK_BACKSPACE)
+        {
+            uiInput->backSpaceDown = false;
+        }
+        break;
+        
+        case SDL_TEXTINPUT:
+        uiInput->textInputChar = event->text.text[0];
+        uiInput->bTextInput = true;
+        break;
     }
 }
+

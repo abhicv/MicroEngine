@@ -1,9 +1,12 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
-#include <windows.h>
 
 #include "sdl2_gamezero.h"
+
+#ifdef __EMSCRIPTEN__
+#include "gamezero.c"
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -36,13 +39,23 @@ int main(int argc, char *argv[])
         return 1;
     }
     
-    renderer = SDL_CreateRenderer(window, 3, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    //using software rendering
+    renderer = SDL_CreateRenderer(window, 3, 0);
     
     if (renderer == NULL)
     {
         SDL_Log("Failed to create SDL renderer : %s\n", SDL_GetError());
         return 1;
     }
+    
+    f32 deltaTime = 1.0f / 60.0f;
+    f32 targetDeltaTime = 1.0f/ 60.0f;
+    
+    u64 startTime = 0;
+    u64 endTime = 0;
+    u64 performanceFreq = SDL_GetPerformanceFrequency();
+    
+    bool quitGame = false;
     
     while(!quitGlobal)
     {
@@ -53,18 +66,12 @@ int main(int argc, char *argv[])
             break;
             
             case GAME_PLAY:
-            f32 deltaTime = 0.016f;
-            u64 startTime = 0;
-            u64 endTime = 0;
-            u64 freq = SDL_GetPerformanceFrequency();
-            
-            bool quitGame = false;
             
             while(!quitGame)
             {
                 startTime = SDL_GetPerformanceCounter();
                 
-                while(SDL_PollEvent(&event) != 0)
+                while(SDL_PollEvent(&event))
                 {
                     switch(event.type)
                     {
@@ -82,37 +89,43 @@ int main(int argc, char *argv[])
                         else if(event.key.keysym.sym == SDLK_ESCAPE)
                         {
                             quitGame = true;
-                            gameMode = GAME_LEVEL_MENU;
+                            gameMode = GAME_EXIT;
                         }
                         break;
                     }
                     HandleEvent(&event);
                 }
                 
-                SDL_SetRenderDrawColor(renderer, 255, 0, 255, 0);
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
                 SDL_RenderClear(renderer);
+                
                 GameUpdateAndRender(&gameMode, &quitGame, deltaTime, renderer);
+                
                 SDL_RenderPresent(renderer);
                 
                 endTime = SDL_GetPerformanceCounter();
-                u64 elapsed = (endTime - startTime) * 1000 / freq;
+                u64 elapsed = (endTime - startTime) * 1000 / performanceFreq;
                 deltaTime = (float)elapsed / 1000.0f;
                 
-                if(deltaTime > 0.016f)
+#if 1
+                if(deltaTime < targetDeltaTime)
                 {
-                    deltaTime = 0.016f;
+                    SDL_Delay((targetDeltaTime - deltaTime)*1000.0f);
+                    
+                    endTime = SDL_GetPerformanceCounter();
+                    elapsed = (endTime - startTime) * 1000 / performanceFreq;
+                    deltaTime = (float)elapsed / 1000.0f;
+                    
                 }
+#endif
+                //printf("deltaTime: %0.6f\n", deltaTime);
             }
-            
             break;
             
             case GAME_LOAD_LEVEL:
             LoadData(renderer);
             gameMode = GAME_PLAY;
-            break;
-            
-            case GAME_LEVEL_MENU:
-            ShowLevelMenu(&gameMode, &event, renderer);
+            quitGame = false;
             break;
             
             case GAME_CREDITS:
@@ -120,10 +133,6 @@ int main(int argc, char *argv[])
             break;
             
             case GAME_EXIT:
-            quitGlobal = true;
-            break;
-            
-            default:
             quitGlobal = true;
             break;
         }
@@ -137,4 +146,4 @@ int main(int argc, char *argv[])
     SDL_Quit();
     
     return 0;
-} 
+}

@@ -12,6 +12,8 @@ typedef signed short i16;
 typedef unsigned int u32;
 typedef signed int i32;
 
+typedef unsigned int b32;
+
 typedef unsigned long long int u64;
 typedef signed long long int i64;
 

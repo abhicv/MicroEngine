@@ -24,14 +24,17 @@ typedef struct PhysicsBody
     Vector2 acceleration;
     Vector2 force;
     
+    Vector2 collisionNormal;
+    
     f32 mass;
     f32 inverseMass;
     
-    CollisionRect rect;
     f32 restitution;
     f32 friction;
     
     bool affectedByGravity;
+    
+    CollisionRect rect;
     
 } PhysicsBody;
 

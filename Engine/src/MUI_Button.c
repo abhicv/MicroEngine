@@ -66,7 +66,9 @@ void MUI_SetButtonPosition(MUI_Button *button, int x, int y)
 void MUI_SetButtonLabel(MUI_Button *button, const char *label)
 {
     if (label != NULL)
+    {
         strcpy(button->label.textString, label);
+    }
 }
 
 void MUI_SetButtonLabelFont(MUI_Button *button, TTF_Font *font)
@@ -119,3 +121,4 @@ void MUI_DestroyButton(MUI_Button *button)
     
     MUI_DestroyTextBox(&(button->label));
 }
+

@@ -66,26 +66,24 @@ void AnimationSystem(AnimationComponent *animationComponent)
 
 void PhysicsSystem(MicroECSWorld *ecsWorld, Vector2 gravity ,f32 deltaTime)
 {
-    u32 i = 0;
-    u32 j = 0;
-    
     //NOTE(abhicv): Resetting all physics info
-    for(i = 0; i < ecsWorld->activeEntityCount; i++)
+    for(u32 i = 0; i < ecsWorld->activeEntityCount; i++)
     {
         if(MECS_EntitySignatureEquals(ecsWorld->entitySignature[i], PhysicsSystemSignature))
         {
             ecsWorld->physics[i].physicsBody.rect.x = ecsWorld->transforms[i].position.x;
             ecsWorld->physics[i].physicsBody.rect.y = ecsWorld->transforms[i].position.y;
             ecsWorld->physics[i].physicsBody.position = ecsWorld->transforms[i].position;
+            ecsWorld->physics[i].physicsBody.collisionNormal = Vector2Null();
             ecsWorld->physics[i].collided = false;
             ecsWorld->physics[i].tagOfCollidedEntity = 0;
             ecsWorld->physics[i].isGrounded = false;
         }
     }
     
-    for(i = 0; i < ecsWorld->activeEntityCount; i++)
+    for(u32 i = 0; i < ecsWorld->activeEntityCount; i++)
     {
-        for(j = i + 1; j < ecsWorld->activeEntityCount; j++)
+        for(u32 j = i + 1; j < ecsWorld->activeEntityCount; j++)
         {
             if(MECS_EntitySignatureEquals(ecsWorld->entitySignature[i], PhysicsSystemSignature) &&
                MECS_EntitySignatureEquals(ecsWorld->entitySignature[j], PhysicsSystemSignature) &&
@@ -107,21 +105,25 @@ void PhysicsSystem(MicroECSWorld *ecsWorld, Vector2 gravity ,f32 deltaTime)
                         ecsWorld->physics[i].collided = true;
                         ecsWorld->physics[j].collided = true;
                         
-                        ecsWorld->physics[i].collidedEntity |= j;
-                        ecsWorld->physics[j].collidedEntity |= i;
+                        ecsWorld->physics[i].collidedEntity = j;
+                        ecsWorld->physics[j].collidedEntity = i;
                         
                         ecsWorld->physics[i].tagOfCollidedEntity |= ecsWorld->tags[j];
                         ecsWorld->physics[j].tagOfCollidedEntity |= ecsWorld->tags[i];
+                        
+                        ecsWorld->physics[i].physicsBody.collisionNormal = info.normal;
+                        ecsWorld->physics[j].physicsBody.collisionNormal = (Vector2){-info.normal.x, -info.normal.y};
                         
                         ResolveCollision(&ecsWorld->physics[i].physicsBody, &ecsWorld->physics[j].physicsBody, info);
                     }
                 }
             }
         }
+        
     }
     
     //NOTE(abhicv): Applying all position changes based on physics calculations
-    for(i = 0; i < ecsWorld->activeEntityCount; i++)
+    for(u32 i = 0; i < ecsWorld->activeEntityCount; i++)
     {
         if(MECS_EntitySignatureEquals(ecsWorld->entitySignature[i], PhysicsSystemSignature))
         {

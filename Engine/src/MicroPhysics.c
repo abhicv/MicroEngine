@@ -65,6 +65,7 @@ void swap(f32 *a, f32 *b)
     *b = temp;
 }
 
+//NOTE(abhicv): tested not used yet in the game
 bool DetectRayRectCollision(Vector2 origin, Vector2 dir, CollisionRect *target, f32 *t, Vector2 *contactPoint, Vector2 *contactNormal)
 {
     f32 x = target->x - target->width / 2;
@@ -134,6 +135,7 @@ bool DetectRayRectCollision(Vector2 origin, Vector2 dir, CollisionRect *target, 
     return true;
 }
 
+// NOTE(abhicv): not used
 CollisionInfo DetectRectVsRectCollision(CollisionRect *rect, CollisionRect *target, Vector2 *velocity, f32 deltaTime)
 {
     Vector2 origin = {rect->x, rect->y};
@@ -243,6 +245,11 @@ void ResolveCollision(PhysicsBody *a, PhysicsBody *b, CollisionInfo info)
     f32 impulseMag = 0.0f;
     
     if(velAlongNormal > 0.0f)
+    {
+        return;
+    }
+    
+    if(a->inverseMass == 0.0f && b->inverseMass == 0.0f)
     {
         return;
     }

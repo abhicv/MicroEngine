@@ -9,7 +9,6 @@ typedef ME_Rect MUI_Rect;
 
 #define BIT_5x3_FONT_FILE "assets/Font/bit5x3.ttf"
 #define OPENSANS_FONT_FILE "assets/Font/OpenSans-Regular.ttf"
-#define VCR_OSD_MONO_FONT_FILE "assets/Font/VCR_OSD_MONO.ttf"
 #define AGOESTOESAN_FONT_FILE "assets/Font/agoestoesan.ttf"
 
 enum
@@ -19,6 +18,7 @@ enum
     MUI_WIDGET_TEXT,
     MUI_WIDGET_ICON_TEXT,
     MUI_WIDGET_COUNT,
+    MUI_WIDGET_TEXTEDIT,
 };
 
 typedef struct Color
@@ -66,6 +66,15 @@ typedef struct MUI_Id
     
 } MUI_Id;
 
+#define MAX_TEXTEDIT_SIZE 100
+
+typedef struct TextEdit
+{
+    u8 text[MAX_TEXTEDIT_SIZE];
+    u32 cursorPos;
+    
+} TextEdit;
+
 typedef struct MUI_Widget
 {
     u32 widgetType;
@@ -97,6 +106,10 @@ typedef struct MUI_Input
     i32 mouseY;
     bool leftMouseButtonDown;
     bool rightMouseButtonDown;
+    bool backSpaceDown;
+    
+    b32 bTextInput;
+    u8 textInputChar;
     
 } MUI_Input;
 
@@ -106,6 +119,9 @@ typedef struct MUI
     i32 mouseY;
     bool leftMouseButtonDown;
     bool rightMouseButtonDown;
+    bool backSpaceDown;
+    u8 textInputChar;
+    b32 bTextInput;
     
     u32 widgetCount;
     MUI_Id hotWidgetId;

@@ -53,6 +53,7 @@ bool DetectRayRectCollisionT(Vector2 origin, Vector2 dir, ME_Rect *target, f32 *
     }
     
     *t = tNear;
+    
     //P`(t) = P(t) + d * t;
     contactPoint->x = origin.x + (dir.x * tNear);
     contactPoint->y = origin.y + (dir.y * tNear);
@@ -141,17 +142,21 @@ void HandleEvent(SDL_Event event)
     }
 }
 
+//TODO(abhicv): need some more tests.
 void Update(float deltaTime)
 {
     if(DetectRectVsRectCollisionT(&rect, &targetRect, 0.016f, &velocity, &contactTime, &contactNormal))
     {
         ME_DEBUG_LOG_COORDINATES(contactNormal);
-        velocity.x = velocity.x + (abs(velocity.x) * contactNormal.x * (1.0f - contactTime));
-        velocity.y = velocity.y + (abs(velocity.y) * contactNormal.y * (1.0f - contactTime));
+        
+        //velocity.x = velocity.x + (velocity.x) * contactNormal.x * (1.0f - contactTime));
+        //velocity.y = velocity.y + (velocity.y) * contactNormal.y * (1.0f - contactTime));
+        
+        //velocity.x = 10.0f * contactNormal.x;
+        //velocity.y = -10.0f * contactNormal.y;
+        
         color.g = 0;
         color.b = 0;
-        //velocity.x = 0;
-        //velocity.y = 0;
     }
     else
     {
@@ -165,28 +170,30 @@ void Update(float deltaTime)
 
 void Render(SDL_Renderer *renderer)
 {
-    MUI_EndFrame(&ui, renderer);
     {
-        SDL_Rect sRect;
+        SDL_Rect sRect = {0};
         sRect.x = rect.x - rect.width / 2;
         sRect.y = rect.y - rect.height / 2;
         sRect.w = rect.width;
         sRect.h = rect.height;
         ME_RenderDrawRect(renderer, &sRect, color);
     }
+    
     {
-        SDL_Rect sRect;
+        SDL_Rect sRect = {0};
         sRect.x = targetRect.x - targetRect.width / 2;
         sRect.y = targetRect.y - targetRect.height / 2;
         sRect.w = targetRect.width;
         sRect.h = targetRect.height;
         ME_RenderDrawRect(renderer, &sRect, color);
     }
+    
+    MUI_EndFrame(&ui, renderer);
 }
 
 int main(int argc, char *argv[])
 {
-    ME_Game game = ME_CreateGame("MicroPhysics_ test", 1280, 720);
+    ME_Game game = ME_CreateGame("MicroPhysics_test", 1280, 720);
     game.update = Update;
     game.handleEvent = HandleEvent;
     game.render = Render;

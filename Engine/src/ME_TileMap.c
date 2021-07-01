@@ -45,7 +45,7 @@ TileMap ME_LoadTileMap(const char *fileName)
     
     FILE *tileMapFile = fopen(fileName, "r");
     
-    if(tileMapFile != NULL)
+    if(tileMapFile)
     {
         char c = 0;
         char a = 0;

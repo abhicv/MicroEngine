@@ -9,12 +9,29 @@
 #define GAME_UPDATE_AND_RENDER(name) void name(u32 *gameMode, bool *quitGame,f32 deltaTime, SDL_Renderer *renderer)
 #define SHOW_SCREEN(name) void name(u32 *gameMode, SDL_Event *event, SDL_Renderer *renderer)
 
+//used by the sdl platform  layer to run the game
+#ifndef __EMSCRIPTEN__
 extern __declspec(dllexport) LOAD_DATA(LoadData);
 extern __declspec(dllexport) HANDLE_EVENT(HandleEvent);
 extern __declspec(dllexport) GAME_UPDATE_AND_RENDER(GameUpdateAndRender);
 extern __declspec(dllexport) SHOW_SCREEN(ShowMainMenu);
 extern __declspec(dllexport) SHOW_SCREEN(ShowCredits);
-extern __declspec(dllexport) SHOW_SCREEN(ShowLevelMenu);
+
+//dll export to test game levels from editor0
+extern __declspec(dllexport) void LoadLevelData(const char *entityMapFile, const char *tileMapFile,
+                                                const char *collisionMapFile, SDL_Renderer *renderer);
+#else
+LOAD_DATA(LoadData);
+HANDLE_EVENT(HandleEvent);
+GAME_UPDATE_AND_RENDER(GameUpdateAndRender);
+SHOW_SCREEN(ShowMainMenu);
+SHOW_SCREEN(ShowCredits);
+
+//dll export to test game levels from editor0
+void LoadLevelData(const char *entityMapFile, const char *tileMapFile,
+                   const char *collisionMapFile, SDL_Renderer *renderer);
+
+#endif
 
 enum GameMode
 {
