@@ -77,7 +77,7 @@ void PlayerInputSystem(InputComponent *input, SDL_Event *event)
     }
 }
 
-#define PLAYER_MAX_SPEED_X 100.0f
+#define PLAYER_MAX_SPEED_X 300.0f
 #define PLAYER_JUMP_SPEED 200.0f
 
 void PlayerControlSystem(TransformComponent *transform, AnimationComponent *animation,
@@ -174,16 +174,13 @@ void EnemyPatrolSystem(TransformComponent *transform,
     //transform->position.y += (sinf(SDL_GetTicks() / 100.0f));
 }
 
-#define ENEMY_BULLET_SPEED 80.0f
+#define ENEMY_BULLET_SPEED 300.0f
 #define ENEMT_CHASE_SPEED 100.0f
 #define SQUARE(x) x*x
 
-void FlyeeAISystem(MicroECSWorld *ecsWorld,
-                   EntityStatComponent *stat,
-                   TransformComponent *transform,
-                   AnimationComponent *animation,
-                   Vector2 playerPosition,
-                   f32 deltaTime)
+void FlyeeAISystem(MicroECSWorld *ecsWorld, EntityStatComponent *stat,
+                   TransformComponent *transform, AnimationComponent *animation,
+                   Vector2 playerPosition, f32 deltaTime)
 {
     Vector2 dirVec = Vector2Subtract(playerPosition, transform->position);
     f32 distanceSqr = Vector2SqrMag(dirVec);
@@ -210,7 +207,7 @@ void FlyeeAISystem(MicroECSWorld *ecsWorld,
         
         animation->animations[Walking].flip = (dirVec.x < 0.0f) ? true : false;
     }
-    else if (stat->EnemyStat.state == SHOOT && stat->EnemyStat.shootDelay > 0.5f)
+    else if (stat->EnemyStat.state == SHOOT && stat->EnemyStat.shootDelay > 1.0f)
     {
         stat->EnemyStat.shootDelay = 0.0f;
         
@@ -268,7 +265,7 @@ void FlyeeAISystem(MicroECSWorld *ecsWorld,
     }
 }
 
-#define BULLET_SPEED 150
+#define BULLET_SPEED 500
 void FiringSystem(MicroECSWorld *ecsWorld,
                   InputComponent *input,
                   EntityStatComponent *playerStat,

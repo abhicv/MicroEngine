@@ -1,7 +1,7 @@
 #ifndef UI_STYLE_H
 #define UI_STYLE_H
 
-#define MUI_ORIGIN_ID 2020
+#define MUI_ORIGIN_ID 2021
 
 MUI_Style buttonStyle = {
     .buttonStyle = {

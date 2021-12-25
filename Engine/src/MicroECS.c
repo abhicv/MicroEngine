@@ -94,12 +94,13 @@ void PhysicsSystem(MicroECSWorld *ecsWorld, Vector2 gravity ,f32 deltaTime)
                    !MECS_EntitySignatureEquals(ecsWorld->physics[j].excludeEntityTag, ecsWorld->tags[i]))
                 {
                     CollisionInfo info = DetectCollision(&ecsWorld->physics[i].physicsBody.rect, &ecsWorld->physics[j].physicsBody.rect);
-#if 0
-                    CollisionInfo info = DetectRectVsRectCollision(&ecsWorld->physics[i].physicsBody.rect, 
+                    
+                    /*CollisionInfo info = DetectRectVsRectCollision(&ecsWorld->physics[i].physicsBody.rect, 
                                                                    &ecsWorld->physics[j].physicsBody.rect, 
                                                                    &ecsWorld->physics[i].physicsBody.velocity, 
                                                                    deltaTime);
-#endif
+                    */
+                    
                     if(info.collided)
                     {
                         ecsWorld->physics[i].collided = true;

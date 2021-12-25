@@ -21,6 +21,13 @@ enum
     MUI_WIDGET_TEXTEDIT,
 };
 
+enum 
+{
+    MUI_TEXT_ALIGN_LEFT = 0,
+    MUI_TEXT_ALIGN_MIDDLE = 1,
+    MUI_TEXT_ALIGN_RIGHT = 2,
+};
+
 typedef struct Color
 {
     u8 r;
@@ -66,7 +73,7 @@ typedef struct MUI_Id
     
 } MUI_Id;
 
-#define MAX_TEXTEDIT_SIZE 100
+#define MAX_TEXTEDIT_SIZE 250
 
 typedef struct TextEdit
 {
@@ -94,7 +101,7 @@ typedef struct MUI_Widget
         {
             char *text;
             u32 fontSize;
-            
+            u32 alignType;
         } text;
     };
     
@@ -102,28 +109,32 @@ typedef struct MUI_Widget
 
 typedef struct MUI_Input
 {
+    u8 textInputChar;
+    
     i32 mouseX;
     i32 mouseY;
-    bool leftMouseButtonDown;
-    bool rightMouseButtonDown;
-    bool backSpaceDown;
     
+    b32 leftMouseButtonDown;
+    b32 rightMouseButtonDown;
+    b32 backSpaceDown;
     b32 bTextInput;
-    u8 textInputChar;
     
 } MUI_Input;
 
 typedef struct MUI
 {
+    u8 textInputChar;
+    
     i32 mouseX;
     i32 mouseY;
-    bool leftMouseButtonDown;
-    bool rightMouseButtonDown;
-    bool backSpaceDown;
-    u8 textInputChar;
+    
+    b32 leftMouseButtonDown;
+    b32 rightMouseButtonDown;
+    b32 backSpaceDown;
     b32 bTextInput;
     
     u32 widgetCount;
+    
     MUI_Id hotWidgetId;
     MUI_Id activeWidgetId;
     
@@ -151,8 +162,8 @@ MUI_Id MUI_IdInit(u32 primary, u32 secondary);
 bool MUI_IdEqual(MUI_Id a, MUI_Id b);
 MUI_Id MUI_NullId(void);
 
-void MUI_Text(MUI *ui, MUI_Id id, MUI_Rect rect, char *text, u32 fontSize, MUI_Style style);
-void MUI_TextA(MUI *ui, MUI_Id id, char *text, u32 fontSize, MUI_Style style);
+void MUI_Text(MUI *ui, MUI_Id id, MUI_Rect rect, char *text, u32 fontSize, MUI_Style style, u32 alignment);
+void MUI_TextA(MUI *ui, MUI_Id id, char *text, u32 fontSize, MUI_Style style, u32 alignment);
 
 bool MUI_Button(MUI *ui, MUI_Id id, char *text, MUI_Rect rect, MUI_Style style);
 bool MUI_ButtonA(MUI *ui, MUI_Id id, char *text, MUI_Style style);

@@ -9,6 +9,14 @@
 #include "..\Engine\src\types.h"
 #include "..\Engine\src\ME_TileMap.h"
 
+enum AppMode
+{
+    APP_MODE_MAIN_MENU,
+    APP_MODE_EDITOR,
+    APP_MODE_GAME_TEST,
+    APP_MODE_QUIT,
+};
+
 enum EditorMode
 {
     EDITOR_MODE_TILE,
@@ -25,7 +33,7 @@ typedef struct TileSpace
     
 } TileSpace;
 
-#define MAX_ENTITY_COUNT 100
+#define MAX_ENTITY_COUNT 200
 typedef struct EntitySpace
 {
 	SDL_Point entityPositions[MAX_ENTITY_COUNT];
@@ -36,7 +44,7 @@ typedef struct EntitySpace
     
 } EntitySpace;
 
-#define MAX_COLLISION_RECTS 100
+#define MAX_COLLISION_RECTS 200
 typedef struct CollisionSpace
 {
     SDL_Rect collisionRects[MAX_COLLISION_RECTS];
@@ -54,6 +62,7 @@ typedef struct TileSheetDisplaySpace
     
 } TileSheetDisplaySpace;
 
+//not yet used in code
 typedef struct Editor
 {
     TileSpace tileSpace;

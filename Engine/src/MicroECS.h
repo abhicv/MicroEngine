@@ -39,7 +39,7 @@ enum Direction
 //NOTE(abhicv): Used for indexing animations in animation component
 enum AnimationState
 {
-    Idle,
+    Idle = 0,
     Walking,
     Jump,
     Attack,
@@ -179,12 +179,12 @@ enum EntityTag
     ENTITY_TAG_SLIME =    (1 << 2),
     ENTITY_TAG_COIN =     (1 << 3),
     ENTITY_TAG_FLYEE =    (1 << 4),
-    ENTITY_TAG_CAPTURE_FLAG = (1 << 5),
-    
-    ENTITY_TAG_NONE =     (1 << 6),   
+    ENTITY_TAG_CRATE = (1 << 5),
+    ENTITY_TAG_CAPTURE_FLAG = (1 << 6),
     ENTITY_TAG_PLATFORM = (1 << 7),   
     ENTITY_TAG_BULLET =   (1 << 8),
     ENTITY_TAG_ENEMY_BULLET = (1 << 9),
+    ENTITY_TAG_NONE =     (1 << 10),   
 };
 
 #endif //MICROECS_H

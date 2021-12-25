@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     }
     
     //using software rendering
-    renderer = SDL_CreateRenderer(window, 3, 0);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     
     if (renderer == NULL)
     {
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     }
     
     f32 deltaTime = 1.0f / 60.0f;
-    f32 targetDeltaTime = 1.0f/ 60.0f;
+    f32 targetDeltaTime = 1.0f / 60.0f;
     
     u64 startTime = 0;
     u64 endTime = 0;
@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
                 u64 elapsed = (endTime - startTime) * 1000 / performanceFreq;
                 deltaTime = (float)elapsed / 1000.0f;
                 
-#if 1
+#if 0
                 if(deltaTime < targetDeltaTime)
                 {
                     SDL_Delay((targetDeltaTime - deltaTime)*1000.0f);
@@ -115,10 +115,9 @@ int main(int argc, char *argv[])
                     endTime = SDL_GetPerformanceCounter();
                     elapsed = (endTime - startTime) * 1000 / performanceFreq;
                     deltaTime = (float)elapsed / 1000.0f;
-                    
                 }
 #endif
-                //printf("deltaTime: %0.6f\n", deltaTime);
+                //printf("fps: %0.3f\n", 1/deltaTime);
             }
             break;
             

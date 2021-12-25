@@ -279,7 +279,7 @@ void LoadFlyee(MicroECSWorld *ecsWorld, GameResource *gameResource, int x, int y
         
         //physics
         PhysicsComponent physics = {0};
-        ecsWorld->physics[flyee].physicsBody = CreatePhysicsBody(Vector2Init((f32)x, (f32)y), 200.0f, 45, 30);
+        ecsWorld->physics[flyee].physicsBody = CreatePhysicsBody(Vector2Init((f32)x, (f32)y), 0.0f, 45, 30);
         ecsWorld->physics[flyee].physicsBody.restitution = 0.0f;
         ecsWorld->physics[flyee].physicsBody.friction = 0.05f;
         ecsWorld->physics[flyee].excludeEntityTag = ENTITY_TAG_PLATFORM | ENTITY_TAG_LIZARD | ENTITY_TAG_SLIME | ENTITY_TAG_COIN;
@@ -319,6 +319,7 @@ void LoadCoin(MicroECSWorld *ecsWorld, GameResource *gameResource, int x, int y)
             .frameCount = 4,
             .flip = false,
         };
+        
         ecsWorld->animations[coin].animations[Idle] = coinAnim;
         ecsWorld->animations[coin].width = 16;
         ecsWorld->animations[coin].height = 16;
@@ -337,6 +338,53 @@ void LoadCoin(MicroECSWorld *ecsWorld, GameResource *gameResource, int x, int y)
         ecsWorld->physics[coin].physicsBody.affectedByGravity = false;
         
         ecsWorld->entitySignature[coin] = TRANSFORM_COMPONENT_SIGN |
+            ANIMATION_COMPONENT_SIGN |
+            RENDER_COMPONENT_SIGN |
+            PHYSICS_COMPONENT_SIGN;
+    }
+    else
+    {
+        printf("\nECS world full!!!\n");
+    }
+}
+
+void LoadCrate(MicroECSWorld *ecsWorld, GameResource *gameResource, int x, int y)
+{
+    Entity crate  = MECS_CreateEntity(ecsWorld, ENTITY_TAG_CRATE);
+    
+    if (crate < MAX_ENTITY_COUNT)
+    {
+        //transform
+        ecsWorld->transforms[crate]= CreateTransformComponent(Vector2Init((f32)x, (f32)y), Vector2Null(), 0.0f);
+        
+        Animation anim = {
+            .frames = {
+                {64, 0},
+            },
+            .currentFrameIndex = 0,
+            .frameInterval  = 100,
+            .frameCount = 1,
+            .flip = false,
+        };
+        
+        ecsWorld->animations[crate].animations[Idle] = anim;
+        ecsWorld->animations[crate].width = 16;
+        ecsWorld->animations[crate].height = 16;
+        ecsWorld->animations[crate].currentAnimationIndex = Idle;
+        
+        //render
+        ecsWorld->renders[crate].texture = gameResource->itemSprite;
+        ecsWorld->renders[crate].width = 50;
+        ecsWorld->renders[crate].height = 50;
+        
+        //physics
+        ecsWorld->physics[crate].physicsBody = CreatePhysicsBody(Vector2Init((f32)x, (f32)y), 2.0f, 50, 50);
+        ecsWorld->physics[crate].physicsBody.restitution = 0.0f;
+        ecsWorld->physics[crate].physicsBody.friction = 0.1f;
+        ecsWorld->physics[crate].excludeEntityTag = ENTITY_TAG_LIZARD | ENTITY_TAG_SLIME | ENTITY_TAG_BULLET;
+        ecsWorld->physics[crate].physicsBody.affectedByGravity = true;
+        
+        ecsWorld->entitySignature[crate] = TRANSFORM_COMPONENT_SIGN |
             ANIMATION_COMPONENT_SIGN |
             RENDER_COMPONENT_SIGN |
             PHYSICS_COMPONENT_SIGN;

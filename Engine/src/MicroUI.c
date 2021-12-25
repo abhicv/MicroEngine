@@ -29,6 +29,7 @@ void MUI_BeginFrame(MUI *ui, MUI_Input *input)
         ui->mouseY = input->mouseY;
         ui->textInputChar = input->textInputChar;
         ui->bTextInput = input->bTextInput;
+        ui->backSpaceDown = input->backSpaceDown;
     }
 }
 
@@ -38,14 +39,13 @@ void MUI_EndFrame(MUI *ui, SDL_Renderer *renderer)
     SDL_Color color = {255, 255, 255, 255};
     SDL_Color textColor = {255, 255, 255, 255};
     
-    TTF_Font *font = NULL;
-    SDL_Surface *surface = NULL;
-    SDL_Texture *tex = NULL;
+    TTF_Font *font = 0;
+    SDL_Surface *surface = 0;
+    SDL_Texture *tex = 0;
     
     bool highlighted = false;
     
-    u32 i = 0;
-    for (i = 0; i < ui->widgetCount; i++)
+    for (u32 i = 0; i < ui->widgetCount; i++)
     {
         switch (ui->widgets[i].widgetType)
         {
@@ -90,19 +90,64 @@ void MUI_EndFrame(MUI *ui, SDL_Renderer *renderer)
             
             case MUI_WIDGET_TEXTEDIT:
             {
-                highlighted = MUI_IdEqual(ui->hotWidgetId, ui->widgets[i].id);
+                highlighted = MUI_IdEqual(ui->activeWidgetId, ui->widgets[i].id);
                 color.r = highlighted ? ui->widgets[i].style.buttonStyle.highlightColor.r : ui->widgets[i].style.buttonStyle.idleColor.r;
                 color.g = highlighted ? ui->widgets[i].style.buttonStyle.highlightColor.g : ui->widgets[i].style.buttonStyle.idleColor.g;
                 color.b = highlighted ? ui->widgets[i].style.buttonStyle.highlightColor.b : ui->widgets[i].style.buttonStyle.idleColor.b;
                 
                 rect = MUI_RectToSDL_Rect(&ui->widgets[i].rect);
-                ME_RenderFillRect(renderer, &rect, color);
-                
-                if(MUI_IdEqual(ui->hotWidgetId, ui->widgets[i].id))
+                ME_RenderDrawRect(renderer, &rect, color);
+                /*
+                if(highlighted)
                 {
                     SDL_Color borderColor = {255, 255, 255, 255};
                     ME_RenderDrawRect(renderer, &rect, borderColor);
                 }
+                */
+                if(ui->fontFile != NULL)
+                {
+                    font = TTF_OpenFont(ui->fontFile, ui->widgets[i].style.buttonStyle.fontSize);
+                }
+                
+                int fontHeight = 0;
+                if(font != NULL)
+                {
+                    surface = TTF_RenderText_Blended(font, ui->widgets[i].text.text, textColor);
+                    fontHeight = TTF_FontHeight(font);
+                }
+                
+                if(surface != NULL)
+                {
+                    tex = SDL_CreateTextureFromSurface(renderer, surface);
+                }
+                
+                SDL_Rect tmpRect = rect;
+                tmpRect.w = 0;
+                tmpRect.h = fontHeight;
+                
+                SDL_QueryTexture(tex, NULL, NULL, &tmpRect.w, &tmpRect.h);
+                
+                tmpRect.x = rect.x + 5;
+                tmpRect.y = rect.y + (rect.h - tmpRect.h) / 2;
+                
+                if (tex != NULL && renderer != NULL)
+                {
+                    SDL_RenderCopy(renderer, tex, NULL, &tmpRect);
+                }
+                
+                if(highlighted)
+                {
+                    SDL_Rect cursorRect;
+                    cursorRect.x = tmpRect.x + tmpRect.w;
+                    cursorRect.y = tmpRect.y;
+                    cursorRect.w = 5;
+                    cursorRect.h = tmpRect.h;
+                    ME_RenderFillRect(renderer, &cursorRect, textColor);
+                }
+                
+                SDL_DestroyTexture(tex);
+                SDL_FreeSurface(surface);
+                TTF_CloseFont(font);
             }
             break;
             
@@ -119,8 +164,9 @@ void MUI_EndFrame(MUI *ui, SDL_Renderer *renderer)
                 
                 if(font != NULL)
                 {
-                    surface = TTF_RenderText_Solid(font, ui->widgets[i].text.text, textColor);
+                    surface = TTF_RenderText_Blended(font, ui->widgets[i].text.text, textColor);
                 }
+                
                 if(surface != NULL)
                 {
                     tex = SDL_CreateTextureFromSurface(renderer, surface);
@@ -131,12 +177,26 @@ void MUI_EndFrame(MUI *ui, SDL_Renderer *renderer)
                 SDL_Rect tmpRect = rect;
                 SDL_QueryTexture(tex, NULL, NULL, &tmpRect.w, &tmpRect.h);
                 
-                tmpRect.x = rect.x + (rect.w - tmpRect.w) / 2;
+                if(ui->widgets[i].text.alignType == MUI_TEXT_ALIGN_MIDDLE)
+                {
+                    tmpRect.x = rect.x + (rect.w - tmpRect.w) / 2;
+                }
+                else if(ui->widgets[i].text.alignType == MUI_TEXT_ALIGN_LEFT)
+                {
+                    tmpRect.x = rect.x + 5;
+                }
+                else if(ui->widgets[i].text.alignType == MUI_TEXT_ALIGN_RIGHT)
+                {
+                    tmpRect.x = (rect.x + rect.w) - (tmpRect.w + 5);
+                }
+                
                 tmpRect.y = rect.y + (rect.h - tmpRect.h) / 2;
                 
                 if (tex != NULL && renderer != NULL)
                 {
                     SDL_RenderCopy(renderer, tex, NULL, &tmpRect);
+                    ME_RenderDrawRect(renderer, &tmpRect, (SDL_Color){255, 255, 255 ,255});
+                    //ME_RenderDrawRect(renderer, &rect, (SDL_Color){255, 0, 255 ,255});
                 }
                 
                 SDL_DestroyTexture(tex);
@@ -151,7 +211,7 @@ void MUI_EndFrame(MUI *ui, SDL_Renderer *renderer)
     }
 }
 
-void MUI_Text(MUI *ui, MUI_Id id, MUI_Rect rect, char *text, u32 fontSize, MUI_Style style)
+void MUI_Text(MUI *ui, MUI_Id id, MUI_Rect rect, char *text, u32 fontSize, MUI_Style style, u32 alignment)
 {
     if(ui->widgetCount < MUI_MAX_WIDGETS)
     {
@@ -160,6 +220,7 @@ void MUI_Text(MUI *ui, MUI_Id id, MUI_Rect rect, char *text, u32 fontSize, MUI_S
         widget->id = id;
         widget->text.text = text;
         widget->text.fontSize = fontSize;
+        widget->text.alignType = alignment;
         widget->rect = rect;
         widget->style = style;
     }
@@ -169,19 +230,19 @@ void MUI_Text(MUI *ui, MUI_Id id, MUI_Rect rect, char *text, u32 fontSize, MUI_S
     }
 }
 
-void MUI_TextA(MUI *ui, MUI_Id id, char *text, u32 fontSize, MUI_Style style)
+void MUI_TextA(MUI *ui, MUI_Id id, char *text, u32 fontSize, MUI_Style style, u32 alignment)
 {
-    MUI_Text(ui, id, MUI_GetNextAutoLayoutRect(ui), text, fontSize, style);
+    MUI_Text(ui, id, MUI_GetNextAutoLayoutRect(ui), text, fontSize, style, alignment);
 }
 
 bool MUI_Button(MUI *ui, MUI_Id id, char *text, MUI_Rect rect, MUI_Style style)
 {
     bool isTriggered = false;
     
-    u32 left = rect.x - rect.width / 2;
-    u32 right = rect.x + rect.width / 2;
-    u32 top = rect.y - rect.height / 2;
-    u32 bottom = rect.y + rect.height / 2;
+    u32 left = rect.x;
+    u32 right = rect.x + rect.width;
+    u32 top = rect.y;
+    u32 bottom = rect.y + rect.height;
     
     bool isMouseOver = (ui->mouseX > left &&
                         ui->mouseX < right &&
@@ -238,7 +299,7 @@ bool MUI_Button(MUI *ui, MUI_Id id, char *text, MUI_Rect rect, MUI_Style style)
         },
     };
     
-    MUI_Text(ui, MUI_IdInit(id.primary - 10, id.secondary + 10), rect, text, style.buttonStyle.fontSize, textStyle);
+    MUI_Text(ui, MUI_IdInit(id.primary - 10, id.secondary + 10), rect, text, style.buttonStyle.fontSize, textStyle, MUI_TEXT_ALIGN_MIDDLE);
     
     return isTriggered;
 }
@@ -250,10 +311,10 @@ bool MUI_ButtonA(MUI *ui, MUI_Id id, char *text, MUI_Style style)
 
 f32 MUI_Slider(MUI *ui, MUI_Id id, f32 value, MUI_Rect rect, MUI_Style style)
 {
-    u32 left = rect.x - rect.width / 2;
-    u32 right = rect.x + rect.width / 2;
-    u32 top = rect.y - rect.height / 2;
-    u32 bottom = rect.y + rect.height / 2;
+    u32 left = rect.x;
+    u32 right = rect.x + rect.width;
+    u32 top = rect.y;
+    u32 bottom = rect.y + rect.height;
     
     bool isMouseOver = (ui->mouseX > left && ui->mouseX < right && ui->mouseY > top && ui->mouseY < bottom);
     
@@ -281,7 +342,7 @@ f32 MUI_Slider(MUI *ui, MUI_Id id, f32 value, MUI_Rect rect, MUI_Style style)
     {
         if (ui->leftMouseButtonDown)
         {
-            value = (f32)(ui->mouseX - left) / (f32)rect.width;
+            value = ((f32)ui->mouseX - (f32)left) / (f32)rect.width;
         }
         else
         {
@@ -322,10 +383,10 @@ f32 MUI_SliderA(MUI *ui, MUI_Id id, f32 value, MUI_Style style)
 
 void MUI_TextEdit(MUI *ui, MUI_Id id, MUI_Rect rect, MUI_Style style, TextEdit *textEdit)
 {
-    u32 left = rect.x - rect.width / 2;
-    u32 right = rect.x + rect.width / 2;
-    u32 top = rect.y - rect.height / 2;
-    u32 bottom = rect.y + rect.height / 2;
+    u32 left = rect.x;
+    u32 right = rect.x + rect.width;
+    u32 top = rect.y;
+    u32 bottom = rect.y + rect.height;
     
     bool isMouseOver = (ui->mouseX > left && ui->mouseX < right &&
                         ui->mouseY > top && ui->mouseY < bottom);
@@ -333,6 +394,11 @@ void MUI_TextEdit(MUI *ui, MUI_Id id, MUI_Rect rect, MUI_Style style, TextEdit *
     if (!MUI_IdEqual(id, ui->hotWidgetId) && isMouseOver)
     {
         ui->hotWidgetId = id;
+    }
+    else if (MUI_IdEqual(id, ui->hotWidgetId) && !isMouseOver && ui->leftMouseButtonDown)
+    {
+        ui->hotWidgetId = MUI_NullId();
+        ui->activeWidgetId = MUI_NullId();
     }
     
     if (MUI_IdEqual(id, ui->activeWidgetId))
@@ -346,6 +412,12 @@ void MUI_TextEdit(MUI *ui, MUI_Id id, MUI_Rect rect, MUI_Style style, TextEdit *
                     textEdit->text[textEdit->cursorPos] = ui->textInputChar;
                     textEdit->cursorPos++;
                 }
+            }
+            
+            if(ui->backSpaceDown && textEdit->cursorPos > 0)
+            {
+                textEdit->cursorPos--;
+                textEdit->text[textEdit->cursorPos] = 0;
             }
         }
     }
@@ -367,29 +439,36 @@ void MUI_TextEdit(MUI *ui, MUI_Id id, MUI_Rect rect, MUI_Style style, TextEdit *
         widget->widgetType = MUI_WIDGET_TEXTEDIT;
         widget->rect = rect;
         widget->style = style;
+        widget->text.text = textEdit->text;
+        widget->text.fontSize = 15;
     }
     else
     {
         printf("UI widget count out of bound\n");
     }
     
+    /*
     MUI_Style textStyle = {
         .textStyle = {
             .textColor = (Color){255, 255, 255, 255},
         },
     };
     
-    MUI_Rect textRect = {0};
-    textRect.x = rect.x;
-    MUI_Text(ui, MUI_IdInit(id.primary - 10, id.secondary + 10), rect, textEdit->text, 20, textStyle);
+    MUI_Text(ui, MUI_IdInit(id.primary - 10, id.secondary + 10), rect, textEdit->text, 15, textStyle);
+    */
+}
+
+void MUI_TextEditA(MUI *ui, MUI_Id id, MUI_Style style, TextEdit *textEdit)
+{
+    MUI_TextEdit(ui, id, MUI_GetNextAutoLayoutRect(ui), style, textEdit);
 }
 
 SDL_Rect MUI_RectToSDL_Rect(MUI_Rect *rect)
 {
     SDL_Rect sdlRect = {0};
     
-    sdlRect.x = rect->x - rect->width / 2;
-    sdlRect.y = rect->y - rect->height / 2;
+    sdlRect.x = rect->x;
+    sdlRect.y = rect->y;
     sdlRect.w = rect->width;
     sdlRect.h = rect->height;
     
