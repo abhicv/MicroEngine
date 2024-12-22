@@ -8,7 +8,7 @@ MUI_Style buttonStyle = {
         .idleColor = {250, 200, 15},
         .highlightColor = {200, 140, 10},
         .textColor = {0, 0, 0},
-        .fontSize = 14,
+        .fontSize = 20,
     },
 };
 

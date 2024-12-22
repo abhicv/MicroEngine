@@ -48,7 +48,7 @@ void UpdatePhysics(PhysicsBody *body, Vector2 gravity, f32 deltaTime)
     body->velocity.x += (body->acceleration.x * deltaTime);
     body->velocity.y += (body->acceleration.y * deltaTime);
     
-    //NOTE(abhicv): applying friction in x direction
+    // Applying friction in x direction
     body->velocity.x -= (body->velocity.x * body->friction);
     
     body->position.x += body->velocity.x * deltaTime;

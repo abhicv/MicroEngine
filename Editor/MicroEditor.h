@@ -9,6 +9,14 @@
 #include "..\Engine\src\types.h"
 #include "..\Engine\src\ME_TileMap.h"
 
+enum MENU_MODE 
+{
+    CREATE_LEVEL_MODE,
+    LOAD_LEVEL_MODE,
+    MENU_MODE,
+    LOAD_DEFAULT_LEVEL
+};
+
 enum AppMode
 {
     APP_MODE_MAIN_MENU,
@@ -29,16 +37,15 @@ enum EditorMode
 typedef struct TileSpace
 {
     TileMap tileMap;
-    SDL_Rect tileMapCursor;
-    
+    SDL_Rect tileMapCursor;    
 } TileSpace;
 
-#define MAX_ENTITY_COUNT 200
+#define MAX_ENTITY_COUNT_EDITOR 200
 typedef struct EntitySpace
 {
-	SDL_Point entityPositions[MAX_ENTITY_COUNT];
+	SDL_Point entityPositions[MAX_ENTITY_COUNT_EDITOR];
 	SDL_Rect entityCursor;
-	u32 entityTag[MAX_ENTITY_COUNT];
+	u32 entityTag[MAX_ENTITY_COUNT_EDITOR];
 	u32 entityCount;
 	u32 currentEntityTag;
     
@@ -58,8 +65,7 @@ typedef struct TileSheetDisplaySpace
 {
     SDL_Texture *displayTexture;
     SDL_Rect displayRect;
-    SDL_Rect tileSheetCursor;
-    
+    SDL_Rect tileSheetCursor;    
 } TileSheetDisplaySpace;
 
 //not yet used in code
@@ -67,8 +73,7 @@ typedef struct Editor
 {
     TileSpace tileSpace;
     CollisionSpace collisionSpace;
-    EntitySpace entitySpace;
-    
+    EntitySpace entitySpace;    
     TileSheetDisplaySpace tileSheetDisplay;
     
     SDL_Rect deleteCursor;

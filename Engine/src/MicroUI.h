@@ -4,7 +4,7 @@
 #include "ME_Rect.h"
 typedef ME_Rect MUI_Rect;
 
-#define MUI_MAX_WIDGETS 128
+#define MUI_MAX_WIDGETS 500
 #define MUI_MAX_AUTOLAYOUT_SIZE 16
 
 #define BIT_5x3_FONT_FILE "assets/Font/bit5x3.ttf"
@@ -47,7 +47,7 @@ typedef struct MUI_Style
             Color highlightColor;
             Color textColor;
             u32 fontSize;
-            
+            bool enableHighlightBorder;            
         } buttonStyle;
         
         struct SliderStyle

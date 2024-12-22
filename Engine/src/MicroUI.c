@@ -59,7 +59,7 @@ void MUI_EndFrame(MUI *ui, SDL_Renderer *renderer)
                 rect = MUI_RectToSDL_Rect(&ui->widgets[i].rect);
                 ME_RenderFillRect(renderer, &rect, color);
                 
-                if(MUI_IdEqual(ui->hotWidgetId, ui->widgets[i].id))
+                if(highlighted && ui->widgets[i].style.buttonStyle.enableHighlightBorder)
                 {
                     SDL_Color borderColor = {255, 255, 255, 255};
                     ME_RenderDrawRect(renderer, &rect, borderColor);
@@ -195,8 +195,8 @@ void MUI_EndFrame(MUI *ui, SDL_Renderer *renderer)
                 if (tex != NULL && renderer != NULL)
                 {
                     SDL_RenderCopy(renderer, tex, NULL, &tmpRect);
-                    ME_RenderDrawRect(renderer, &tmpRect, (SDL_Color){255, 255, 255 ,255});
-                    //ME_RenderDrawRect(renderer, &rect, (SDL_Color){255, 0, 255 ,255});
+                    // ME_RenderDrawRect(renderer, &tmpRect, (SDL_Color){255, 255, 255 ,255});
+                    // ME_RenderDrawRect(renderer, &rect, (SDL_Color){255, 0, 255 ,255});
                 }
                 
                 SDL_DestroyTexture(tex);
@@ -528,9 +528,6 @@ MUI_Rect MUI_GetNextAutoLayoutRect(MUI *ui)
 
 void MUI_GetInput(MUI_Input *uiInput, SDL_Event *event)
 {
-    uiInput->mouseX = event->motion.x;
-    uiInput->mouseY = event->motion.y;
-    
     uiInput->bTextInput = false;
     
     SDL_StartTextInput();
@@ -576,6 +573,11 @@ void MUI_GetInput(MUI_Input *uiInput, SDL_Event *event)
         case SDL_TEXTINPUT:
         uiInput->textInputChar = event->text.text[0];
         uiInput->bTextInput = true;
+        break;
+
+        case SDL_MOUSEMOTION:
+        uiInput->mouseX = event->motion.x;
+        uiInput->mouseY = event->motion.y;
         break;
     }
 }

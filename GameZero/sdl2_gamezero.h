@@ -3,10 +3,9 @@
 
 #include "gamezero.h"
 
-global SDL_Window *window;
-global SDL_Renderer *renderer;
-global SDL_Event event;
-
+global SDL_Window *window = 0;
+global SDL_Renderer *renderer = 0;
+global SDL_Event event = {0};
 global bool quitGlobal = false;
 global u32 gameMode = GAME_MAIN_MENU;
 

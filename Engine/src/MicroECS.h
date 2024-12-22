@@ -79,10 +79,16 @@ typedef struct AnimationComponent
     
 } AnimationComponent;
 
+#define MAX_COLLISION_COUNT 4
 typedef struct PhysicsComponent
 {
     PhysicsBody physicsBody;
-    Entity collidedEntity;
+
+    // a physics can collide upto 4 other physics body
+    Entity collidedEntities[MAX_COLLISION_COUNT];
+    Vector2 normals[MAX_COLLISION_COUNT];
+    
+    u32 collisionCount;
     u32 tagOfCollidedEntity;
     bool collided;
     bool isGrounded;
@@ -108,18 +114,15 @@ typedef struct InputComponent
     
 } InputComponent;
 
-//NOTE(abhicv): states specifically for the game
-typedef struct EntityStatComponent
+typedef struct EntityStateComponent
 {
     union
     {
         struct
         {
             f32 health;
-            u32 facingDir;
-            f32 affectHealthDelay;
-            
-        } PlayerStat;
+            u32 facingDir;            
+        } Player;
         
         struct
         {
@@ -130,16 +133,15 @@ typedef struct EntityStatComponent
             u32 state;
             f32 shootDelay;
             
-        } EnemyStat;
+        } Enemy;
         
         struct 
         {
-            Vector2 startPosition;
-            
-        } BulletStat;
+            Vector2 startPosition;            
+        } Bullet;
     };
     
-} EntityStatComponent;
+} EntityStateComponent;
 
 //NOTE(abhicv): component signature
 #define TRANSFORM_COMPONENT_SIGN   (1 << 0)
@@ -160,7 +162,7 @@ typedef struct MicroECSWorld
     RenderComponent renders[MAX_ENTITY_COUNT];        
     AnimationComponent animations[MAX_ENTITY_COUNT];  
     PhysicsComponent physics[MAX_ENTITY_COUNT];       
-    EntityStatComponent stat[MAX_ENTITY_COUNT];       
+    EntityStateComponent states[MAX_ENTITY_COUNT];
     
     u32 entitySignature[MAX_ENTITY_COUNT];
     u32 tags[MAX_ENTITY_COUNT];

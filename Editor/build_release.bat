@@ -1,6 +1,8 @@
 @echo off
 REM call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall" x64
 
+call "../GameZero/build.bat"
+
 set microengine_src= /I..\Engine\src
 set sdl2_include= /I..\SDL2\include  
 set sdl2_lib= /LIBPATH:..\SDL2\lib\x64

@@ -1,7 +1,6 @@
 #include "..\Engine\src\MicroECS.h"
 #include "data.h"
 
-//NOTE(abhicv): returns player index so to address the player later from game logic code
 Entity LoadPlayer(MicroECSWorld *ecsWorld, GameResource *gameResource, int x, int y)
 {
     Entity player = MECS_CreateEntity(ecsWorld, ENTITY_TAG_PLAYER);
@@ -67,16 +66,16 @@ Entity LoadPlayer(MicroECSWorld *ecsWorld, GameResource *gameResource, int x, in
         ecsWorld->animations[player].height = 16;
         ecsWorld->animations[player].currentAnimationIndex = 0;
         
-        //stat
-        ecsWorld->stat[player].PlayerStat.health = 100;
-        ecsWorld->stat[player].PlayerStat.facingDir = Right;
+        //state
+        ecsWorld->states[player].Player.health = 100;
+        ecsWorld->states[player].Player.facingDir = Right;
         
         //physics
         ecsWorld->physics[player].physicsBody = CreatePhysicsBody(Vector2Init((f32)x, (f32)y), 1.0, 45, 64);
         ecsWorld->physics[player].physicsBody.velocity = Vector2Init(0.0f, 0.0f);
         ecsWorld->physics[player].physicsBody.affectedByGravity = true;
         ecsWorld->physics[player].physicsBody.restitution = 0.0f;
-        ecsWorld->physics[player].physicsBody.friction = 0.15f;
+        ecsWorld->physics[player].physicsBody.friction = 0.25f;
         ecsWorld->physics[player].excludeEntityTag = ENTITY_TAG_NONE;
         
         ecsWorld->entitySignature[player] = TRANSFORM_COMPONENT_SIGN |
@@ -139,11 +138,11 @@ void LoadLizard(MicroECSWorld *ecsWorld, GameResource *gameResource, int x, int 
         ecsWorld->renders[lizard].height = 64;
         
         //stats
-        ecsWorld->stat[lizard].EnemyStat.startPosition = Vector2Init((f32)x, (f32)y);
-        ecsWorld->stat[lizard].EnemyStat.moveRight = !!(lizard % 2); //odd ones moves right
-        ecsWorld->stat[lizard].EnemyStat.patrolDistance = 40.0f;
-        ecsWorld->stat[lizard].EnemyStat.moveRight = false;
-        ecsWorld->stat[lizard].EnemyStat.health = 1.0f;
+        ecsWorld->states[lizard].Enemy.startPosition = Vector2Init((f32)x, (f32)y);
+        ecsWorld->states[lizard].Enemy.moveRight = !!(lizard % 2); //odd ones moves right
+        ecsWorld->states[lizard].Enemy.patrolDistance = 40.0f;
+        ecsWorld->states[lizard].Enemy.moveRight = false;
+        ecsWorld->states[lizard].Enemy.health = 1.0f;
         
         //physics
         ecsWorld->physics[lizard].physicsBody = CreatePhysicsBody(Vector2Init((f32)x, (f32)y), 0.5f, 64, 64);
@@ -205,10 +204,10 @@ void LoadSlime(MicroECSWorld *ecsWorld, GameResource *gameResource, int x, int y
         ecsWorld->animations[slime].currentAnimationIndex = 1;
         
         //stat
-        ecsWorld->stat[slime].EnemyStat.health = 1.0f;
-        ecsWorld->stat[slime].EnemyStat.startPosition = Vector2Init((f32)x, (f32)y);
-        ecsWorld->stat[slime].EnemyStat.moveRight = !!(slime % 2); //odd ones moves right
-        ecsWorld->stat[slime].EnemyStat.patrolDistance = 50.0f;
+        ecsWorld->states[slime].Enemy.health = 1.0f;
+        ecsWorld->states[slime].Enemy.startPosition = Vector2Init((f32)x, (f32)y);
+        ecsWorld->states[slime].Enemy.moveRight = !!(slime % 2); //odd ones moves right
+        ecsWorld->states[slime].Enemy.patrolDistance = 50.0f;
         
         //physics
         PhysicsComponent physics = {0};
@@ -271,11 +270,11 @@ void LoadFlyee(MicroECSWorld *ecsWorld, GameResource *gameResource, int x, int y
         ecsWorld->animations[flyee].currentAnimationIndex = 1;
         
         //stat
-        ecsWorld->stat[flyee].EnemyStat.health = 1.0f;
-        ecsWorld->stat[flyee].EnemyStat.startPosition = Vector2Init((f32)x, (f32)y);
-        ecsWorld->stat[flyee].EnemyStat.moveRight = !!(flyee % 2); //odd ones moves right
-        ecsWorld->stat[flyee].EnemyStat.patrolDistance = 50.0f;
-        ecsWorld->stat[flyee].EnemyStat.state = PATROL;
+        ecsWorld->states[flyee].Enemy.health = 1.0f;
+        ecsWorld->states[flyee].Enemy.startPosition = Vector2Init((f32)x, (f32)y);
+        ecsWorld->states[flyee].Enemy.moveRight = !!(flyee % 2); //odd ones moves right
+        ecsWorld->states[flyee].Enemy.patrolDistance = 50.0f;
+        ecsWorld->states[flyee].Enemy.state = PATROL;
         
         //physics
         PhysicsComponent physics = {0};
@@ -378,13 +377,61 @@ void LoadCrate(MicroECSWorld *ecsWorld, GameResource *gameResource, int x, int y
         ecsWorld->renders[crate].height = 50;
         
         //physics
-        ecsWorld->physics[crate].physicsBody = CreatePhysicsBody(Vector2Init((f32)x, (f32)y), 2.0f, 50, 50);
+        ecsWorld->physics[crate].physicsBody = CreatePhysicsBody(Vector2Init((f32)x, (f32)y), 10.0f, 50, 50);
         ecsWorld->physics[crate].physicsBody.restitution = 0.0f;
         ecsWorld->physics[crate].physicsBody.friction = 0.1f;
         ecsWorld->physics[crate].excludeEntityTag = ENTITY_TAG_LIZARD | ENTITY_TAG_SLIME | ENTITY_TAG_BULLET;
         ecsWorld->physics[crate].physicsBody.affectedByGravity = true;
         
         ecsWorld->entitySignature[crate] = TRANSFORM_COMPONENT_SIGN |
+            ANIMATION_COMPONENT_SIGN |
+            RENDER_COMPONENT_SIGN |
+            PHYSICS_COMPONENT_SIGN;
+    }
+    else
+    {
+        printf("\nECS world full!!!\n");
+    }
+}
+
+void LoadCaptureFlag(MicroECSWorld *ecsWorld, GameResource *gameResource, int x, int y)
+{
+    Entity flag  = MECS_CreateEntity(ecsWorld, ENTITY_TAG_CAPTURE_FLAG);
+    
+    if (flag < MAX_ENTITY_COUNT)
+    {
+        //transform
+        ecsWorld->transforms[flag]= CreateTransformComponent(Vector2Init((f32)x, (f32)y), Vector2Null(), 0.0f);
+        
+        Animation anim = {
+            .frames = {
+                {64, 16},
+            },
+            .currentFrameIndex = 0,
+            .frameInterval  = 100,
+            .frameCount = 1,
+            .flip = false,
+        };
+        
+        ecsWorld->animations[flag].animations[Idle] = anim;
+        ecsWorld->animations[flag].width = 16;
+        ecsWorld->animations[flag].height = 16;
+        ecsWorld->animations[flag].currentAnimationIndex = Idle;
+        
+        //render
+        ecsWorld->renders[flag].texture = gameResource->itemSprite;
+        ecsWorld->renders[flag].width = 50;
+        ecsWorld->renders[flag].height = 50;
+        
+        //physics
+        ecsWorld->physics[flag].physicsBody = CreatePhysicsBody(Vector2Init((f32)x, (f32)y), 10.0f, 50, 50);
+        ecsWorld->physics[flag].physicsBody.restitution = 0.0f;
+        ecsWorld->physics[flag].physicsBody.friction = 0.1f;
+        ecsWorld->physics[flag].excludeEntityTag = 0xFFFFFFFF & (~ENTITY_TAG_PLATFORM);  //exclude all entity except platform
+
+        ecsWorld->physics[flag].physicsBody.affectedByGravity = true;
+        
+        ecsWorld->entitySignature[flag] = TRANSFORM_COMPONENT_SIGN |
             ANIMATION_COMPONENT_SIGN |
             RENDER_COMPONENT_SIGN |
             PHYSICS_COMPONENT_SIGN;

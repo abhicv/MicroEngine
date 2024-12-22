@@ -7,20 +7,13 @@
 #include "data.h"
 void PlayerInputSystem(InputComponent *input, SDL_Event *event);
 
-void PlayerControlSystem(TransformComponent *transform,
-                         AnimationComponent *animation,
-                         InputComponent *input,
-                         PhysicsComponent *physics,
-                         EntityStatComponent *stat);
+void PlayerControlSystem(TransformComponent *transform, AnimationComponent *animation,
+                         InputComponent *input, PhysicsComponent *physics, EntityStateComponent *stat);
 
-void EnemyPatrolSystem(TransformComponent *transform,
-                       EntityStatComponent *stat,
-                       AnimationComponent *animation,
-                       f32 deltaTime);
+void EnemyPatrolSystem(TransformComponent *transform, EntityStateComponent *stat,
+                       AnimationComponent *animation, f32 deltaTime);
 
-void FiringSystem(MicroECSWorld *ecsWorld,
-                  InputComponent *input,
-                  EntityStatComponent *playerStat,
-                  Vector2 playerPosition);
+void FiringSystem(MicroECSWorld *ecsWorld, InputComponent *input,
+                  u32 playerFacingDirection, Vector2 playerPosition);
 
 #endif //SYSTEM_H

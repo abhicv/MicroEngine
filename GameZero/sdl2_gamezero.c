@@ -4,10 +4,6 @@
 
 #include "sdl2_gamezero.h"
 
-#ifdef __EMSCRIPTEN__
-#include "gamezero.c"
-#endif
-
 int main(int argc, char *argv[])
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -39,7 +35,6 @@ int main(int argc, char *argv[])
         return 1;
     }
     
-    //using software rendering
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     
     if (renderer == NULL)
@@ -56,6 +51,8 @@ int main(int argc, char *argv[])
     u64 performanceFreq = SDL_GetPerformanceFrequency();
     
     bool quitGame = false;
+
+    gameMode = GAME_LOAD_LEVEL;
     
     while(!quitGlobal)
     {
@@ -117,7 +114,7 @@ int main(int argc, char *argv[])
                     deltaTime = (float)elapsed / 1000.0f;
                 }
 #endif
-                //printf("fps: %0.3f\n", 1/deltaTime);
+                // printf("FPS: %0.7f\n", deltaTime);
             }
             break;
             

@@ -14,9 +14,8 @@ bool IsEntityDead(u32 index, MicroECSWorld *world)
 
 u32 MECS_CreateEntity(MicroECSWorld *world, u32 tag)
 {
-    //NOTE(abhicv): finding a dead(inactive) entity index
-    u32 i = 0;
-    for(i = 0; i < world->activeEntityCount; i++)
+    // reusung dead entity index
+    for(u32 i = 0; i < world->activeEntityCount; i++)
     {
         if(IsEntityDead(i, world))
         {
@@ -66,7 +65,7 @@ void AnimationSystem(AnimationComponent *animationComponent)
 
 void PhysicsSystem(MicroECSWorld *ecsWorld, Vector2 gravity ,f32 deltaTime)
 {
-    //NOTE(abhicv): Resetting all physics info
+    // Resetting all physics info
     for(u32 i = 0; i < ecsWorld->activeEntityCount; i++)
     {
         if(MECS_EntitySignatureEquals(ecsWorld->entitySignature[i], PhysicsSystemSignature))
@@ -76,6 +75,7 @@ void PhysicsSystem(MicroECSWorld *ecsWorld, Vector2 gravity ,f32 deltaTime)
             ecsWorld->physics[i].physicsBody.position = ecsWorld->transforms[i].position;
             ecsWorld->physics[i].physicsBody.collisionNormal = Vector2Null();
             ecsWorld->physics[i].collided = false;
+            ecsWorld->physics[i].collisionCount = 0;
             ecsWorld->physics[i].tagOfCollidedEntity = 0;
             ecsWorld->physics[i].isGrounded = false;
         }
@@ -89,41 +89,43 @@ void PhysicsSystem(MicroECSWorld *ecsWorld, Vector2 gravity ,f32 deltaTime)
                MECS_EntitySignatureEquals(ecsWorld->entitySignature[j], PhysicsSystemSignature) &&
                !IsEntityDead(i, ecsWorld) && !IsEntityDead(j, ecsWorld))
             {
-                //NOTE(abhicv): avoiding entity in exclude entity tag
-                if(!MECS_EntitySignatureEquals(ecsWorld->physics[i].excludeEntityTag, ecsWorld->tags[j]) &&
-                   !MECS_EntitySignatureEquals(ecsWorld->physics[j].excludeEntityTag, ecsWorld->tags[i]))
+                CollisionInfo info = DetectCollision(&ecsWorld->physics[i].physicsBody.rect, &ecsWorld->physics[j].physicsBody.rect);
+                                
+                if(info.collided)
                 {
-                    CollisionInfo info = DetectCollision(&ecsWorld->physics[i].physicsBody.rect, &ecsWorld->physics[j].physicsBody.rect);
-                    
-                    /*CollisionInfo info = DetectRectVsRectCollision(&ecsWorld->physics[i].physicsBody.rect, 
-                                                                   &ecsWorld->physics[j].physicsBody.rect, 
-                                                                   &ecsWorld->physics[i].physicsBody.velocity, 
-                                                                   deltaTime);
-                    */
-                    
-                    if(info.collided)
+                    ecsWorld->physics[i].collided = true;
+                    ecsWorld->physics[j].collided = true;
+
+                    if(ecsWorld->physics[i].collisionCount < MAX_COLLISION_COUNT)
                     {
-                        ecsWorld->physics[i].collided = true;
-                        ecsWorld->physics[j].collided = true;
-                        
-                        ecsWorld->physics[i].collidedEntity = j;
-                        ecsWorld->physics[j].collidedEntity = i;
-                        
+                        ecsWorld->physics[i].collidedEntities[ecsWorld->physics[i].collisionCount] = j;
+                        ecsWorld->physics[i].normals[ecsWorld->physics[i].collisionCount] = info.normal;
                         ecsWorld->physics[i].tagOfCollidedEntity |= ecsWorld->tags[j];
+                        ecsWorld->physics[i].collisionCount++;
+                    }
+
+                    if(ecsWorld->physics[j].collisionCount < MAX_COLLISION_COUNT)
+                    {
+                        ecsWorld->physics[j].collidedEntities[ecsWorld->physics[j].collisionCount] = i;
+                        ecsWorld->physics[j].normals[ecsWorld->physics[j].collisionCount] = (Vector2){-info.normal.x, -info.normal.y};
                         ecsWorld->physics[j].tagOfCollidedEntity |= ecsWorld->tags[i];
-                        
-                        ecsWorld->physics[i].physicsBody.collisionNormal = info.normal;
-                        ecsWorld->physics[j].physicsBody.collisionNormal = (Vector2){-info.normal.x, -info.normal.y};
-                        
+                        ecsWorld->physics[j].collisionCount++;
+                    }
+
+                    // ecsWorld->physics[i].physicsBody.collisionNormal = info.normal;
+                    // ecsWorld->physics[j].physicsBody.collisionNormal = (Vector2){-info.normal.x, -info.normal.y};
+
+                    if(!MECS_EntitySignatureEquals(ecsWorld->physics[i].excludeEntityTag, ecsWorld->tags[j]) &&
+                        !MECS_EntitySignatureEquals(ecsWorld->physics[j].excludeEntityTag, ecsWorld->tags[i]))
+                    {
                         ResolveCollision(&ecsWorld->physics[i].physicsBody, &ecsWorld->physics[j].physicsBody, info);
                     }
                 }
             }
-        }
-        
+        }        
     }
     
-    //NOTE(abhicv): Applying all position changes based on physics calculations
+    // Applying all position changes based on physics calculations
     for(u32 i = 0; i < ecsWorld->activeEntityCount; i++)
     {
         if(MECS_EntitySignatureEquals(ecsWorld->entitySignature[i], PhysicsSystemSignature))
@@ -134,10 +136,8 @@ void PhysicsSystem(MicroECSWorld *ecsWorld, Vector2 gravity ,f32 deltaTime)
     }
 }
 
-void RenderSystem(TransformComponent *transformComponent,
-                  AnimationComponent *animationComponent,
-                  RenderComponent *renderComponent,
-                  SDL_Renderer *renderer)
+void RenderSystem(TransformComponent *transformComponent, AnimationComponent *animationComponent,
+                  RenderComponent *renderComponent, SDL_Renderer *renderer)
 {
     
     u32 animationIndex = animationComponent->currentAnimationIndex;
@@ -163,10 +163,8 @@ void RenderSystem(TransformComponent *transformComponent,
     }
 }
 
-//NOTE(abhicv): simple rendering for entity without animation component
-void RenderSystemSimple(TransformComponent *transformComponent,
-                        RenderComponent *renderComponent,
-                        SDL_Renderer *renderer)
+// Simple rendering for entity without animation component
+void RenderSystemSimple(TransformComponent *transformComponent, RenderComponent *renderComponent, SDL_Renderer *renderer)
 {
     SDL_Rect destRect = {0};
     destRect.x = (int)transformComponent->position.x - renderComponent->width / 2;

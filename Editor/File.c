@@ -66,14 +66,13 @@ void WriteTileMapDataToFile(TileMap *tileMap, const char *fileName)
         fprintf(tileMapFile, "sh:%d\n", tileMap->tileSheetTileHeight);
         
         //writing tile data
-        u32 i = 0;
-        for(i = 0; i < tileMap->tileCount; i++)
+        for(u32 n = 0; n < tileMap->tileCount; n++)
         {
             fprintf(tileMapFile, "t:%d,%d,%d,%d\n",
-                    tileMap->tiles[i].tileMapPosX,
-                    tileMap->tiles[i].tileMapPosY,
-                    tileMap->tiles[i].tileSheetPosX,
-                    tileMap->tiles[i].tileSheetPosY);
+                    tileMap->tiles[n].tileMapPosX,
+                    tileMap->tiles[n].tileMapPosY,
+                    tileMap->tiles[n].tileSheetPosX,
+                    tileMap->tiles[n].tileSheetPosY);
         }
         fclose(tileMapFile);
     }

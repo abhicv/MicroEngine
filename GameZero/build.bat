@@ -15,6 +15,6 @@ cl /nologo /Zi /LD ..\GameZero\gamezero.c %sdl2_include% %microengine_src% /link
 rem platform dependent executable
 if exist sdl2_gamezero.c del sdl2_gamezero.c
 
-cl /nologo /Zi ..\GameZero\sdl2_gamezero.c %sdl2_include% /link  /incremental:no /subsystem:console %sdl2_lib% %lflags% gamezero.lib
+cl /nologo /Zi ..\GameZero\sdl2_gamezero.c %sdl2_include% /link /incremental:no /subsystem:console %sdl2_lib% %lflags% gamezero.lib
 
 popd ..\bin

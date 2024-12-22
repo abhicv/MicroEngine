@@ -29,7 +29,7 @@ enum GameMode
     GAME_EXIT,
 };
 
-#define SCREEN_WIDTH 1280
-#define SCREEN_HEIGHT 704
+#define SCREEN_WIDTH 1600
+#define SCREEN_HEIGHT 900
 
 #endif //GAMEZERO_H

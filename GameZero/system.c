@@ -77,12 +77,11 @@ void PlayerInputSystem(InputComponent *input, SDL_Event *event)
     }
 }
 
-#define PLAYER_MAX_SPEED_X 300.0f
-#define PLAYER_JUMP_SPEED 200.0f
-
+#define PLAYER_MAX_SPEED 400.0f
+#define PLAYER_JUMP_SPEED 300.0f
 void PlayerControlSystem(TransformComponent *transform, AnimationComponent *animation,
                          InputComponent *input, PhysicsComponent *physics,
-                         EntityStatComponent *stat)
+                         EntityStateComponent *state)
 {
     if(physics->isGrounded)
     {
@@ -109,8 +108,8 @@ void PlayerControlSystem(TransformComponent *transform, AnimationComponent *anim
         
         animation->animations[Walking].flip = true;
         
-        stat->PlayerStat.facingDir = Left;
-        physics->physicsBody.velocity.x = -PLAYER_MAX_SPEED_X;
+        state->Player.facingDir = Left;
+        physics->physicsBody.velocity.x = -PLAYER_MAX_SPEED;
     }
     
     if(input->rightKeyDown)
@@ -127,11 +126,11 @@ void PlayerControlSystem(TransformComponent *transform, AnimationComponent *anim
         
         animation->animations[Walking].flip = false;
         
-        stat->PlayerStat.facingDir = Right;
-        physics->physicsBody.velocity.x = PLAYER_MAX_SPEED_X;
+        state->Player.facingDir = Right;
+        physics->physicsBody.velocity.x = PLAYER_MAX_SPEED;
     }
     
-    if(input->jumpKeyDown)
+    if(input->jumpKeyDown && physics->isGrounded)
     {
         physics->physicsBody.velocity.y = -PLAYER_JUMP_SPEED;
     }
@@ -144,23 +143,22 @@ void PlayerControlSystem(TransformComponent *transform, AnimationComponent *anim
 }
 
 void EnemyPatrolSystem(TransformComponent *transform,
-                       EntityStatComponent *stat,
+                       EntityStateComponent *state,
                        AnimationComponent *animation,
                        f32 deltaTime)
 {
     animation->currentAnimationIndex = Walking;
     
-    if(transform->position.x > (stat->EnemyStat.startPosition.x + stat->EnemyStat.patrolDistance))
+    if(transform->position.x > (state->Enemy.startPosition.x + state->Enemy.patrolDistance))
     {
-        stat->EnemyStat.moveRight = false;
+        state->Enemy.moveRight = false;
+    }
+    else if(transform->position.x < (state->Enemy.startPosition.x - state->Enemy.patrolDistance))
+    {
+        state->Enemy.moveRight = true;
     }
     
-    if(transform->position.x < (stat->EnemyStat.startPosition.x - stat->EnemyStat.patrolDistance))
-    {
-        stat->EnemyStat.moveRight = true;
-    }
-    
-    if(stat->EnemyStat.moveRight)
+    if(state->Enemy.moveRight)
     {
         transform->position.x += 100.0f * deltaTime;
         animation->animations[Walking].flip = false;
@@ -170,15 +168,13 @@ void EnemyPatrolSystem(TransformComponent *transform,
         transform->position.x += -100.0f * deltaTime;
         animation->animations[Walking].flip = true;
     }
-    
-    //transform->position.y += (sinf(SDL_GetTicks() / 100.0f));
 }
 
 #define ENEMY_BULLET_SPEED 300.0f
 #define ENEMT_CHASE_SPEED 100.0f
 #define SQUARE(x) x*x
 
-void FlyeeAISystem(MicroECSWorld *ecsWorld, EntityStatComponent *stat,
+void FlyeeAISystem(MicroECSWorld *ecsWorld, EntityStateComponent *state,
                    TransformComponent *transform, AnimationComponent *animation,
                    Vector2 playerPosition, f32 deltaTime)
 {
@@ -186,32 +182,31 @@ void FlyeeAISystem(MicroECSWorld *ecsWorld, EntityStatComponent *stat,
     f32 distanceSqr = Vector2SqrMag(dirVec);
     
     //simple Finite State Machine logic for enemy AI
-    stat->EnemyStat.state = PATROL;
+    state->Enemy.state = PATROL;
     
     if (distanceSqr < SQUARE(300.0f))
     {
-        stat->EnemyStat.state = CHASE;
+        state->Enemy.state = CHASE;
     }
     if (distanceSqr < SQUARE(200.0f))
     {
-        stat->EnemyStat.shootDelay += deltaTime;
-        stat->EnemyStat.state = SHOOT;
+        state->Enemy.shootDelay += deltaTime;
+        state->Enemy.state = SHOOT;
     }
     
     Vector2Normalize(&dirVec);
     
-    if (stat->EnemyStat.state == CHASE)
+    if (state->Enemy.state == CHASE)
     {
         transform->position.x = transform->position.x + (ENEMT_CHASE_SPEED * dirVec.x * deltaTime);
         transform->position.y = transform->position.y + (ENEMT_CHASE_SPEED * dirVec.y * deltaTime);
         
         animation->animations[Walking].flip = (dirVec.x < 0.0f) ? true : false;
     }
-    else if (stat->EnemyStat.state == SHOOT && stat->EnemyStat.shootDelay > 1.0f)
+    else if (state->Enemy.state == SHOOT && state->Enemy.shootDelay > 1.0f)
     {
-        stat->EnemyStat.shootDelay = 0.0f;
+        state->Enemy.shootDelay = 0.0f;
         
-        //spawning a new bullet entity
         Entity bullet = MECS_CreateEntity(ecsWorld, ENTITY_TAG_ENEMY_BULLET);
         if (ENTITY_INDEX_VALID(bullet))
         {
@@ -257,7 +252,7 @@ void FlyeeAISystem(MicroECSWorld *ecsWorld, EntityStatComponent *stat,
                 ENTITYSTAT_COMPONENT_SIGN |
                 PHYSICS_COMPONENT_SIGN;
             
-            ecsWorld->stat[bullet].BulletStat.startPosition = transform->position;
+            ecsWorld->states[bullet].Bullet.startPosition = transform->position;
             
             ecsWorld->physics[bullet].physicsBody.velocity.x = ENEMY_BULLET_SPEED * dirVec.x;
             ecsWorld->physics[bullet].physicsBody.velocity.y = ENEMY_BULLET_SPEED * dirVec.y;
@@ -266,10 +261,8 @@ void FlyeeAISystem(MicroECSWorld *ecsWorld, EntityStatComponent *stat,
 }
 
 #define BULLET_SPEED 500
-void FiringSystem(MicroECSWorld *ecsWorld,
-                  InputComponent *input,
-                  EntityStatComponent *playerStat,
-                  Vector2 playerPosition)
+void FiringSystem(MicroECSWorld *ecsWorld, InputComponent *input,
+                  u32 playerFacingDirection, Vector2 playerPosition)
 {
     TransformComponent transform = {0};
     PhysicsComponent physics = {0};
@@ -287,7 +280,7 @@ void FiringSystem(MicroECSWorld *ecsWorld,
         .flip = false,
     };
     
-    bulletAnim.flip = (playerStat->PlayerStat.facingDir == Right) ? false : true;
+    bulletAnim.flip = (playerFacingDirection == Right) ? false : true;
     
     AnimationComponent anim = {
         .animations = {0},
@@ -325,17 +318,8 @@ void FiringSystem(MicroECSWorld *ecsWorld,
             ecsWorld->physics[bullet] = physics;
             ecsWorld->renders[bullet] = render;
             
-            ecsWorld->stat[bullet].BulletStat.startPosition = transform.position;
-            
-            if(playerStat->PlayerStat.facingDir == Left)
-            {
-                ecsWorld->physics[bullet].physicsBody.velocity.x = -BULLET_SPEED;
-            }
-            
-            if(playerStat->PlayerStat.facingDir == Right)
-            {
-                ecsWorld->physics[bullet].physicsBody.velocity.x = BULLET_SPEED;
-            }
+            ecsWorld->states[bullet].Bullet.startPosition = transform.position;
+            ecsWorld->physics[bullet].physicsBody.velocity.x = (playerFacingDirection == Left) ? -BULLET_SPEED : BULLET_SPEED;
         }
         else
         {
