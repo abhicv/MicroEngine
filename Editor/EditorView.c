@@ -24,6 +24,12 @@ global u8 tileMapFileName[MAX_FILE_NAME_SIZE] = "tmp.tmap";
 global u8 collisionMapFileName[MAX_FILE_NAME_SIZE] = "tmp.cmap";
 global u8 entityMapFileName[MAX_FILE_NAME_SIZE] = "tmp.emap";
 
+global bool isMiddleMouseButtonDown = false;
+global SDL_Point editorSpaceOrigin = {0, 0};
+
+bool enableTileMapGridLines = true;
+bool enabledCollisionBoxPreview = true;
+
 void InitializeEditorData(SDL_Renderer *renderer, u32 displayWidth)
 {
     tileMapCursor.x = 0;
@@ -107,7 +113,7 @@ char *EntityTagToString(u32 tag)
         break;
         
         case ENTITY_TAG_FLYEE:
-        tagString = "FYLYEE";
+        tagString = "FLYEE";
         break;
         
         case ENTITY_TAG_COIN:
@@ -167,6 +173,7 @@ void CursorMovementControl(SDL_Rect *cursor, u32 deltaStep, SDL_Event *event)
 
 void CursorSizeControl(SDL_Rect *cursor, u32 deltaSize, SDL_Event *event)
 {
+
     switch (event->type)
     {
         case SDL_KEYDOWN:
@@ -221,18 +228,31 @@ void PlaceTile()
     }
 }
 
-void EditorHandleEvent(SDL_Event *event, MUI ui, MUI_Input *uiInput)
+void EditorHandleEvent(SDL_Event *event, MUI ui, MUI_Input *uiInput, f32 *zoom)
 {
     MUI_GetInput(uiInput, event);
-    
+
+    bool cursorIsInsideEditorSpace = false;
+
+    if(uiInput->mouseX > editorSpaceOrigin.x &&
+        uiInput->mouseY > editorSpaceOrigin.y &&
+        uiInput->mouseX < (editorSpaceOrigin.x + (tileMap.tileMapWidth * tileMap.tileWidth * (*zoom))) && 
+        uiInput->mouseY < (editorSpaceOrigin.y + (tileMap.tileMapHeight * tileMap.tileHeight * (*zoom))))
+    {
+        u32 column = (u32)(uiInput->mouseX - editorSpaceOrigin.x) / (tileMap.tileWidth * (*zoom));
+        u32 row = (u32)(uiInput->mouseY - editorSpaceOrigin.y) / (tileMap.tileHeight * (*zoom));
+        activeCursor->x = (column * tileMap.tileWidth);
+        activeCursor->y = (row * tileMap.tileHeight);
+        cursorIsInsideEditorSpace = true;
+    }
+
     switch(editorMode)
     {
         case EDITOR_MODE_TILE:
         {
             activeCursor = &tileMapCursor;
-            CursorSizeControl(&tileMapCursor, tileMap.tileWidth, event);
-
-            if(uiInput->leftMouseButtonDown && MUI_IdEqual(ui.hotWidgetId, MUI_NullId()))
+            CursorSizeControl(activeCursor, tileMap.tileWidth, event);
+            if(uiInput->leftMouseButtonDown && MUI_IdEqual(ui.hotWidgetId, MUI_NullId()) && cursorIsInsideEditorSpace)
             {
                 PlaceTile();
             }            
@@ -262,16 +282,9 @@ void EditorHandleEvent(SDL_Event *event, MUI ui, MUI_Input *uiInput)
         {
             activeCursor = &deleteCursor;
             CursorSizeControl(&deleteCursor, tileMap.tileWidth, event);
-        }
-        
+        }        
         break;
     }
-
-    u32 column = (u32)uiInput->mouseX / tileMap.tileWidth;
-    u32 row = (u32)uiInput->mouseY / tileMap.tileHeight;
-
-    activeCursor->x = column * tileMap.tileWidth;
-    activeCursor->y = row * tileMap.tileHeight;
 
     switch (event->type)
     {
@@ -366,22 +379,60 @@ void EditorHandleEvent(SDL_Event *event, MUI ui, MUI_Input *uiInput)
             break;
         }
         break;
+
+        case SDL_MOUSEWHEEL:
+        {
+            if(event->wheel.y > 0 && (*zoom) > 0.2f) { 
+                (*zoom) -= 0.1f;
+            }
+
+            if(event->wheel.y < 0 && (*zoom) < 1.5f) {
+                (*zoom) += 0.1f;
+            }
+        }
+        break;
+
+        case SDL_MOUSEBUTTONDOWN:
+        {
+            if(event->button.button == SDL_BUTTON_MIDDLE) {
+                isMiddleMouseButtonDown = true;
+            }
+        }
+        break;
+
+        case SDL_MOUSEBUTTONUP:
+        {
+            if(event->button.button == SDL_BUTTON_MIDDLE) {
+                isMiddleMouseButtonDown = false;
+            }
+        }
+        break;
+
+        case SDL_MOUSEMOTION:
+        {
+            if(isMiddleMouseButtonDown) {
+                // printf("Panning: %d, %d\n", event->motion.xrel, event->motion.yrel);
+                editorSpaceOrigin.x += event->motion.xrel * 0.8f;
+                editorSpaceOrigin.y += event->motion.yrel * 0.8f;
+            }
+        }
+        break;
     }
 }
 
-void EditorUpdateAndRender(SDL_Renderer *renderer, MUI ui, MUI_Input uiInput)
+void EditorUpdateAndRender(SDL_Renderer *renderer, MUI *ui, MUI_Input uiInput, f32 zoom)
 {
-    MUI_BeginFrame(&ui, &uiInput);
+    MUI_BeginFrame(ui, &uiInput);
     
-    // entity name text ui
+    // entity name text label
     for(u32 i = 0; i < entitySpace.entityCount; i++)
     {
         MUI_Rect rect = {0};
         rect.width = entitySpace.entityCursor.w;
         rect.height = entitySpace.entityCursor.h;
-        rect.x = entitySpace.entityPositions[i].x - rect.width / 2;
-        rect.y = (entitySpace.entityPositions[i].y - rect.height - 10);
-        MUI_Text(&ui, GEN_MUI_IDi(i), rect, EntityTagToString(entitySpace.entityTag[i]), 18, textStyle, MUI_TEXT_ALIGN_MIDDLE);
+        rect.x = editorSpaceOrigin.x + (entitySpace.entityPositions[i].x - rect.width / 2) * zoom;
+        rect.y = editorSpaceOrigin.y + (entitySpace.entityPositions[i].y - rect.height - 10) * zoom;
+        MUI_Text(ui, GEN_MUI_IDi(i), rect, EntityTagToString(entitySpace.entityTag[i]), 20 * zoom, textStyle, MUI_TEXT_ALIGN_MIDDLE);
     }
     
     // checking for collision rects mouse over
@@ -398,29 +449,46 @@ void EditorUpdateAndRender(SDL_Renderer *renderer, MUI ui, MUI_Input uiInput)
         }
     }
     
-    const displayWidth = 1600;
-    MUI_Rect rect = {displayWidth - 220, 500, 200, 40};
-    MUI_PushColumnLayout(&ui, rect, 8);
+    MUI_Rect rect = {5, 5, 200, 40};
+    MUI_PushColumnLayout(ui, rect, 8, 8, true);
+    // MUI_PushRowLayout(ui, rect, 2, 4, true);
     {
-        MUI_TextA(&ui, GEN_MUI_ID(), EntityTagToString(entitySpace.currentEntityTag), 20, textStyle, MUI_TEXT_ALIGN_MIDDLE);
-        MUI_TextA(&ui, GEN_MUI_ID(), EditModeToString(editorMode), 20, textStyle, MUI_TEXT_ALIGN_MIDDLE);
+        char zoomText[100] = {0};
+        sprintf(zoomText, "ZOOM: %0.1fx\0", zoom);
+        MUI_TextA(ui, GEN_MUI_ID(), zoomText, 20, textStyle, MUI_TEXT_ALIGN_LEFT);
+        MUI_TextA(ui, GEN_MUI_ID(), EditModeToString(editorMode), 20, textStyle, MUI_TEXT_ALIGN_LEFT);
         
-        if(MUI_ButtonA(&ui, GEN_MUI_ID(), "tilemap", buttonStyle))
+        if(MUI_ButtonA(ui, GEN_MUI_ID(), "tilemap", buttonStyle))
         {
             editorMode = EDITOR_MODE_TILE;
         }
-        
-        if(MUI_ButtonA(&ui, GEN_MUI_ID(), "collision box", buttonStyle))
+            
+        MUI_ToogleButtonA(ui, GEN_MUI_ID(), "show grid", buttonStyle, &enableTileMapGridLines);
+
+        if(MUI_ButtonA(ui, GEN_MUI_ID(), "collision", buttonStyle))
         {
             editorMode = EDITOR_MODE_COLLISION_RECT;
         }
         
-        if(MUI_ButtonA(&ui, GEN_MUI_ID(), "entity", buttonStyle))
+        MUI_ToogleButtonA(ui, GEN_MUI_ID(), "show boxes", buttonStyle, &enabledCollisionBoxPreview);
+
+        if(MUI_ButtonA(ui, GEN_MUI_ID(), "entity", buttonStyle))
         {
             editorMode = EDITOR_MODE_ENTITY;
         }
+
+        if(editorMode == EDITOR_MODE_ENTITY) {
+            MUI_TextA(ui, GEN_MUI_ID(), EntityTagToString(entitySpace.currentEntityTag), 20, textStyle, MUI_TEXT_ALIGN_LEFT);
+            for(int n = 0; n < 6; n++) {
+                u32 entityTag = 1 << n;
+                char *entityName = EntityTagToString(entityTag);
+                if(MUI_ButtonA(ui, GEN_MUI_IDi(n), entityName, entityButtonStyle)) {
+                    entitySpace.currentEntityTag = entityTag;
+                }
+            }
+        }
         
-        if(MUI_ButtonA(&ui, GEN_MUI_ID(), "save file", buttonStyle))
+        if(MUI_ButtonA(ui, GEN_MUI_ID(), "save file", buttonStyle))
         {
             WriteTileMapDataToFile(&tileMap, tileMapFileName);
             WriteCollisionDataToFile(&collisionSpace, collisionMapFileName);
@@ -428,24 +496,35 @@ void EditorUpdateAndRender(SDL_Renderer *renderer, MUI ui, MUI_Input uiInput)
             printf("Data written to files %s, %s, and %s\n", tileMapFileName, collisionMapFileName, entityMapFileName);
         }
     }
-    MUI_PopLayout(&ui);
+    MUI_PopLayout(ui);
     
-    ME_RenderTileMap(&tileMap, renderer);
-    RenderEditorSpace(renderer, tileMapCursor, tileMap, tileSheetDisplay);
-    RenderTileSheetDisplay(&tileSheetDisplay, renderer);
-    RenderCollisionSpace(&collisionSpace, renderer);
-    RenderEntitySpace(&entitySpace, renderer);
+    RenderTileMap(tileMap, renderer, zoom, editorSpaceOrigin);
+
+    bool drawCursorPreview = editorMode == EDITOR_MODE_TILE;
+    RenderEditorSpace(renderer, tileMapCursor, tileMap, tileSheetDisplay, zoom, editorSpaceOrigin, enableTileMapGridLines, drawCursorPreview);
+
+    RenderTileSheetDisplay(tileSheetDisplay, renderer);
+    RenderCollisionSpace(collisionSpace, renderer, zoom, editorSpaceOrigin, enabledCollisionBoxPreview);
+    RenderEntitySpace(entitySpace, renderer, zoom, editorSpaceOrigin);
 
     // drawing cursor
-    ME_RenderDrawRect(renderer, activeCursor, (SDL_Color){255, 255, 255, 255});
+    {
+        SDL_Rect rect = {
+            .x = (activeCursor->x * zoom) + editorSpaceOrigin.x,
+            .y = (activeCursor->y * zoom) + editorSpaceOrigin.y,
+            .w = activeCursor->w * zoom,
+            .h = activeCursor->h * zoom,
+        };
+        ME_RenderDrawRect(renderer, &rect, (SDL_Color){255, 255, 255, 255});
+    }
 
     if(disableEditorUI) 
     {
-        ui.hotWidgetId = MUI_NullId();
-        ui.activeWidgetId = MUI_NullId();
+        ui->hotWidgetId = MUI_NullId();
+        ui->activeWidgetId = MUI_NullId();
     }
 
-    MUI_EndFrame(&ui, renderer);
+    MUI_EndFrame(ui, renderer);
 }
 
 void EditorLoop(SDL_Renderer *renderer, u32 *appMode)
@@ -458,6 +537,8 @@ void EditorLoop(SDL_Renderer *renderer, u32 *appMode)
     ui.fontFile = "assets/Font/OCRAEXT.ttf";
 
     MUI_Input uiInput = {0};
+
+    f32 zoom = 0.8f;
 
     while(!quit)
     {
@@ -476,22 +557,27 @@ void EditorLoop(SDL_Renderer *renderer, u32 *appMode)
                     quit = true;
                     (*appMode) = APP_MODE_QUIT;
                 }
-                else if (event.key.keysym.sym == SDLK_r)
+                break;
+
+                case SDL_KEYUP:
                 {
-                    WriteTileMapDataToFile(&tileMap, "tmp.tmap");
-                    WriteCollisionDataToFile(&collisionSpace, "tmp.cmap");
-                    WriteEntityDataToFile(&entitySpace, "tmp.emap");
-                    (*appMode) = APP_MODE_GAME_TEST;
-                    quit = true;
+                    if (event.key.keysym.sym == SDLK_r)
+                    {
+                        WriteTileMapDataToFile(&tileMap, "tmp.tmap");
+                        WriteCollisionDataToFile(&collisionSpace, "tmp.cmap");
+                        WriteEntityDataToFile(&entitySpace, "tmp.emap");
+                        (*appMode) = APP_MODE_GAME_TEST;
+                        quit = true;
+                    }
                 }
                 break;
             }
-            EditorHandleEvent(&event, ui, &uiInput);
+            EditorHandleEvent(&event, ui, &uiInput, &zoom);
         }
         
         SDL_SetRenderDrawColor(renderer, 18, 18, 18, 0);
         SDL_RenderClear(renderer);
-        EditorUpdateAndRender(renderer, ui, uiInput);
+        EditorUpdateAndRender(renderer, &ui, uiInput, zoom);
         SDL_RenderPresent(renderer);
     }
 }

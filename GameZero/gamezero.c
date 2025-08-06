@@ -72,7 +72,7 @@ void ShowMainMenu(u32 *gameMode, SDL_Event *event, SDL_Renderer *renderer)
         
         // menu buttons
         MUI_Rect rect = ME_RectInit(40, 300, 200, 50);
-        MUI_PushColumnLayout(&ui, rect, 15);
+        MUI_PushColumnLayout(&ui, rect, 15, 0, false);
         {
             if(MUI_ButtonA(&ui, GEN_MUI_ID(), "Start", buttonStyle))
             {

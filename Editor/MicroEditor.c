@@ -78,7 +78,7 @@ void MainMenuLoop(SDL_Renderer *renderer, u32 *appMode)
         
         MUI_BeginFrame(&ui, &uiInput);
         
-        MUI_PushColumnLayout(&ui, (MUI_Rect){10, 10, 250, 35}, 10);
+        MUI_PushColumnLayout(&ui, (MUI_Rect){10, 10, 250, 35}, 10, 0, false);
         {
             if(mode == MENU_MODE)
             {
@@ -102,7 +102,7 @@ void MainMenuLoop(SDL_Renderer *renderer, u32 *appMode)
             
             if(mode == CREATE_LEVEL_MODE)
             {
-                MUI_PushRowLayout(&ui, MUI_GetNextAutoLayoutRect(&ui), 15);
+                MUI_PushRowLayout(&ui, MUI_GetNextAutoLayoutRect(&ui), 15, 0, false);
                 
                 MUI_TextA(&ui, GEN_MUI_ID(), "Map Width:", 20, textStyle, MUI_TEXT_ALIGN_RIGHT);
                 MUI_TextEditA(&ui, GEN_MUI_ID(), buttonStyle, &tileMapWidthText);
@@ -112,7 +112,7 @@ void MainMenuLoop(SDL_Renderer *renderer, u32 *appMode)
                 
                 MUI_PopLayout(&ui);
                 
-                MUI_PushRowLayout(&ui, MUI_GetNextAutoLayoutRect(&ui), 15);
+                MUI_PushRowLayout(&ui, MUI_GetNextAutoLayoutRect(&ui), 15, 0, false);
                 
                 MUI_TextA(&ui, GEN_MUI_ID(), "Tile Width:", 20, textStyle, MUI_TEXT_ALIGN_RIGHT);
                 MUI_TextEditA(&ui, GEN_MUI_ID(), buttonStyle, &tileWidthText);
@@ -122,7 +122,7 @@ void MainMenuLoop(SDL_Renderer *renderer, u32 *appMode)
                 
                 MUI_PopLayout(&ui);
                 
-                MUI_PushRowLayout(&ui, MUI_GetNextAutoLayoutRect(&ui), 15);
+                MUI_PushRowLayout(&ui, MUI_GetNextAutoLayoutRect(&ui), 15, 0, false);
                 
                 MUI_TextA(&ui, GEN_MUI_ID(), "Sheet Tile Width:", 20, textStyle, MUI_TEXT_ALIGN_RIGHT);
                 MUI_TextEditA(&ui, GEN_MUI_ID(), buttonStyle, &tileSheetTileWidthText);
@@ -132,7 +132,7 @@ void MainMenuLoop(SDL_Renderer *renderer, u32 *appMode)
                 
                 MUI_PopLayout(&ui);
                 
-                MUI_PushRowLayout(&ui, MUI_GetNextAutoLayoutRect(&ui), 15);
+                MUI_PushRowLayout(&ui, MUI_GetNextAutoLayoutRect(&ui), 15, 0, false);
                 
                 if(MUI_ButtonA(&ui, GEN_MUI_ID(), "back", buttonStyle))
                 {
@@ -160,7 +160,7 @@ void MainMenuLoop(SDL_Renderer *renderer, u32 *appMode)
             }
             else if(mode == LOAD_LEVEL_MODE)
             {
-                MUI_PushRowLayout(&ui, MUI_GetNextAutoLayoutRect(&ui), 10);
+                MUI_PushRowLayout(&ui, MUI_GetNextAutoLayoutRect(&ui), 10, 0, false);
                 
                 MUI_TextA(&ui, GEN_MUI_ID(), "tile map:", 20, textStyle, MUI_TEXT_ALIGN_RIGHT);
                 MUI_Rect r = MUI_GetNextAutoLayoutRect(&ui);
@@ -169,7 +169,7 @@ void MainMenuLoop(SDL_Renderer *renderer, u32 *appMode)
                 
                 MUI_PopLayout(&ui);
                 
-                MUI_PushRowLayout(&ui, MUI_GetNextAutoLayoutRect(&ui), 10);
+                MUI_PushRowLayout(&ui, MUI_GetNextAutoLayoutRect(&ui), 10, 0, false);
                 
                 MUI_TextA(&ui, GEN_MUI_ID(), "collision map:", 20, textStyle, MUI_TEXT_ALIGN_RIGHT);
                 r = MUI_GetNextAutoLayoutRect(&ui);
@@ -178,7 +178,7 @@ void MainMenuLoop(SDL_Renderer *renderer, u32 *appMode)
                 
                 MUI_PopLayout(&ui);
                 
-                MUI_PushRowLayout(&ui, MUI_GetNextAutoLayoutRect(&ui), 10);
+                MUI_PushRowLayout(&ui, MUI_GetNextAutoLayoutRect(&ui), 10, 0, false);
                 
                 MUI_TextA(&ui, GEN_MUI_ID(), "entity map:", 20, textStyle, MUI_TEXT_ALIGN_RIGHT);
                 r = MUI_GetNextAutoLayoutRect(&ui);
@@ -187,7 +187,7 @@ void MainMenuLoop(SDL_Renderer *renderer, u32 *appMode)
                 
                 MUI_PopLayout(&ui);
                 
-                MUI_PushRowLayout(&ui, MUI_GetNextAutoLayoutRect(&ui), 10);
+                MUI_PushRowLayout(&ui, MUI_GetNextAutoLayoutRect(&ui), 10, 0, false);
                 
                 if(MUI_ButtonA(&ui, GEN_MUI_ID(), "back", buttonStyle))
                 {

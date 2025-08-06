@@ -11,21 +11,23 @@ typedef ME_Rect MUI_Rect;
 #define OPENSANS_FONT_FILE "assets/Font/OpenSans-Regular.ttf"
 #define AGOESTOESAN_FONT_FILE "assets/Font/agoestoesan.ttf"
 
-enum
+enum WidgetType
 {
-    MUI_WIDGET_BUTTON,
+    MUI_WIDGET_BUTTON = 0,
+    MUI_WIDGET_TOGGLE_BUTTON,
     MUI_WIDGET_SLIDER,
     MUI_WIDGET_TEXT,
     MUI_WIDGET_ICON_TEXT,
-    MUI_WIDGET_COUNT,
     MUI_WIDGET_TEXTEDIT,
+    MUI_WIDGET_PANEL,
+    MUI_WIDGET_COUNT,
 };
 
-enum 
+enum TextAlignment
 {
     MUI_TEXT_ALIGN_LEFT = 0,
-    MUI_TEXT_ALIGN_MIDDLE = 1,
-    MUI_TEXT_ALIGN_RIGHT = 2,
+    MUI_TEXT_ALIGN_MIDDLE,
+    MUI_TEXT_ALIGN_RIGHT,
 };
 
 typedef struct Color
@@ -53,14 +55,12 @@ typedef struct MUI_Style
         struct SliderStyle
         {
             Color sliderColor;
-            Color bgColor;
-            
+            Color bgColor;            
         } sliderStyle;
         
         struct TextStyle
         {
             Color textColor;
-            
         } textStyle;
     };
     
@@ -103,6 +103,10 @@ typedef struct MUI_Widget
             u32 fontSize;
             u32 alignType;
         } text;
+
+        struct Toggle {
+            bool isChecked;
+        } toggle;        
     };
     
 } MUI_Widget;
@@ -140,14 +144,15 @@ typedef struct MUI
     
     MUI_Widget widgets[MUI_MAX_WIDGETS];
     
-    u32 autoLayOutIndex;
+    i32 autoLayOutIndex;
     struct AutoLayOutGroup
     {
         MUI_Rect rect;
         u32 progress;
         bool isColumn;
-        u32 offset;
-        
+        u32 gap;
+        i32 indexInWidgetList;
+        u32 padding;
     } autoLayOutGroup[MUI_MAX_AUTOLAYOUT_SIZE];
     
     char *fontFile;
@@ -168,11 +173,14 @@ void MUI_TextA(MUI *ui, MUI_Id id, char *text, u32 fontSize, MUI_Style style, u3
 bool MUI_Button(MUI *ui, MUI_Id id, char *text, MUI_Rect rect, MUI_Style style);
 bool MUI_ButtonA(MUI *ui, MUI_Id id, char *text, MUI_Style style);
 
+void MUI_ToogleButtonA(MUI *ui, MUI_Id id, char *text, MUI_Style style, bool *isChecked);
+void MUI_ToogleButton(MUI *ui, MUI_Id id, char *text, MUI_Rect rect, MUI_Style style, bool *isChecked);
+
 f32 MUI_Slider(MUI *ui, MUI_Id id, f32 value, MUI_Rect rect, MUI_Style style);
 f32 MUI_SliderA(MUI *ui, MUI_Id id, f32 value, MUI_Style style);
 
-void MUI_PushColumnLayout(MUI *ui, MUI_Rect rect, u32 offset);
-void MUI_PushRowLayout(MUI *ui, MUI_Rect rect, u32 offset);
+void MUI_PushColumnLayout(MUI *ui, MUI_Rect rect, u32 offset, u32 padding, bool drawPanel);
+void MUI_PushRowLayout(MUI *ui, MUI_Rect rect, u32 offset, u32 padding, bool drawPanel);
 void MUI_PopLayout(MUI *ui);
 MUI_Rect MUI_GetNextAutoLayoutRect(MUI *ui);
 

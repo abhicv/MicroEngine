@@ -13,6 +13,16 @@ MUI_Style buttonStyle = {
     },
 };
 
+MUI_Style entityButtonStyle = {
+    .buttonStyle = {
+        .idleColor = {18, 150, 0},
+        .highlightColor = {12, 100, 0},
+        .textColor = {255, 255, 255},
+        .fontSize  = 20,
+        .enableHighlightBorder = false,
+    },
+};
+
 MUI_Style textOnlybuttonStyle = {
     .buttonStyle = {
         .idleColor = {18, 18, 18},
